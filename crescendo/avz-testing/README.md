@@ -1,6 +1,6 @@
 # AvZ Testing 测试框架 220605
 
-![GitHub](https://badgen.net/badge/GitHub/avz_testing/cyan?icon=github)
+[![GitHub](https://badgen.net/badge/GitHub/avz_testing/cyan?icon=github)](https://github.com/Rottenham/avz-testing)
 
 ## 运行环境
 
