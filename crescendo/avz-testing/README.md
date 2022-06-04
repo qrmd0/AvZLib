@@ -9,7 +9,7 @@
 ## 使用方法
 将 avz_testing.h 与 avz_logger.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
-需在Script()外添加:
+需在 Script() 外添加:
 ```c++
 #include "avz_testing.h"
 #include "avz_logger.h"

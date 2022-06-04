@@ -7,7 +7,7 @@
 ## 使用方法
 将 avz_more.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
-需在Script()外添加:
+需在 Script() 外添加:
 ```c++
 #include "avz_more.h"
 using namespace cresc;
