@@ -2,13 +2,17 @@
  * @Author: crescendo
  * @Date: 2022-05-28 08:45:31
  * @Last Modified by: crescendo
- * @Last Modified time: 2022-05-29 17:30:26
+ * @Last Modified time: 2022-06-04 19:59:16
  *  __AVZ_VERSION__ == 220213
  * AvZ 日志输出工具
  */
 
-/*使用示例：
-AZL::Logger Log("C:\MyFolder");
+/*
+使用说明：
+1. 将本文件置于AvZ目录inc文件夹下
+
+使用示例：
+cresc::Logger Log("C:\MyFolder");
 void Script() {
     Log.log("hello, #", "world");
     SetTime(0, 1);
@@ -21,10 +25,10 @@ void Script() {
 #include <fstream>
 
 #ifndef __AZL_VERSION__
-#define __AZL_VERSION__ 220601
+#define __AZL_VERSION__ 220605
 #endif
 
-namespace AZL
+namespace cresc
 {
     void Utf8ToGbk(std::string &strUTF8)
     {
@@ -200,4 +204,4 @@ namespace AZL
     protected:
         std::ofstream ofile;
     };
-} // namespace AZL
+} // namespace cresc

@@ -2,9 +2,15 @@
  * @Author: crescendo
  * @Date: 2022-05-28 08:45:31
  * @Last Modified by: crescendo
- * @Last Modified time: 2022-06-03 19:17:26
+ * @Last Modified time: 2022-06-04 19:57:50
  *  __AVZ_VERSION__ == 220213
  */
+
+/*
+使用说明：
+1. 将本文件置于AvZ目录inc文件夹下
+2. 在Script()函数外添加 using namespace cresc;
+*/
 
 #pragma once
 #include "libavz.h"
@@ -13,7 +19,7 @@
 #define __AZT_VERSION__ 220605
 #endif
 
-namespace AZT
+namespace cresc
 {
     struct ZombieRowInfo
     {
@@ -777,7 +783,7 @@ namespace AZT
         return nullptr;
     }
 
-} // namespace AZT
+} // namespace cresc
 
 /*
 getDefenseRange and judgeExplode are taken from 炸率测试-v1.0rc2.cpp with the
