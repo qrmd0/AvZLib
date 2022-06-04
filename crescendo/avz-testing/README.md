@@ -9,7 +9,12 @@
 ## 使用方法
 将 avz_testing.h 与 avz_logger.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
-> 需在 Script() 函数前添加 “using namespace cresc;”
+需在Script()外添加:
+```c++
+#include "avz_testing.h"
+#include "avz_logger.h"
+using namespace cresc;
+```
 
 运行完毕后，会跳出弹窗，展示统计信息。
 
