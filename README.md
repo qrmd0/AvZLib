@@ -1,2 +1,2 @@
 # AvZLib
-Public repository of AsmVsZombies
+public repository of AsmVsZombies
