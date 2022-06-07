@@ -2,7 +2,7 @@
  * @Author: crescendo
  * @Date: 2021-10-12 13:19:26
  * @Last Modified by: crescendo
- * @Last Modified time: 2022-06-04 19:48:40
+ * @Last Modified time: 2022-06-06 11:52:18
  *  __AVZ_VERSION__ == 220213
  * 各种AvZ附加功能
  */
@@ -17,7 +17,7 @@
 #include "libavz.h"
 
 #ifndef __AZM_VERSION__
-#define __AZM_VERSION__ 220605
+#define __AZM_VERSION__ 220607
 #endif
 
 using namespace AvZ;
@@ -219,167 +219,7 @@ namespace cresc
                         } },
                         "RecoverSafeCard");
     }
-
-    // 对炮操作目标进行分类
-    // ALL - 全场
-    // UPPER - 上半场
-    // LOWER - 下半场
-    enum PaoOperationType
-    {
-        ALL_FIELD = 0,
-        UPPER,
-        LOWER,
-    };
-
-    // 自定义PaoOperator子类，用于简化发炮
-    class PaoOperatorAZM : public PaoOperator
-    {
-    public:
-        // ***In Queue
-        // 发射并炸炮，五行场地炸2、4路，六行场地炸2、5路
-        // ***使用示例：
-        // p.pp(9);    // 双边并炸9列
-        // p.pp(9, 8.5); // 一炮炸2路9列，一炮炸4/5路8.5列
-        void pp(float col1 = 9, float col2 = -1)
-        {
-            InsertOperation([=]()
-                            { int scene = AvZ::GetMainObject()->scene();
-                        int r2 = (scene == 2 || scene == 3) ? 5: 4;
-                        if (col2 == -1)
-                        {
-                            pao({{2, col1}, {r2, col1}});
-                        }
-                        else
-                        {
-                            pao({{2, col1}, {r2, col2}});
-                        } },
-                            "PaoOperatorAZM::pp");
-        }
-
-        // ***In Queue
-        // 发射拦截炮，五行场地炸1、4路，六行场地炸1、5路
-        // ***使用示例：
-        // p.dd(7.4);    // 双边并炸7.4列
-        // p.dd(7.4, 7.8); // 一炮炸1路7.4列，一炮炸4/5路7.8列
-        void dd(float col1 = 7.4, float col2 = -1)
-        {
-            InsertOperation([=]()
-                            { int scene = AvZ::GetMainObject()->scene();
-                        int r2 = (scene == 2 || scene == 3) ? 5: 4;
-                        if (col2 == -1)
-                        {
-                            pao({{1, col1}, {r2, col1}});
-                        }
-                        else
-                        {
-                            pao({{1, col1}, {r2, col2}});
-                        } },
-                            "PaoOperatorAZM::dd");
-        }
-
-        // ***In Queue
-        // 精准之舞，默认359激活，466拦截
-        // 可以指定要执行操作的具体半场
-        // ***使用示例：
-        // p.jw(1);     // w1进行精准之舞
-        // p.jw(1, UPPER); // w1上半场进行精准之舞
-        void jw(int wave, PaoOperationType type = ALL_FIELD)
-        {
-            InsertOperation([=]()
-                            {
-                int scene = AvZ::GetMainObject()->scene();
-                int r2 = (scene == 2 || scene == 3) ? 5 : 4;
-                SetTime(359 - 373, wave);
-                if (type == ALL_FIELD)
-                {
-                    pao({{2, 9}, {r2, 9}});
-                    Delay(107);
-                    pao({{1, 7.8}, {r2, 7.8}});
-                }
-                else if (type == UPPER)
-                {
-                    pao(2, 9);
-                    Delay(107);
-                    pao(1, 7.8);
-                }
-                else if (type == LOWER)
-                {
-                    pao(r2, 9);
-                    delay(107);
-                    pao(r2, 7.8);
-                } },
-                            "PaoOperatorAZM::jw");
-        }
-
-        // ***In Queue
-        // 执行PDc时机的PD，默认225激活，延迟107拦截
-        // 可以指定要执行操作的具体半场
-        // ***使用示例：
-        // p.pd(1);     // w1进行PD
-        // p.pd(1, UPPER); // w1上半场进行PD
-        void pd(int wave, PaoOperationType type = ALL_FIELD)
-        {
-            InsertOperation([=]()
-                            {
-                int scene = AvZ::GetMainObject()->scene();
-                int r2 = (scene == 2 || scene == 3) ? 5 : 4;
-                SetTime(225 - 373, wave);
-                if (type == ALL_FIELD)
-                {
-                    pao({{2, 9}, {r2, 9}});
-                    Delay(107);
-                    pao({{1, 8.1875}, {r2, 8.1875}});
-                }
-                else if (type == UPPER)
-                {
-                    pao(2, 9);
-                    Delay(107);
-                    pao(1, 8.1875);
-                }
-                else if (type == LOWER)
-                {
-                    pao(r2, 9);
-                    delay(107);
-                    pao(r2, 8.1875);
-                } },
-                            "PaoOperatorAZM::pd");
-        }
-
-        // ***In Queue
-        // 执行连拦BD，默认240激活，延迟107拦截
-        // 可以指定要执行操作的具体半场
-        // ***使用示例：
-        // p.bd(1);     // w1进行BD
-        // p.bd(1, UPPER); // w1上半场进行BD
-        void bd(int wave, PaoOperationType type = ALL_FIELD)
-        {
-            InsertOperation([=]()
-                            {
-                int scene = AvZ::GetMainObject()->scene();
-                int r2 = (scene == 2 || scene == 3) ? 5 : 4;
-                SetTime(240 - 373, wave);
-                if (type == ALL_FIELD)
-                {
-                    pao({{1, 8.625}, {r2, 8.625}});
-                    Delay(107);
-                    pao({{1, 8.1625}, {r2, 8.1625}});
-                }
-                else if (type == UPPER)
-                {
-                    pao(2, 8.625);
-                    Delay(107);
-                    pao(1, 8.1875);
-                }
-                else if (type == LOWER)
-                {
-                    pao(r2, 8.625);
-                    delay(107);
-                    pao(r2, 8.1875);
-                } },
-                            "PaoOperatorAZM::bd");
-        }
-    };
-
+    
     // 自定义IceFiller子类
     // 用于白昼简化点冰
     class IceFillerAZM : public IceFiller
@@ -780,4 +620,5 @@ namespace cresc
                                 count.erase(count.begin() + num);
                             } });
     }
+
 } // namespace cresc
