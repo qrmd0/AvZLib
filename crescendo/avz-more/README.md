@@ -18,7 +18,6 @@ using namespace cresc;
 ## 内含功能
 - 用卡相关：SmartCard, RecoverCard, SafeCard, RecoverSafeCard
 - 智能垫材：SmartStall
-- 快捷发炮：PaoOperatorAZM(pp, dd, pd, bd)
 - 快捷用冰：IceFillerAZM(ice), nice, mice
 - 平均分配僵尸行数：AverageSpawn
 - 常用修改器功能：IgnoreSun, NoFog
