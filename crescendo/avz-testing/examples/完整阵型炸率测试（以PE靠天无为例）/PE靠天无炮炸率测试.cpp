@@ -11,7 +11,7 @@
 #include "avz_logger.h"
 
 using namespace AvZ;
-using namespace AZT;
+using namespace cresc;
 
 /* 配置部分开始 */
 #define TOTAL_TEST_ROUND 200
