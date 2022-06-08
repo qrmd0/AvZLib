@@ -23,7 +23,7 @@ public:
     void enable()
     {
         InsertOperation([=]() {
-            ShowErrorNotInQueue("按键辅助已启用，快捷键说明：\n数字键：在光标处种植对应卡槽位置的植物\nC：铲除光标处的植物\nR：开关高级暂停\nA：减慢游戏运行速度\nD：加快游戏运行速度\nS：恢复游戏运行速度\nX：开关女仆秘籍");
+            ShowErrorNotInQueue("按键辅助已启用，快捷键说明：\n数字键：在光标处种植对应卡槽位置的植物\nC：铲除光标处的植物\nR：开关高级暂停\nA：减慢游戏运行速度\nD：加快游戏运行速度\nS：恢复游戏运行速度\nX：开关女仆秘籍\nP：停用按键辅助，恢复游戏运行速度并停用女仆秘籍");
             // 按键种植
             key_connect_plus.add('1', [=]() { CardNotInQueue(1, MouseRow(), MouseCol()); });
             key_connect_plus.add('2', [=]() { CardNotInQueue(2, MouseRow(), MouseCol()); });
