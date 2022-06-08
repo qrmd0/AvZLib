@@ -76,7 +76,7 @@ public:
             // 按键控制女仆秘籍
             key_connect_plus.add('X', [=]() {
                 if (is_maid_activated) {
-                    MaidCheats::callPartner();
+                    MaidCheats::dancing();
                 } else {
                     MaidCheats::stop();
                 }

@@ -14,14 +14,16 @@
 将KeyAssistant.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
 在 Script() 外添加下面的代码以在编译时包含此库:
-```c++
+```cpp
 #include "KeyAssistant.h"
 ```
 
 在 Script() 开头添加下面的代码以启用 tick_planter:
-```c++
+```cpp
 key_assistant.enable();
 ```
+
+如果不需要将其 embed 到脚本中（也就是准备单独使用 KeyAssistant），可以使用 `bin/` 中的二进制版本。将 `KeyAssistant.dll` 与 `KeyAssistant.exe` 放在同一目录下，打开 PvZ 后运行 `KeyAssistant.exe` 即可，无需 AvZ 套件。
 
 ## 按键说明
 
@@ -63,7 +65,7 @@ D：加快游戏运行速度，即增大一个速度倍率档位；
 S：恢复游戏运行速度，即将游戏运行速度倍率设为1。
 
 ### 按键控制女仆秘籍
-X：当未启用女仆秘籍时，启用“舞王不前进且每帧尝试召唤舞伴”；启用了女仆秘籍时，停用女仆秘籍。
+X：当未启用女仆秘籍时，启用“舞王和舞伴持续跳舞”；启用了女仆秘籍时，停用女仆秘籍。
 
 ### 按键停用按键辅助
 P：停用按键辅助，恢复游戏运行速度并停用女仆秘籍。
