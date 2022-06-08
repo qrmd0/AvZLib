@@ -84,7 +84,7 @@ public:
             });
 
             // 按键停用按键辅助
-            key_connect_plus.add('Q', [=]() {
+            key_connect_plus.add('P', [=]() {
                 disable();
             });
         });
