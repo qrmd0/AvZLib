@@ -5,7 +5,5 @@ using namespace AvZ;
 
 void Script()
 {
-    SetErrorMode(CONSOLE);
-    // 启动KeyAssistant
     key_assistant.enable();
 }

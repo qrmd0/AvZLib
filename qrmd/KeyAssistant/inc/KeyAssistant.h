@@ -18,11 +18,12 @@ private:
     bool is_maid_activated = false;
 
 public:
-    // *** In Quene
+    // *** In Queue
     // 启用
     void enable()
     {
         InsertOperation([=]() {
+            ShowErrorNotInQueue("按键辅助已启用，快捷键说明：\n数字键：在光标处种植对应卡槽位置的植物\nC：铲除光标处的植物\nR：开关高级暂停\nA：减慢游戏运行速度\nD：加快游戏运行速度\nS：恢复游戏运行速度\nX：开关女仆秘籍");
             // 按键种植
             key_connect_plus.add('1', [=]() { CardNotInQueue(1, MouseRow(), MouseCol()); });
             key_connect_plus.add('2', [=]() { CardNotInQueue(2, MouseRow(), MouseCol()); });
@@ -81,14 +82,22 @@ public:
                 }
                 is_maid_activated = !is_maid_activated;
             });
+
+            // 按键停用按键辅助
+            key_connect_plus.add('Q', [=]() {
+                disable();
+            });
         });
     }
-    // *** In Quene
+    // *** In Queue
     // 停用
     void disable()
     {
         InsertOperation([=]() {
             key_connect_plus.clear();
+            SetGameSpeed(1.0);
+            MaidCheats::stop();
         });
+        ShowErrorNotInQueue("按键辅助已停用，将恢复游戏运行速度并停用女仆秘籍");
     }
 } key_assistant;
