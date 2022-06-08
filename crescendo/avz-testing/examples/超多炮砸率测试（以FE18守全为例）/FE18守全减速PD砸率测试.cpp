@@ -20,7 +20,7 @@
 #include "GetZombieAbscissas.h"
 
 using namespace AvZ;
-using namespace cresc;
+using namespace AZT;
 
 /* 配置部分开始 */
 #define TOTAL_TEST_ROUND 400
