@@ -1,5 +1,5 @@
 # AvZLib
-public repository of AsmVsZombies
+AsmVsZombies的公开插件仓库
 # 上传说明
 ## 文件夹结构
 
