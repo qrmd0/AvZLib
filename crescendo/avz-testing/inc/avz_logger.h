@@ -12,7 +12,7 @@
 1. 将本文件置于AvZ目录inc文件夹下
 
 使用示例：
-cresc::Logger Log("C:\MyFolder");
+cresc::Logger Log("C:/MyFolder");
 void Script() {
     Log.log("hello, #", "world");
     SetTime(0, 1);
