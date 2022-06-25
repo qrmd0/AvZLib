@@ -18,7 +18,7 @@
 #include "KeyAssistant.h"
 ```
 
-在 Script() 开头添加下面的代码以启用 tick_planter:
+在 Script() 开头添加下面的代码以启用 KeyAssistant:
 ```cpp
 key_assistant.enable();
 ```
