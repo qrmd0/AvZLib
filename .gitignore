@@ -8,3 +8,19 @@ Desktop.ini
 
 # AsmVsZombies
 libavz_inject.dll
+qrmd/GetZombieAbscissas/README.md
+qrmd/GetZombieAbscissas/bin/temp.txt
+qrmd/GetZombieAbscissas/example/SlowestZombieSeparate/game3_13.dat
+qrmd/GetZombieAbscissas/example/SlowestZombieSeparate/README.md
+qrmd/GetZombieAbscissas/example/SlowestZombieSeparate/SlowestZombieSeparate.cpp
+qrmd/GetZombieAbscissas/inc/GetZombieAbscissas.h
+qrmd/GetZombieAbscissas/inc/GetZombieAbscissas_2.h
+qrmd/GetZombieAbscissas/inc/GetZombieCoordinate.zip
+qrmd/GetZombieAbscissas/inc/structtest.cpp
+qrmd/GetZombieAbscissas/inc/test.cpp
+qrmd/GetZombieAbscissas/inc/test2.cpp
+qrmd/GetZombieAbscissas/inc/vectortest.cpp
+qrmd/GetZombieAbscissas/inc/GetZombieCoordinate/v1/GetZombieAbscissas.h
+qrmd/GetZombieAbscissas/inc/GetZombieCoordinate/v1/test.cpp
+qrmd/GetZombieAbscissas/inc/GetZombieCoordinate/v2/GetZombieAbscissas_2.h
+qrmd/GetZombieAbscissas/inc/GetZombieCoordinate/v2/test2.cpp
