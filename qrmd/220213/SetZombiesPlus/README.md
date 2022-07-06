@@ -26,6 +26,16 @@ SetZombies的增强版本，支持更多的出怪方式。
 #include "SetZombiesPlus.h"
 ```
 
+## 使用示例
+
+```c++
+// 以极限（均匀摊派）方式设置出怪为 {普通僵尸、读报僵尸、小丑僵尸、冰车僵尸、扶梯僵尸、跳跳僵尸、舞王僵尸、潜水僵尸、海豚僵尸、铁门僵尸}
+    SetZombies({0, DB_5, XC_15, ZOMBONI, FT_21, POGO_ZOMBIE, WW_8, 11, 14, SCREEN_DOOR_ZOMBIE}, AVERAGE);
+    
+    // 以自然（游戏原生）方式设置出怪为 {普通僵尸、路障僵尸、撑杆僵尸、舞王僵尸、海豚僵尸、小丑僵尸、气球僵尸、矿工僵尸、跳跳僵尸、巨人僵尸、红眼巨人僵尸}
+    SetZombies({ZOMBIE, LZ_2, POLE_VAULTING_ZOMBIE, 8, HT_14, JACK_IN_THE_BOX_ZOMBIE, QQ_16, 17, TT_18, BY_23, 32}, INTERNAL);
+```
+
 ## 更新计划
 
 加入模拟方式出怪，满足夹零、变速等测试需求。
