@@ -11,7 +11,7 @@
 本插件针对 AvZ 220213 版本开发，不确保对其它 AvZ 版本的兼容性。
 
 ## 使用方法
-将KeyAssistant.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
+将KeyAssistant.h 置于 AsmVsZombies/inc 目录后，编写脚本并运行即可。
 
 在 Script() 外添加下面的代码以在编译时包含此库:
 ```cpp
