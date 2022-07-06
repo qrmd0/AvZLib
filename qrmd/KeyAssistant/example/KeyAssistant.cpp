@@ -1,9 +1,14 @@
 /*
- * @字符编码: UTF-8
- * @作者: qrmd
- * @时间: 2022-06-09 15:44:08
- * @描述: 按键辅助
- * @AvZ版本：220213
+ * @Author: qrmd
+ * @Date: 2022-06-06 15:44:53
+ * @LastEditors: qrmd
+ * @LastEditTime: 2022-07-06 12:53:11
+ * @Description:KeyAssistant按键辅助AvZ插件使用示例
+ * 来自AsmVsZombies的公开插件仓库：
+ * 主库：https://github.com/qrmd0/AvZLib
+ * 镜像库1：https://gitee.com/qrmd/AvZLib
+ * 镜像库2：https://gitlab.com/avzlib/AvZLib
+ * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
 
 #include "KeyAssistant.h"
