@@ -1,16 +1,18 @@
-# AvZ SetZombiesPlus 20220706
+# AvZ SetZombiesPlus 20220708
 
 ## 简介
 
-SetZombies的增强版本，支持更多的出怪方式。
+SetZombies的增强版本，更自由地设置出怪。
 
 1、极限出怪不再强制刷出旗帜僵尸和蹦极僵尸；
 
-2、支持使用游戏原生方式自然出怪。
+2、支持在夹零、变速等限定条件下使用游戏原生方式自然出怪。
+
+3、支持逐波设置出怪列表。
 
 ### 关键词
 
-自然出怪 游戏内部出怪 游戏原生出怪 模拟出怪
+自然出怪 游戏内部出怪 游戏原生出怪
 
 ## 运行环境
 
@@ -29,13 +31,28 @@ SetZombies的增强版本，支持更多的出怪方式。
 ## 使用示例
 
 ```c++
-// 以极限（均匀摊派）方式设置出怪为 {普通僵尸、读报僵尸、小丑僵尸、冰车僵尸、扶梯僵尸、跳跳僵尸、舞王僵尸、潜水僵尸、海豚僵尸、铁门僵尸}
-    SetZombies({0, DB_5, XC_15, ZOMBONI, FT_21, POGO_ZOMBIE, WW_8, 11, 14, SCREEN_DOOR_ZOMBIE}, AVERAGE);
-    
-    // 以自然（游戏原生）方式设置出怪为 {普通僵尸、路障僵尸、撑杆僵尸、舞王僵尸、海豚僵尸、小丑僵尸、气球僵尸、矿工僵尸、跳跳僵尸、巨人僵尸、红眼巨人僵尸}
-    SetZombies({ZOMBIE, LZ_2, POLE_VAULTING_ZOMBIE, 8, HT_14, JACK_IN_THE_BOX_ZOMBIE, QQ_16, 17, TT_18, BY_23, 32}, INTERNAL);
+    // 以自然（游戏原生）方式设置出怪为{普通僵尸、路障僵尸、撑杆僵尸、舞王僵尸、海豚僵尸、小丑僵尸、气球僵尸、矿工僵尸、跳跳僵尸、红眼巨人僵尸}
+    SetZombies({ZOMBIE, CONEHEAD_ZOMBIE, POLE_VAULTING_ZOMBIE, DANCING_ZOMBIE, DOLPHIN_RIDER_ZOMBIE, JACK_IN_THE_BOX_ZOMBIE, BALLOON_ZOMBIE, DIGGER_ZOMBIE, POGO_ZOMBIE, GIGA_GARGANTUAR}, INTERNAL);
+    // 显示为了满足限定条件刷新出怪列表的调试信息
+    SetIsShowInfo(true);
+    // 限定第9波不刷出红眼巨人僵尸、第10波刷出至少10只普通僵尸以及变速的波数不小于15
+    SetZombiesLimits({{9, GIGA_GARGANTUAR, "==", 0}, {10, ZOMBIE, ">=", 10}, {TRANS_WAVE, GIGA_GARGANTUAR, ">=", 16}});
+    // 设置第18波的出怪为：小鬼僵尸20只、蹦极僵尸14只和巨人僵尸16只
+    SetWaveZombieList(18, {{IMP, 20}, {BUNGEE_ZOMBIE, 14}, {GARGANTUAR, 16}});
 ```
 
-## 更新计划
+## 关于出怪机制
 
-加入模拟方式出怪，满足夹零、变速等测试需求。
+### 变速
+
+变速是在生存无尽模式中红眼巨人僵尸在一轮游戏内累计刷出 50 只便不再在非旗帜波刷出的游戏特性。
+
+了解更多出怪机制请访问：https://pvz.tools/wiki/#%E5%87%BA%E6%80%AA%E8%A7%84%E5%BE%8B
+
+## 相关链接
+
+如果您想设置僵尸出现的行数，请访问：
+https://github.com/qrmd0/AvZLib/tree/main/crescendo/avz-more
+
+如果您想查看出怪列表，可以使用第三方辅助工具 Plants vs. Zombies Toolkit：
+https://pvz.tools/toolkit/
