@@ -66,16 +66,17 @@ class Fodder {
             std::map<int, std::pair<int, int>> priority_;
             for(int r : rows)
                 priority_[r] = {0, 0};
-            for(auto z : AliveFilter<Zombie>([=](auto z){return priority_.count(z->row() + 1);}))
-                if(z->type() == LADDER_ZOMBIE)
-                    priority_[z->row() + 1].first--;
-                else if(z->type() == JACK_IN_THE_BOX_ZOMBIE || z->type() == FOOTBALL_ZOMBIE)
-                    priority_[z->row() + 1].second--;
+            for(auto z : alive_zombie_filter)
+                if(priority_.count(z->row() + 1))
+                    if(z->type() == LADDER_ZOMBIE)
+                        priority_[z->row() + 1].first--;
+                    else if(z->type() == JACK_IN_THE_BOX_ZOMBIE || z->type() == FOOTBALL_ZOMBIE)
+                        priority_[z->row() + 1].second--;
             std::vector<std::pair<std::pair<int, int>, int>> priority;
             for(auto t : priority_)
                 priority.push_back({t.second, t.first});
             if(smart)
-                sort(priority.begin(), priority.end());
+                std::sort(priority.begin(), priority.end());
             auto sa = GetMainObject()->seedArray();
             auto cur = fodder_cards.begin();
             for(auto t : priority) {
@@ -88,7 +89,7 @@ class Fodder {
                     CardNotInQueue(*cur + 1, r, col);
                     if(removal_delay != -1) {
                         SetDelayTime(removal_delay);
-                        Shovel(r, col);
+                        Shovel(r, col, true);
                     }
                 }
             }
