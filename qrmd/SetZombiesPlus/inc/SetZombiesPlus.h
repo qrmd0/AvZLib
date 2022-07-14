@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-05 19:56:17
  * @LastEditors: qrmd
- * @LastEditTime: 2022-07-08 17:08:43
+ * @LastEditTime: 2022-07-14 16:03:57
  * @Description:SetZomies的增强版本，更自由地设置出怪
  * 使用方法：1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SetZombiesPlus.h" ；
@@ -59,7 +59,7 @@ void ShowInfo(bool is_successful, int count, int time);
 // *** Not In Queue
 // 设置为了满足限定条件刷新出怪列表的最长耗时（秒），默认为60
 // 此行代码必须编写于对应的SetZombiesLimits前以生效
-void SetWaitLimit();
+void SetWaitLimit(int time);
 
 // *** Not In Queue
 // 设置是否显示为了满足限定条件刷新出怪列表的调试信息，默认为否
@@ -357,7 +357,11 @@ void _qrmd::SetZombiesLimits(int wave, int type, std::string method, int number)
     std::vector<ZombiesRefreshLimit> temp2 = {temp1};
     SetZombiesLimits(temp2);
 }
-
+void _qrmd::SetWaitLimit(int time)
+{
+    wait_limit = time;
+    return;
+}
 void _qrmd::ShowInfo(bool is_successful, int count, int time)
 {
     if (is_successful)
