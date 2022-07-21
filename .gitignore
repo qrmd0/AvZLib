@@ -8,3 +8,6 @@ Desktop.ini
 
 # AsmVsZombies
 libavz_inject.dll
+
+qrmd/GetZombieAbscissas/inc/beta/*
+

@@ -1,9 +1,14 @@
 /*
- * @字符编码: UTF-8
- * @作者: qrmd
- * @时间: 2022-06-07 18:05:34
- * @描述: 按键辅助操作类
- * @AvZ版本：220213
+ * @Author: qrmd
+ * @Date: 2022-06-09 00:03:58
+ * @LastEditors: qrmd
+ * @LastEditTime: 2022-07-06 12:52:09
+ * @Description:KeyAssistant按键辅助AvZ插件
+ * 来自AsmVsZombies的公开插件仓库：
+ * 主库：https://github.com/qrmd0/AvZLib
+ * 镜像库1：https://gitee.com/qrmd/AvZLib
+ * 镜像库2：https://gitlab.com/avzlib/AvZLib
+ * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
 
 #include "avz.h"
@@ -39,6 +44,22 @@ public:
 
             // 按键铲除（优先南瓜头）
             key_connect_plus.add('C', [=]() { ShovelNotInQueue(MouseRow(), MouseCol(), true); });
+
+            // 按键发炮
+            key_connect_plus.add('F', [=]() {
+                pao_operator.autoGetPaoList();
+                pao_operator.pao(MouseRow(), MouseCol());
+            });
+
+            // 按键记录游戏进度
+            key_connect_plus.add('T', [=]() {
+                Asm::saveData();
+            });
+
+            // 按键回退游戏进度
+            key_connect_plus.add('Y', [=]() {
+                Asm::loadData();
+            });
 
             // 按键高级暂停
             SetAdvancedPauseKey('R');

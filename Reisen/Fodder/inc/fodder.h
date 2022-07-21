@@ -22,101 +22,51 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
+#ifndef REISEN_FODDER_FODDER_H
+#define REISEN_FODDER_FODDER_H
 #include <algorithm>
 #include <iterator>
 #include <map>
+#include <memory>
 #include <utility>
 #include <vector>
 #include "avz.h"
 
 using namespace AvZ;
 
-class ZombieIterator : public std::iterator<std::forward_iterator_tag, SafePtr<Zombie>> {
-    private:
-    SafePtr<Zombie> cur;
-
-    ZombieIterator(SafePtr<Zombie> cur_) : cur(cur_) {}
-
-    void forward() {
-        ++cur;
-        while(cur != GetMainObject()->zombieArray() + GetMainObject()->zombieTotal() &&
-            (cur->isDead() || cur->isDisappeared()))
-            ++cur;
-    }
-
-    public:
-    ZombieIterator() {
-        cur = GetMainObject()->zombieArray();
-        if(cur->isDead() || cur->isDisappeared())
-            forward();
-    }
-
-    SafePtr<Zombie> operator*() const {
-        return cur;
-    }
-
-    SafePtr<Zombie> operator++() {
-        forward();
-        return cur;
-    }
-
-    SafePtr<Zombie> operator++(int) {
-        auto tmp = cur;
-        forward();
-        return tmp;
-    }
-
-    bool operator==(ZombieIterator& rhs) { 
-        return cur.toUnsafe() == rhs.cur.toUnsafe();
-    }
-
-    bool operator!=(ZombieIterator& rhs) { 
-        return !(*this == rhs);
-    }
-
-    static ZombieIterator begin() {
-        return ZombieIterator();
-    }
-
-    static ZombieIterator end() {
-        return ZombieIterator(GetMainObject()->zombieArray() + GetMainObject()->zombieTotal());
-    }
-};
-
 class Fodder {
     private:
-    std::vector<int> fodder_cards;
+    std::vector<PlantType> cards;
 
-    public:
-    // 构造垫材类。输入为垫材卡片类型，优先级高的（比如有100cs免疫啃食的花盆）在前。
-    Fodder(const std::vector<PlantType>& cards) {
-        InsertOperation([=](){
-            fodder_cards.resize(fodder_cards.size());
-            std::transform(cards.begin(), cards.end(), fodder_cards.begin(), [](auto p){
-                bool is_imitator = (p >= M_PEASHOOTER);
-                return GetSeedIndex(is_imitator ? p - M_PEASHOOTER : p, is_imitator);
-            });
-        });
+    static std::vector<int> cards_to_id(const std::vector<PlantType>& c) {
+        std::vector<int> fodder_cards;
+        for(auto p : c) {
+            bool is_imitator = (p >= M_PEASHOOTER);
+            auto x = GetSeedIndex(is_imitator ? p - M_PEASHOOTER : p, is_imitator);
+            if(x != -1)
+                fodder_cards.push_back(x);
+        }
+        return fodder_cards;
     }
 
-    // In Queue
-    // 放垫。
-    // rows: 用垫的行（{}代表所有陆地行）
-    // removal_delay: 铲除垫材的延迟。默认值266为减速巨人锤击生效时间。
-    // col: 垫材放置列数。
-    // smart: 是否根据快速僵尸数量调整顺序（为false则严格按顺序放置）
-    void operator()(std::vector<int> rows = {}, int removal_delay = 266, int col = 9, bool smart = true) {
+    public:
+    Fodder(const std::vector<PlantType>& c = {}) : cards(c) {}
+
+    void setCards(const std::vector<PlantType>& c) { cards = c; }
+
+    void operator()(std::vector<int> rows = {}, int removal_delay = 266, int col = 9, bool smart = true) const {
         if(rows.empty()) {
             int scene = GetMainObject()->scene();
-            rows = (scene == 2 || scene == 3) ? std::vector<int>{1, 2, 5, 6} : 
+            rows = (scene == 2 || scene == 3) ? std::vector<int>{1, 2, 5, 6} :
                 std::vector<int>{1, 2, 3, 4, 5};
         }
+        auto c = std::make_shared<std::vector<PlantType>>(cards);
         InsertOperation([=](){
+            auto fodder_cards = cards_to_id(*c);
             std::map<int, std::pair<int, int>> priority_;
             for(int r : rows)
                 priority_[r] = {0, 0};
-            for(auto z : ZombieIterator())
+            for(auto z : alive_zombie_filter)
                 if(priority_.count(z->row() + 1))
                     if(z->type() == LADDER_ZOMBIE)
                         priority_[z->row() + 1].first--;
@@ -126,7 +76,7 @@ class Fodder {
             for(auto t : priority_)
                 priority.push_back({t.second, t.first});
             if(smart)
-                sort(priority.begin(), priority.end());
+                std::sort(priority.begin(), priority.end());
             auto sa = GetMainObject()->seedArray();
             auto cur = fodder_cards.begin();
             for(auto t : priority) {
@@ -138,11 +88,12 @@ class Fodder {
                 else {
                     CardNotInQueue(*cur + 1, r, col);
                     if(removal_delay != -1) {
-                        SetDelayTime(removal_delay); 
-                        Shovel(r, col);
+                        SetDelayTime(removal_delay);
+                        Shovel(r, col, true);
                     }
                 }
             }
         });
     }
-};
+} fodder;
+#endif

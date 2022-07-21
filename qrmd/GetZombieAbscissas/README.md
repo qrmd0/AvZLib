@@ -14,7 +14,7 @@
 
 ## 使用方法
 
-将 GetZombieAbscissas.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
+将 GetZombieAbscissas.h 置于AsmVsZombies/inc 目录后，编写脚本并运行即可。
 
 在 Script() 外添加下面的代码以在编译时包含此库:
 
