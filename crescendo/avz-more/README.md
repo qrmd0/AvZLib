@@ -25,9 +25,9 @@ using namespace cresc;
 
 ## 其他插件
 
-本插件可以配合 [!AvZ Smart Cannon 智能发炮](https://github.com/qrmd0/AvZLib/tree/main/crescendo/avz-smart-cannon)插件一起使用。
+本插件可以配合 [AvZ Smart Cannon 智能发炮](https://github.com/qrmd0/AvZLib/tree/main/crescendo/avz-smart-cannon) 插件一起使用。
 
-[![GitHub](https://badgen.net/badge/GitHub/avz_testing/cyan?icon=github)](https://github.com/Rottenham/avz-testing)
+[![GitHub](
+https://badgen.net/badge/GitHub/avz_smart_cannon/orange?icon=github)](https://github.com/qrmd0/AvZLib/tree/main/crescendo/avz-smart-cannon)
 
 
-https://badgen.net/badge/GitHub/avz_smart_cannon/orange?icon=github
