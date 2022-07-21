@@ -5,11 +5,11 @@
 本插件针对 AvZ 220213 版本开发，不确保对其它 AvZ 版本的兼容性。
 
 ## 使用方法
-> 请根据 https://tieba.baidu.com/p/7860494646 安装AvZ精确预测僵尸坐标插件
+> 本插件需要和 [AvZ 精确预测僵尸坐标插件](https://github.com/qrmd0/AvZLib/tree/main/qrmd/GetZombieAbscissas) 一起使用。
 
-> 确保AvZ目录inc文件夹下已有GetZombieAbscissas.h文件，且已替换pvzstruct.h
+当前仓库的inc文件夹下已有 GetZombieAbscissas.h 文件（220608版）。
 
-将 avz_smart_cannon.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
+将 avz_smart_cannon.h 与 GetZombieAbscissas.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
 需在 Script() 外添加:
 ```c++
