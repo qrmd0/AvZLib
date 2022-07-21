@@ -9,8 +9,8 @@
  */
 
 #include "avz.h"
-#include "avz_testing.h"
 #include "avz_logger.h"
+#include "avz_testing.h"
 
 using namespace AvZ;
 using namespace cresc;
@@ -46,15 +46,12 @@ int completed_round = 0;
 int current_jackdata = 0;
 int total_jack_num = 0;
 
-void Script()
-{
+void Script() {
     // 跳帧测试
-    auto condition = [=]()
-    {
+    auto condition = [=]() {
         return current_jackdata < BATCH_SIZE && ice_time_list.size() == BATCH_SIZE;
     };
-    auto callback = [=]()
-    {
+    auto callback = [=]() {
         OpenMultipleEffective('W', -1);
         SetErrorMode(POP_WINDOW);
         SetGameSpeed(0.2);
@@ -66,15 +63,11 @@ void Script()
         freePlanting(false);
 
         // 显示统计结果
-        if (ice_time_list.size() != BATCH_SIZE)
-        {
+        if (ice_time_list.size() != BATCH_SIZE) {
             ShowErrorNotInQueue("测试程序未能执行。原因：BATCH_SIZE设置有误。");
-        }
-        else
-        {
+        } else {
             // 显示统计结果
-            for (int i = 0; i < BATCH_SIZE; i++)
-            {
+            for (int i = 0; i < BATCH_SIZE; i++) {
                 AvZ::ShowErrorNotInQueue("测试完毕，总共测试了#只小丑", total_jack_num);
                 Log.log("总共测试了#只小丑。\n#", total_jack_num, jd_list[i].stats());
             }
@@ -92,10 +85,10 @@ void Script()
     SelectCards({ICE_SHROOM, M_ICE_SHROOM, 40, 41, 42, 43, 44, 45, 46, 47});
 
     // 开启修改功能
-    forbidItemDrop();  // 僵尸不掉钱
-    forbidEnterHome(); // 僵尸不进家
-    plantInvincible(); // 植物无敌
-    freePlanting();    // 自由种植
+    forbidItemDrop();   // 僵尸不掉钱
+    forbidEnterHome();  // 僵尸不进家
+    plantInvincible();  // 植物无敌
+    freePlanting();     // 自由种植
 
     // 将小丑僵尸平均分配至指定路
     moveZombieRow(JACK_IN_THE_BOX_ZOMBIE, jack_rows);
@@ -111,18 +104,15 @@ void Script()
     killAllZombie({20});
 
     SetTime(-599, 1);
-    jd_list[current_jackdata].start(test_plant_list); // 开始记录指定植物的炸率数据
-    aa.start(always_attack_list);                     // 使指定植物永动
-    if (LOCK_WAVE == 1)
-    {
+    jd_list[current_jackdata].start(test_plant_list);  // 开始记录指定植物的炸率数据
+    aa.start(always_attack_list);                      // 使指定植物永动
+    if (LOCK_WAVE == 1) {
         lw.start({JACK_IN_THE_BOX_ZOMBIE});
     }
 
     // 自由种植功能里已开启蘑菇免唤醒
-    for (int w = 1; w <= 20; w++)
-    {
-        if (ice_time_list[current_jackdata] > 0)
-        {
+    for (int w = 1; w <= 20; w++) {
+        if (ice_time_list[current_jackdata] > 0) {
             SetTime(ice_time_list[current_jackdata] - 100, w);
             Card(ICE_SHROOM, 1, 1);
         }
@@ -130,23 +120,21 @@ void Script()
 
     // 更新已经完成的选卡数
     InsertTimeOperation(
-        0, 20, [=]()
-        {  
+        0, 20, [=]() {
             // 统计本次选卡的小丑总数（排除w20）
             total_jack_num += countZombie({JACK_IN_THE_BOX_ZOMBIE}, {20});
             completed_round++;
 
+            // 保存测试途中信息，防止意外中止
+            if (current_jackdata < BATCH_SIZE && EPOCH > 0 && TOTAL_TEST_ROUND / EPOCH != 0 && completed_round % (TOTAL_TEST_ROUND / EPOCH) == 0) {
+                Log.log("总共测试了#只小丑。\n#", total_jack_num, jd_list[current_jackdata].stats());
+            }
+
             // 更新已完成选卡数和已完成批次数
-            if (completed_round >= TOTAL_TEST_ROUND)
-            {
+            if (completed_round >= TOTAL_TEST_ROUND) {
                 completed_round = 0;
                 current_jackdata++;
             }
-
-            // 保存测试途中信息，防止意外中止
-            if (current_jackdata < BATCH_SIZE && EPOCH > 0 && completed_round % (TOTAL_TEST_ROUND / EPOCH) == 0)
-            {
-                Log.log("总共测试了#只小丑。\n#", total_jack_num, jd_list[current_jackdata].stats());
-            } },
+        },
         "w20-stats");
 }
