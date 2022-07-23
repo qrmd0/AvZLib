@@ -509,7 +509,7 @@ int GetCurrentLevel() {
 // ***使用示例：
 // SetTime(824, 1);
 // SmartStall({1, 2, 3, 4, 5}, {PUFF_SHROOM, SUN_SHROOM, FLOWER_POT, SCAREDY_SHROOM, SUNFLOWER}); // 于第一波824放置垫材，垫1、2、3、4、5路，使用小喷菇、阳光菇、花盆、胆小菇、向日葵这五张垫材
-void SmartStall(int time, int wave, const std::vector<int> &r = {1, 2, 5, 6}, const std::vector<PlantType> &t = {FLOWER_POT, SCAREDY_SHROOM, PUFF_SHROOM, SUN_SHROOM}) {
+void SmartStall(const std::vector<int> &r = {1, 2, 5, 6}, const std::vector<PlantType> &t = {FLOWER_POT, SCAREDY_SHROOM, PUFF_SHROOM, SUN_SHROOM}) {
     InsertOperation([=]() {
                             std::vector<PlantType> types = t;
                             if (std::find(types.begin(), types.end(), FLOWER_POT) != types.end())
