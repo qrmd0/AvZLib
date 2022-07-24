@@ -82,8 +82,8 @@ int CountZombie(int type = -1, int row = -1, int left_lim = -1, int right_lim = 
 // 默认检测是否有僵尸在所用卡同一行
 // ***使用示例：
 // SetTime(330, 1);
-// SmartCard(SPIKEWEED, 2, 9, {ZOMBONI}); //如果有冰车在第2行，则种植地刺于2-9
-// SmartCard(CHERRY_BOMB, 2, 9, {ZOMBONI}, {1, 2}); //如果有冰车在第1或2行，则种植樱桃于2-9
+// SmartCard(CHERRY_BOMB, 2, 9, {ZOMBONI}); //如果场上存在冰车，则种植樱桃于2-9
+// SmartCard(SPIKEWEED, 2, 9, {ZOMBONI}, {2}); //如果有冰车在第2行，则种植地刺于2-9
 // SmartCard(CHERRY_BOMB, 2, 9, {GARGANTUAR, GIGA_GARGANTUAR}, {1, 2}, {-1, 800}, {70});
 // 如果有白眼或红眼在第1或2行，且横坐标整数部分小于等于800，且状态为70，则种植樱桃于2-9
 void SmartCard(PlantType plant_type, int row, float col, const std::set<int> &_zombie_type, const std::set<int> &_check_rows = {}, const std::pair<int, int> &_limits = {-1, -1}, const std::set<int> &_states = {}) {
