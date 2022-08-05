@@ -4,8 +4,6 @@
 
 SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
 
-![演示](C:\Users\13371\Music\PlantsVsZombie\AvZLib\qrmd\SelectCardsPlus\README.assets\演示.gif)
-
 ### 关键词
 
 选择植物 极速
