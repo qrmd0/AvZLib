@@ -31,7 +31,7 @@ using namespace AvZ;
 
 // Not In Queue
 // 将当前dance状态设为state（true = dance，false = 正常）
-void setDance(bool state) {
+void SetDance(bool state) {
     if(state)
         __asm__ __volatile__(
             "pushal;"
@@ -56,31 +56,26 @@ void setDance(bool state) {
         );
 }
 
-namespace _dance_cheat_internal {
-    TickRunner runner;
-
-    class Manager : GlobalVar {
-    public:
-        void beforeScript() {
-            runner.pushFunc([](){
-                setDance(false);
-            });
-            InsertTimeOperation(-599, 1, [](){
-                runner.pause();
-            });
-        }
-    } _;
+enum DanceCheatMode {
+    FAST,
+    SLOW,
+    STOP
 };
 
-namespace DanceCheat {
-    // In Queue
-    void start() {
-        _dance_cheat_internal::runner.goOn();
-    }
+TickRunner _dance_cheat_internal_runner;
 
-    // In Queue
-    void stop() {
-        _dance_cheat_internal::runner.pause();
-    }
-};
+// In Queue
+void DanceCheat(DanceCheatMode mode) {
+    InsertOperation([=](){
+        InsertGuard _(false);
+        if(_dance_cheat_internal_runner.getStatus() != STOPPED)
+            _dance_cheat_internal_runner.stop();
+        if(mode != STOP)
+            _dance_cheat_internal_runner.pushFunc([=](){
+                SetDance(mode == SLOW);
+            });
+        else
+            SetDance(false);
+    });
+}
 #endif
