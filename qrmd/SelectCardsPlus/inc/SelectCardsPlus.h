@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-05 17:20:33
  * @LastEditors: qrmd
- * @LastEditTime: 2022-08-05 23:30:54
+ * @LastEditTime: 2022-08-16 19:48:42
  * @Description:SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
  *          1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SelectCardsPlus.h" ；
@@ -38,6 +38,7 @@ void _SelectCardsFast();
 // 示例：// 选择植物卡{咖啡豆、睡莲叶、毁灭菇、模仿毁灭菇、寒冰菇、樱桃炸弹、南瓜头}，若卡槽未被填满，则自动选择植物将其填满
 // SelectCardsPlus({COFFEE_BEAN, HY_16, HMG_15, M_DOOM_SHROOM, 14, 2, PUMPKIN});
 void SelectCardsPlus(std::vector<int> list, bool is_accelerate = true);
+void SelectCardsPlus();
 
 }; // namespace _qrmd
 
@@ -141,5 +142,8 @@ void _qrmd::SelectCardsPlus(std::vector<int> list, bool is_accelerate)
     if (cards_selector.getStatus() != RUNNING)
         cards_selector.pushFunc(_SelectCardsFast, false);
 }
-
+void _qrmd::SelectCardsPlus()
+{
+    SelectCardsPlus({}, true);
+}
 using _qrmd::SelectCardsPlus;

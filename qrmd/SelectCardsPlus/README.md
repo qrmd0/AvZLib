@@ -8,7 +8,7 @@ SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
 
 ### 关键词
 
-选择植物 极速
+选择植物 极速 选择种子
 
 ## 运行环境
 
@@ -27,6 +27,9 @@ SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
 ## 使用示例
 
 ```c++
-    // 选择植物卡{咖啡豆、睡莲叶、毁灭菇、模仿毁灭菇、寒冰菇、樱桃炸弹、南瓜头}，若卡槽未被填满，则自动选择植物将其填满
-    SelectCardsPlus({COFFEE_BEAN, HY_16, HMG_15, M_DOOM_SHROOM, 14, 2, PUMPKIN});
+// 选择植物卡{咖啡豆、睡莲叶、毁灭菇、模仿毁灭菇、寒冰菇、樱桃炸弹、南瓜头}，若卡槽未被填满，则自动选择种子将其填满
+SelectCardsPlus({COFFEE_BEAN, HY_16, HMG_15, M_DOOM_SHROOM, 14, 2, PUMPKIN});
+
+// 自动选择种子将卡槽填满并快速进入战斗
+SelectCardsPlus();
 ```
