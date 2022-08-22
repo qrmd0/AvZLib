@@ -197,7 +197,7 @@ int TypeCount(const std::vector<int> &zombie_types)
 int Past(TimeWave time_wave)
 ```
 
-### avz_autoplay.h
+### avz_more_autoplay.h
 
 ```c++
 // ***Not In Queue
@@ -226,7 +226,7 @@ int GridZomHP(int row, int col, int zombie_type = GIGA_GARGANTUAR, PlantType pla
 class GridLocker
 ```
 
-### avz_autoplay.h
+### avz_more_debug.h
 
 > 存放一些调试用函数，请自行翻阅
 
