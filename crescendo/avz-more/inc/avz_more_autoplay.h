@@ -110,7 +110,7 @@ struct ZombieInfo {
 };
 
 // 获得能攻击到某格植物的僵尸的描述信息
-ZombieInfo GridZomInfo(int row, int col, int zombie_type = GIGA_GARGANTUAR, PlantType plant_type = PEASHOOTER, bool ignore_iced, bool ignore_slow, int min_hp) {
+ZombieInfo GridZomInfo(int row, int col, int zombie_type, PlantType plant_type, bool ignore_iced, bool ignore_slow, int min_hp) {
     ZombieInfo info;
     auto zombie = GetMainObject()->zombieArray();
     int zombies_count_max = GetMainObject()->zombieTotal();
@@ -240,4 +240,49 @@ class GridLocker : public TickRunner {
         ShowErrorNotInQueue("blocked_grid_list: N=#, #", blocked_grid_list.size(), ss.str());
     }
 };
+
+// 用卡单位
+class CardUnit : public GlobalVar, TickRunner {
+   public:
+    std::vector<TimeWave> card_ddl;
+    std::vector<SafePtr<CardUnit>> friend_units;
+    int trigger_count = 0;
+    int trigger_max = 1;
+
+    // 触发条件
+    virtual bool triggered() {
+        if (trigger_count > trigger_max) return false;
+        if (card_ddl.empty()) {
+            ++trigger_count;
+            return true;
+        }
+        for (auto &&ddl : card_ddl) {
+            if (Past(ddl) > 0) {
+                ++trigger_count;
+                return true;
+            }
+        }
+        return false;
+    }
+    virtual void callback();  // 触发后动作
+    virtual void run() {
+        if (triggered()) {
+            callback();
+        }
+    }
+
+    virtual void enterFight() override {
+        InsertGuard ig(false);
+        pushFunc([=]() { run(); });
+        pause();
+    }
+    virtual void start() {
+        InsertOperation([=]() {
+            SetNowTime();
+            goOn();
+        },
+                        "CardUnit::start");
+    }
+};
+
 }  // namespace cresc
