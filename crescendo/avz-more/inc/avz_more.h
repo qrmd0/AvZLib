@@ -36,18 +36,14 @@ struct ZombieAZM : public Zombie {
 };
 
 // 获得动画对象
-Animation *GetAnimation(SafePtr<ZombieAZM> z) {
+Animation *GetAnimation(SafePtr<Zombie> z) {
+    auto &&z_azm = (ZombieAZM *)z;
     return GetPvzBase()
                ->animationMain()
                ->animationOffset()
                ->animationArray() +
-           z->animationCode();
+           z_azm->animationCode();
 }
-
-Animation *GetAnimation(SafePtr<Zombie> z) {
-    return GetAnimation((ZombieAZM *)z);
-}
-
 // 获得动画对象
 Animation *GetAnimation(SafePtr<Plant> p) {
     return GetPvzBase()
@@ -819,7 +815,8 @@ int CheckPlant(int row, int col, int type = -1,
     auto plant = GetMainObject()->plantArray();
     int plants_count_max = GetMainObject()->plantCountMax();
     int plant_type;
-    std::set<Grid> valid_grids = {row, col};
+    std::set<Grid> valid_grids;
+    valid_grids.insert({row, col});
     if (type == COB_CANNON) valid_grids.insert({row, col - 1});
     for (int i = 0; i < plants_count_max; ++i, ++plant) {
         if ((!plant->isDisappeared()) && (!plant->isCrushed()) &&
