@@ -2,7 +2,7 @@
  * @Author: crescendo
  * @Date: 2021-10-12 13:19:26
  * @Last Modified by: crescendo
- * @Last Modified time: 2022-06-06 11:52:18
+ * @Last Modified time: 2022-08-26 02:31:57
  *  __AVZ_VERSION__ == 220213
  * 各种AvZ附加功能
  */
@@ -36,7 +36,7 @@ struct ZombieAZM : public Zombie {
 };
 
 // 获得动画对象
-Animation *GetAnimation(SafePtr<Zombie> z) {
+inline Animation *GetAnimation(SafePtr<Zombie> z) {
     auto &&z_azm = (ZombieAZM *)z;
     return GetPvzBase()
                ->animationMain()
@@ -45,7 +45,7 @@ Animation *GetAnimation(SafePtr<Zombie> z) {
            z_azm->animationCode();
 }
 // 获得动画对象
-Animation *GetAnimation(SafePtr<Plant> p) {
+inline Animation *GetAnimation(SafePtr<Plant> p) {
     return GetPvzBase()
                ->animationMain()
                ->animationOffset()
@@ -105,17 +105,17 @@ struct MainObjectAZM : public MainObject {
 };
 
 // 获得MainObjectAZM对象
-MainObjectAZM *MyMainObject() {
+inline MainObjectAZM *MyMainObject() {
     return (MainObjectAZM *)GetMainObject();
 }
 
 // 完成关卡数
-int GetCurrentLevel() {
+inline int GetCurrentLevel() {
     return ReadMemory<int>(0x6A9EC0, 0x768, 0x160, 0x6c);
 }
 
 // 当前阳光数
-int GetSun() {
+inline int GetSun() {
     return MyMainObject()->sun();
 }
 
@@ -170,6 +170,23 @@ void mice(int row, float col, int time = 601, int wave = -1) {
     SetPlantActiveTime(ICE_SHROOM, 420);
 }
 
+// 和AvZ::Grid完全一样，但更泛用
+struct Pair {
+    int first;
+    int second;
+
+    friend bool operator==(const Pair &pair1, const Pair &pair2) {
+        return pair1.first == pair2.first && pair1.second == pair2.second;
+    }
+
+    friend bool operator<(const Pair &pair1, const Pair &pair2) {
+        if (pair1.first == pair2.first) {
+            return pair1.second < pair2.second;
+        }
+        return pair1.first < pair2.first;
+    }
+};
+
 /** ===判定部分===**/
 
 // 获得row行col列无偏移植物的内存坐标
@@ -213,7 +230,7 @@ std::pair<int, int> GetExplodeDefenseRange(PlantType type) {
 }
 
 // 判断两个区间是否重叠
-bool IntervalIntersectInterval(int x1, int w1, int x2, int w2) {
+inline bool IntervalIntersectInterval(int x1, int w1, int x2, int w2) {
     return ((x1 <= x2 + w2) && (x2 <= x1 + w1));
 }
 
@@ -222,7 +239,6 @@ bool JudgeHit(SafePtr<Zombie> zombie, int plant_row, int plant_col, PlantType pl
     auto z = (ZombieAZM *)zombie;
     auto plant_coord = GetPlantCoord(plant_row, plant_col);
     auto def = GetDefenseRange(plant_type);
-
     return zombie->row() + 1 == plant_row && IntervalIntersectInterval(int(zombie->abscissa()) + zombie->attackAbscissa(), z->attackWidth(), plant_coord.first + def.first, def.second - def.first);
 }
 
@@ -271,6 +287,20 @@ bool CheckZombie(int type = -1, int row = -1, int left_lim = -1,
                 }
             }
     }
+    return false;
+}
+
+bool CheckZombieOr(const std::vector<int> &zombie_types, const std::vector<int> &rows = {-1}, const std::vector<int> &waves = {-1}, int hp_min = -1) {
+    for (auto &&z : zombie_types)
+        for (auto &&r : rows)
+            for (auto &&w : waves)
+                if (CheckZombie(z, r, -1, -1, w, hp_min)) return true;
+    return false;
+}
+
+bool CheckPlantOr(const std::vector<int> &plant_types, int row, int col) {
+    for (auto &&p : plant_types)
+        if (GetPlantIndex(row, col, p) >= 0) return true;
     return false;
 }
 
@@ -331,6 +361,8 @@ int DoomCD(int row, int col) {
     return doom_cd;
 }
 
+inline int DoomCD(Grid g) { return DoomCD(g.row, g.col); }
+
 // 某行的冰道倒计时
 int IceTrailCD(int row) {
     if (row < 1 || row > 6) return -1;
@@ -349,14 +381,18 @@ int IceTrailCD(int row, int col) {
         return IceTrailCD(row);
 }
 
+inline int IceTrailCD(Grid g) { return IceTrailCD(g.row, g.col); }
+
 // 某各自的核坑倒计时和冰道倒计时的较大值
 int GridCD(int row, int col) {
     return std::max(DoomCD(row, col), IceTrailCD(row, col));
 }
 
+inline int GridCD(Grid g) { return GridCD(g.row, g.col); }
+
 // 返回某卡能否成功用在某处
 // 主要用于防止Card函数一帧内调用多次Card导致不明原因崩溃
-bool Plantable(PlantType type, int row, int col) {
+inline bool Plantable(PlantType type, int row, int col) {
     return Asm::getPlantRejectType(type, row - 1, col - 1) == Asm::NIL;
 }
 
@@ -373,44 +409,75 @@ int CardCD(PlantType type) {
     return seeds[idx].initialCd() - seeds[idx].cd() + 1;
 }
 
-// 如果放置成功或下一帧尝试，返回true；否则返回false
-bool CardNIQ(PlantType plant_type, int row, int col, bool force = false) {
-    bool is_usable = IsUsable(plant_type), plantable = Plantable(plant_type, row, col);
-    if (!is_usable) return false;
-    if (plantable) {
-        CardNotInQueue(GetCardIndex(plant_type) + 1, row, col);
-        return true;
+void SimpleCardNIQ(PlantType plant_type, int row, int col) {
+    int seed_index = GetCardIndex(plant_type);
+    if (seed_index == -1) {
+        return;
     }
+    CardNotInQueue(seed_index + 1, row, col);
+}
 
-    // 如果想要强制种植，尝试铲除该位置的植物后重试
-    if (force) {
-        bool shovel_flag = false;
-        if (!RangeIn(plant_type, {LILY_PAD, FLOWER_POT, PUMPKIN})) {
-            if (GetPlantIndex(row, col) >= 0 && !(GetPlantIndex(row, col, CATTAIL) >= 0 && GetPlantIndex(row, col, PUMPKIN) < 0)) {
-                shovel_flag = true;
-            }
-        } else if (GetPlantIndex(row, col, plant_type) >= 0) {
+// 先判断能否种植，若能种植，直接返回
+// 如果要种植容器（睡莲、花盆、南瓜头），且当前位置有容器，则铲除
+// 如果不要种植容器，且当前位置有植物，则铲除
+// 注意：至多铲除一次
+bool ShovelIfNecessary(PlantType plant_type, int row, int col) {
+    if (Plantable(plant_type, row, col)) return false;
+    bool shovel_flag = false;
+    if (!RangeIn(plant_type, {LILY_PAD, FLOWER_POT, PUMPKIN})) {
+        if (GetPlantIndex(row, col) >= 0 && !(GetPlantIndex(row, col, CATTAIL) >= 0 && GetPlantIndex(row, col, PUMPKIN) < 0)) {
             shovel_flag = true;
         }
-        if (shovel_flag) {
-            SetNowTime();
-            Shovel(row, col);
-            Delay(1);
-            InsertOperation([=]() {
-                CardNIQ(plant_type, row, col, false);
-            },
-                            "cardNIQ");
-            return true;
-        }
+    } else if (GetPlantIndex(row, col, plant_type) >= 0) {
+        shovel_flag = true;
+    }
+    if (shovel_flag) {
+        ShovelNotInQueue(row, col);
+    }
+    return shovel_flag;
+}
+
+// 该函数请勿和Shovel同帧使用
+bool CardNIQ(PlantType plant_type, int row, int col, bool force = false) {
+    if (!IsUsable(plant_type)) return false;
+    if (force) {
+        ShovelIfNecessary(plant_type, row, col);
+    }
+    SimpleCardNIQ(plant_type, row, col);
+    return true;
+}
+
+// 该函数请勿和Shovel同帧使用
+bool CardNIQ(PlantType plant_type, const std::vector<Grid> &lst, bool force = false) {
+    if (!IsUsable(plant_type) || lst.empty()) return false;
+    for (auto &&l : lst) {
+        if (CardNIQ(plant_type, l.row, l.col, force)) return true;
     }
     return false;
 }
 
-void CardNIQ(PlantType plant_type, const std::vector<Grid> &lst, bool force = false) {
-    for (const auto &l : lst) {
-        if (!IsUsable(plant_type)) break;
-        if (CardNIQ(plant_type, l.row, l.col, force)) return;
+// 该函数请勿和Shovel同帧使用
+// 用多张卡
+// 注意：force只对第一张卡生效
+bool CardNIQ(const std::vector<PlantType> &plant_types, const std::vector<Grid> &lst, bool force = false) {
+    if (plant_types.empty() || lst.empty()) return false;
+    for (auto &&type : plant_types) {
+        if (!IsUsable(type)) return false;
     }
+    for (auto &&l : lst) {
+        int row = l.row, col = l.col;
+        if (force && !Plantable(plant_types.front(), row, col)) {
+            bool shovel_flag = ShovelIfNecessary(plant_types.front(), row, col);
+            if (!shovel_flag) continue;
+        }
+        for (auto &&type : plant_types) CardNIQ(type, row, col, false);
+        return true;
+    }
+    return false;
+}
+
+inline bool CardNIQ(const std::vector<PlantType> &plant_types, int row, int col, bool force = false) {
+    return CardNIQ(plant_types, {{row, col}}, force);
 }
 
 // ***In Queue
@@ -462,8 +529,7 @@ void RecoverCard(PlantType plant_type, int row, int col, bool force = true) {
             if (IsUsable(plant_type)) {
                 CardNIQ(plant_type, row, col, force);
             } else {
-                SetNowTime();
-                Delay(CardCD(plant_type));
+                SetDelayTime(CardCD(plant_type));
                 InsertOperation([=]() {
                     CardNIQ(plant_type, row, col, force);
                 },
@@ -488,8 +554,7 @@ void RecoverCard(PlantType plant_type, const std::vector<Grid> &lst, bool force 
             if (IsUsable(plant_type)) {
                 CardNIQ(plant_type, lst, force);
             } else {
-                SetNowTime();
-                Delay(CardCD(plant_type));
+                SetDelayTime(CardCD(plant_type));
                 InsertOperation([=]() {
                     CardNIQ(plant_type, lst, force);
                 },
@@ -525,8 +590,7 @@ void SafeCard(PlantType plant_type, int row, int col, bool force = true, int nee
             if (countdown == -1) {
                 CardNIQ(plant_type, row, col, force);
             } else {
-                SetNowTime();
-                Delay(countdown + 1);
+                SetDelayTime(countdown + 1);
                 SafeCard(plant_type, row, col, force, need_time);
             }
         },
@@ -574,8 +638,7 @@ void SafeCard(PlantType plant_type, const std::vector<Grid> &lst, bool force = t
                 min_wait += 1;
             else
                 min_wait = 5;  // 如果没有小丑爆炸却用卡失败，5cs后重试
-            SetNowTime();
-            Delay(min_wait);
+            SetDelayTime(min_wait);
             SafeCard(plant_type, lst, force, need_time);
         },
         "SafeCard");
@@ -610,11 +673,9 @@ void SafeCard(const std::vector<PlantType> &lst, int row, int col, bool force = 
                 }
             }
             if (countdown == -1) {
-                for (auto l : lst)
-                    CardNIQ(l, row, col, force);
+                CardNIQ(lst, row, col, force);
             } else {
-                SetNowTime();
-                Delay(countdown + 1);
+                SetDelayTime(countdown + 1);
                 SafeCard(lst, row, col, force, need_time);
             }
         },
@@ -819,24 +880,24 @@ int CheckPlant(int row, int col, int type = -1,
     valid_grids.insert({row, col});
     if (type == COB_CANNON) valid_grids.insert({row, col - 1});
     for (int i = 0; i < plants_count_max; ++i, ++plant) {
-        if ((!plant->isDisappeared()) && (!plant->isCrushed()) &&
-            valid_grids.count({plant->row() + 1, plant->col() + 1}) > 0) {
-            plant_type = plant->type();
-            if (type == -1) {
-                //如果植物存在	且不在排除类型中
-                if (ignore_types.count(plant_type) == 0)
-                    return i;  //返回植物的对象序列
-            } else {
-                if (plant_type == type) {
-                    return i;
-                } else if (ignore_types.count(plant_type) == 0 &&
-                           ignore_types.count(type) == 0) {
-                    return -2;
-                }
+        if (plant->isDisappeared()) continue;
+        if (plant->isCrushed()) continue;
+        if (valid_grids.count({plant->row() + 1, plant->col() + 1}) == 0) continue;
+        plant_type = plant->type();
+        if (type == -1) {
+            //如果植物存在	且不在排除类型中
+            if (ignore_types.count(plant_type) == 0)
+                return i;  //返回植物的对象序列
+        } else {
+            if (plant_type == type) {
+                return i;
+            } else if (ignore_types.count(plant_type) == 0 &&
+                       ignore_types.count(type) == 0) {
+                return -2;
             }
         }
-        return -1;  //没有符合要求的植物返回-1
     }
+    return -1;  //没有符合要求的植物返回-1
 }
 
 // 某两波（包含）之间所有波的波长总和
@@ -849,8 +910,19 @@ int WaveLength(int start_wave, int end_wave) {
 }
 
 // 返回某波的波长
-int WaveLength(int wave) {
+inline int WaveLength(int wave) {
     return WaveLength(wave, wave);
+}
+
+// 返回某波是否已检测到刷新（-200起）
+inline bool WaveReached(int wave) {
+    return NowTime(wave) > -1000;
+}
+
+// 是否出现以下出怪
+bool TypeExist(int zombie_type) {
+    auto zombie_type_list = GetZombieTypeList();
+    return zombie_type >= 0 && zombie_type <= 32 && zombie_type_list[zombie_type];
 }
 
 // 是否出现以下出怪之一
@@ -886,8 +958,35 @@ int Past(TimeWave time_wave) {
     return relative_time >= time_wave.time ? 1 : 0;
 }
 
-void Append(std::vector<Grid> &dest, const std::vector<Grid> &src) {
-    for (auto &&s : src) dest.emplace_back(s);
+inline int Past(int time, int wave) { return Past({time, wave}); }
+
+bool PastOr(const std::vector<TimeWave> &time_waves) {
+    for (auto &&time_wave : time_waves) {
+        if (Past(time_wave) > 0) return true;
+    }
+    return false;
+}
+
+// 尝试将时间设为某个时间点
+// 如果该波次未检测到，或当前已超过该时间点，则设为当前时间
+void TrySetTime(int time, int wave) {
+    if (Past(time, wave) != 0)
+        SetNowTime();
+    else
+        SetTime(time, wave);
+}
+
+inline void TrySetTime(TimeWave time_wave) { TrySetTime(time_wave.time, time_wave.wave); }
+
+// 弥补一些弱鸡c++不知道为什么没有的函数
+template <class T>
+void Append(std::vector<T> &dest, const std::vector<T> &src) {
+    for (auto &&s : src) dest.push_back(s);
+}
+
+template <class T>
+void Erase(std::vector<T> &vec, T val) {
+    vec.erase(std::remove(vec.begin(), vec.end(), val), vec.end());
 }
 
 }  // namespace cresc
