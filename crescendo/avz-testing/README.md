@@ -1,16 +1,17 @@
-# AvZ Testing 测试框架 220605
+# AvZ Testing 测试框架 220920
 
 [![GitHub](https://badgen.net/badge/GitHub/avz_testing/cyan?icon=github)](https://github.com/Rottenham/avz-testing)
 
 ## 运行环境
 
-本插件针对 AvZ 220213 版本开发，不确保对其它 AvZ 版本的兼容性。
+本插件针对 AvZ 220920 (Nightly) 版本开发。兼容更旧 AvZ 版本的 AvZ Testing [在此处获取](https://github.com/qrmd0/AvZLib/tree/8ffaef125c75cdff65e7cb5b3a2bc20161d0b714/crescendo/avz-testing)。
 
 ## 使用方法
 
 将 avz_testing.h 与 avz_logger.h 置于 AvZ/inc 目录后，编写脚本并运行即可。
 
 需在 Script() 外添加:
+
 ```c++
 #include "avz_testing.h"
 #include "avz_logger.h"
@@ -30,17 +31,18 @@ using namespace cresc;
 > 若打开该文件夹失败，程序会试图在 C:\Software\AsmVsZombies 目录下创建 AZL_output 文件夹。
 
 你可以自行指定输出文件夹的位置，如：
+
 ```c++
 cresc::Logger Log("C:/MyFolder");
 ```
 
 若使用反斜杠，请使用双反斜杠，如：
+
 ```c++
 cresc::Logger Log("C:\\MyFolder");
 ```
 
 > 考虑到测试样本量大的情况，示例程序默认将统计结果分10次输出，即便中途退出也能尽可能保留数据。
-
 
 ## 常见问题
 
@@ -54,6 +56,6 @@ cresc::Logger Log("C:\\MyFolder");
 
 若长时间无响应，请使用 [PVZ Tools](https://get.pvz.tools/) 或 [无炮辅助](https://tieba.baidu.com/p/6640418740) 等能够显示刷新倒计时的工具，检查是否卡在某一波次。一般这种问题的原因是测试脚本编写有问题。
 
-
 ## 更多说明
+
 https://www.bilibili.com/read/cv16933298

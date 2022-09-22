@@ -16,7 +16,7 @@
 #include "libavz.h"
 
 #ifndef __AZT_VERSION__
-#define __AZT_VERSION__ 220605
+#define __AZT_VERSION__ 220920
 #endif
 
 namespace cresc
@@ -69,7 +69,7 @@ namespace cresc
         }
     }
 
-    bool judgeExplode(SafePtr<Zombie> z, SafePtr<Plant> p)
+    bool judgeExplode(Zombie* z, Plant* p)
     {
         int x = z->abscissa(), y = z->ordinate();
         int y_dis = 0;
@@ -84,7 +84,7 @@ namespace cresc
         return p->xi() + def.first - x_dis <= x && x <= p->xi() + def.second + x_dis;
     }
 
-    bool judgeHammer(SafePtr<Zombie> z, SafePtr<Plant> p)
+    bool judgeHammer(Zombie* z, Plant* p)
     {
         if (z->row() != p->row())
             return false;
@@ -101,7 +101,7 @@ namespace cresc
         return result;
     }
 
-    void killZombie(SafePtr<Zombie> zombie)
+    void killZombie(Zombie* zombie)
     {
         zombie->state() = 3;
     }
@@ -111,9 +111,9 @@ namespace cresc
     {
     private:
         int callback_num = 0;
-        void run(std::function<bool(SafePtr<Zombie>)> condition, std::function<void(SafePtr<Zombie>)> callback)
+        void run(std::function<bool(Zombie*)> condition, std::function<void(Zombie*)> callback)
         {
-            SafePtr<Zombie> zombie = AvZ::GetMainObject()->zombieArray();
+            Zombie* zombie = AvZ::GetMainObject()->zombieArray();
             int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
             for (int i = 0; i < zombies_count_max; ++i, ++zombie)
             {
@@ -128,7 +128,7 @@ namespace cresc
 
     public:
         // ***In Queue
-        void start(std::function<bool(SafePtr<Zombie>)> condition, std::function<void(SafePtr<Zombie>)> callback)
+        void start(std::function<bool(Zombie*)> condition, std::function<void(Zombie*)> callback)
         {
             AvZ::InsertOperation([=]()
                                  { pushFunc([=]()
@@ -163,8 +163,8 @@ namespace cresc
         }
         void run(const std::vector<AvZ::Grid> &plant_list)
         {
-            SafePtr<Plant> plant = AvZ::GetMainObject()->plantArray();
-            std::vector<SafePtr<Plant>> final_plant_list;
+            Plant* plant = AvZ::GetMainObject()->plantArray();
+            std::vector<Plant*> final_plant_list;
             for (const auto &p : plant_list)
             {
                 int idx = AvZ::GetPlantIndex(p.row, p.col);
@@ -173,7 +173,7 @@ namespace cresc
                     final_plant_list.push_back(plant + idx);
                 }
             }
-            SafePtr<Zombie> zombie = AvZ::GetMainObject()->zombieArray();
+            Zombie* zombie = AvZ::GetMainObject()->zombieArray();
             int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
             for (int i = 0; i < zombies_count_max; ++i, ++zombie)
             {
@@ -264,12 +264,12 @@ namespace cresc
         // 由于技术原因，暂时不支持以下植物：仙人掌、裂荚、三线、玉米、香蒲、地刺
         const std::map<PlantType, PlantAttackInfo> PLANT_ATK_INFO = {{PEASHOOTER, {35}}, {SNOW_PEA, {35}}, {REPEATER, {26, {26, 1}}}, {PUFF_SHROOM, {29}}, {SEA_SHROOM, {29}}, {FUME_SHROOM, {50}}, {SCAREDY_SHROOM, {25}}, {STARFRUIT, {40}}, {CABBAGE_PULT, {26}}, {MELON_PULT, {36}}, {WINTER_MELON, {36}}, {GATLING_PEA, {100}}, {GLOOM_SHROOM, {200}}};
 
-        SafePtr<PlantAZT> getValidPlant(const AvZ::Grid &p, int type = -1)
+        PlantAZT* getValidPlant(const AvZ::Grid &p, int type = -1)
         {
             auto idx = AvZ::GetPlantIndex(p.row, p.col);
             if (idx < 0)
                 return nullptr;
-            SafePtr<PlantAZT> plant = (PlantAZT *)AvZ::GetMainObject()->plantArray();
+            PlantAZT* plant = (PlantAZT *)AvZ::GetMainObject()->plantArray();
             plant += idx;
             bool valid_plant = true;
             if (type != -1)
@@ -365,7 +365,7 @@ namespace cresc
     // AvZ::IsZombieExist有bug，重新实现
     bool checkZombieExist(int type = -1, int row = -1)
     {
-        SafePtr<Zombie> zombie = AvZ::GetMainObject()->zombieArray();
+        Zombie* zombie = AvZ::GetMainObject()->zombieArray();
         int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
         for (int i = 0; i < zombies_count_max; ++i, ++zombie)
         {
@@ -561,11 +561,39 @@ namespace cresc
         }
     }
 
+    // 不长墓碑，不出墓碑、珊瑚、空降僵尸
+    void forbid3zGroup(bool f = true)
+    {
+        if (f)
+        {
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x0042694a);
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x00413083);
+        }
+        else
+        {
+            AvZ::WriteMemory<uint8_t>(0x75, 0x0042694a);
+            AvZ::WriteMemory<uint8_t>(0x75, 0x00413083);
+        }
+    }
+
+    // 取消炸陆地的炮的延迟引信
+    void forbidFireDelay(bool f = true)
+    {
+        if (f)
+        {
+            AvZ::WriteMemory<uint16_t>(0x9700, 0x0046d672);
+        }
+        else
+        {
+            AvZ::WriteMemory<uint16_t>(0x96d0, 0x0046d672);
+        }
+    }
+
     // ***Not In Queue
     // 移动单波僵尸
     void moveZombieOne(ZombieType zombie_type, const std::set<int> &rows, int height, int baseY)
     {
-        SafePtr<ZombieAZT> zombie = (ZombieAZT *)AvZ::GetMainObject()->zombieArray();
+        ZombieAZT* zombie = (ZombieAZT *) AvZ::GetMainObject()->zombieArray();
         int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
         auto it = rows.begin();
         std::advance(it, rand() % (rows.size()));
@@ -643,7 +671,7 @@ namespace cresc
 
     void killAllZombieByType(const std::set<ZombieType> &type_list)
     {
-        SafePtr<Zombie> zombie = AvZ::GetMainObject()->zombieArray();
+        Zombie* zombie = AvZ::GetMainObject()->zombieArray();
         int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
         for (int i = 0; i < zombies_count_max; ++i, ++zombie)
         {
@@ -708,7 +736,7 @@ namespace cresc
             AvZ::InsertTimeOperation(
                 1, w, [=]()
                 {
-                SafePtr<Zombie> zombie = AvZ::GetMainObject()->zombieArray();
+                Zombie* zombie = AvZ::GetMainObject()->zombieArray();
                 int zombies_count_max = AvZ::GetMainObject()->zombieTotal();
                 for (int i = 0; i < zombies_count_max; ++i, ++zombie)
                 {
@@ -768,7 +796,7 @@ namespace cresc
         }
     };
 
-    AnimationAZT *getAnimationFromZombie(SafePtr<Zombie> zombie)
+    AnimationAZT *getAnimationFromZombie(Zombie* zombie)
     {
         ZombieAZT *zombieazt_ptr = (ZombieAZT *)zombie;
         int animation_index = zombieazt_ptr->animationIndex();
