@@ -242,7 +242,7 @@ inline SMShowObj<Seed>::SMShowObj()
     info_func = [=](Seed* seed) {
         SMText text;
         text += "类型:" + name_dict[seed->type()] + '\n';
-        text += "冷却:" + std::to_string(seed->initialCd() - seed->cd());
+        text += "冷却:" + std::to_string(seed->isUsable() ? 0 : seed->initialCd() - seed->cd());
         return text;
     };
     name_dict = {
@@ -262,7 +262,10 @@ template <>
 inline Seed* SMShowObj<Seed>::findObject(int mouse_x, int mouse_y)
 {
     float min_distance = 0xffff;
-    for (auto&& obj : AvZ::alive_seed_filter) {
+    int seed_cnt = AvZ::GetMainObject()->seedArray()->count();
+    auto seed_array = AvZ::GetMainObject()->seedArray();
+    for (int idx = 0; idx < seed_cnt; ++idx) {
+        auto&& obj = seed_array[idx];
         auto type = obj.type();
         if (!type_dict[type]) {
             continue;
@@ -275,6 +278,7 @@ inline Seed* SMShowObj<Seed>::findObject(int mouse_x, int mouse_y)
             return &obj;
         }
     }
+
     return nullptr;
 }
 
