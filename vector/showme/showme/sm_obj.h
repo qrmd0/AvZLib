@@ -283,6 +283,7 @@ inline SMShowObj<PlaceItem>::SMShowObj()
 {
     type_dict.assign(14 + 1, 0);
     type_dict[2] = 1;
+    type_dict.back() = 1;
     info_func = [=](PlaceItem* place_item) {
         SMText text;
         text += "类型:" + name_dict[place_item->type()] + '\n';
@@ -300,7 +301,6 @@ inline SMShowObj<PlaceItem>::SMShowObj()
 template <>
 inline PlaceItem* SMShowObj<PlaceItem>::findObject(int mouse_x, int mouse_y)
 {
-    float min_distance = 0xffff;
     for (auto&& obj : AvZ::alive_place_item_filter) {
         auto type = obj.type();
         if (!type_dict[type]) {
