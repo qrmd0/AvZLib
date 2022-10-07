@@ -1,3 +1,6 @@
+#ifndef __GetZombieAbscissas
+#define __GetZombieAbscissas
+
 #include "avz.h"
 #include <vector>
 using namespace AvZ;
@@ -293,3 +296,5 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
     }
     return result;
 }
+
+#endif

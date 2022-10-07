@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-13 13:20:20
  * @LastEditors: qrmd
- * @LastEditTime: 2022-08-16 19:47:08
+ * @LastEditTime: 2022-10-07 20:37:29
  * @Description:PlantFixer的增强版本，支持紫卡修补、咖啡豆修补等功能
  * 使用方法：1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "PlantFixerPlus.h" ；
@@ -13,6 +13,8 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
+#ifndef __PlantFixerPlus
+#define __PlantFixerPlus
 #include "avz.h"
 
 using namespace AvZ;
@@ -358,3 +360,5 @@ void PlantFixerPlus::resetFixHpThreshold(unsigned int fix_hp_threshold)
 {
     InsertOperation([=]() { _fix_hp_threshold = fix_hp_threshold; }, "resetFixHp:" + std::to_string(fix_hp_threshold));
 }
+
+#endif

@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-05 17:20:33
  * @LastEditors: qrmd
- * @LastEditTime: 2022-08-16 19:48:42
+ * @LastEditTime: 2022-10-07 20:41:40
  * @Description:SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
  *          1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SelectCardsPlus.h" ；
@@ -13,6 +13,9 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
+
+#ifndef __SelectCardsPlus
+#define __SelectCardsPlus
 
 #include "avz.h"
 
@@ -147,3 +150,5 @@ void _qrmd::SelectCardsPlus()
     SelectCardsPlus({}, true);
 }
 using _qrmd::SelectCardsPlus;
+
+#endif

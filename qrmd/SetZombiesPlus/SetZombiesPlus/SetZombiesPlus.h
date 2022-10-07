@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-05 19:56:17
  * @LastEditors: qrmd
- * @LastEditTime: 2022-07-14 16:03:57
+ * @LastEditTime: 2022-10-07 20:43:12
  * @Description:SetZomies的增强版本，更自由地设置出怪
  * 使用方法：1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SetZombiesPlus.h" ；
@@ -13,6 +13,9 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
+
+#ifndef __SetZombiesPlus
+#define __SetZombiesPlus
 
 #include "avz.h"
 #include <ctime>
@@ -392,3 +395,5 @@ void _qrmd::SetWaveZombieList(int wave, std::vector<WaveZombies> wave_zombies)
         index += each.number;
     }
 }
+
+#endif

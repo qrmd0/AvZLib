@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-06-09 00:03:58
  * @LastEditors: qrmd
- * @LastEditTime: 2022-07-06 12:52:09
+ * @LastEditTime: 2022-10-07 20:35:28
  * @Description:KeyAssistant按键辅助AvZ插件
  * 来自AsmVsZombies的公开插件仓库：
  * 主库：https://github.com/qrmd0/AvZLib
@@ -10,6 +10,9 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
+
+#ifndef __KeyAssistant
+#define __KeyAssistant
 
 #include "avz.h"
 using namespace AvZ;
@@ -26,7 +29,9 @@ public:
     // *** In Queue
     // 启用
     void enable()
+
     {
+
         InsertOperation([=]() {
             ShowErrorNotInQueue("按键辅助已启用，快捷键说明：\n数字键：在光标处种植对应卡槽位置的植物\nC：铲除光标处的植物\nR：开关高级暂停\nA：减慢游戏运行速度\nD：加快游戏运行速度\nS：恢复游戏运行速度\nX：开关女仆秘籍\nZ：开关自动收集掉落物\nP：停用按键辅助，恢复游戏运行速度并停用女仆秘籍");
             key_connect_plus.clear();
@@ -130,3 +135,5 @@ public:
         ShowErrorNotInQueue("按键辅助已停用，将恢复游戏运行速度并停用女仆秘籍");
     }
 } key_assistant;
+
+#endif

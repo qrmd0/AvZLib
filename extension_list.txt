@@ -1,1 +1,7 @@
 vector/showme
+qrmd/GetZombieAbscissas
+qrmd/KeyAssistant
+qrmd/PlantFixerPlus
+qrmd/SelectCardsPlus
+qrmd/SetZombiesPlus
+qrmd/TickPlanter

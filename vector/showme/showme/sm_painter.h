@@ -152,6 +152,102 @@ public:
         }
     }
 
+    // 控制进度条内容的增长方向
+    enum Direction {
+        UP = 0,
+        LEFT = 1,
+        DOWN = 2,
+        RIGHT = 3
+    };
+
+    // 绘制矩形进度条
+    // [painter] 填入用于绘制进度条的 SMPainter;
+    // [pos_x] 填入进度条中心所在的横坐标；
+    // [pos_y] 填入进度条中心所在的纵坐标；
+    // [rate] 填入进度条的进度比率，取值范围为 [0, 1]；
+    // [size_x] 填入进度条内容的横向长度，默认为 76；
+    // [size_y] 填入进度条内容的纵向长度，默认为 6；
+    // [frame_thickness] 填入进度条的边框粗细，默认为 1；
+    // [ARGB] 填入进度条内容的不透明度和RGB颜色信息，默认为不透明橙色。背景的不透明度与内容相同，颜色为白色，边框的不透明度与内容相同，颜色为黑色；
+    // [direction] 填入进度条内容的增长方向，参数前面需加上 SMPainter:: ，默认为 RIGHT；
+    // [seperators] 填入进度条的分节线位置，其元素取值范围为 [0, 1]，默认为空
+    void drawBar(int pos_x, int pos_y, double rate, int size_x = 76, int size_y = 6, int frame_thickness = 1, uint32_t ARGB = 0xFFFFFC000, Direction direction = RIGHT, std::vector<double> separators = {})
+    {
+        uint8_t alpha = (ARGB & (0xFF << 24)) >> 24;
+
+        int content_x = int(rate * size_x);
+        int content_y = int(rate * size_y);
+
+        // 绘制内容
+        this->setColor(SMArgb(0xFF, 0x0, 0x0, 0x0), ARGB);
+        switch (direction) {
+        case UP:
+            this->drawRect(pos_x - size_x / 2, pos_y + size_y / 2 - content_y, size_x, content_y);
+            break;
+        case LEFT:
+            this->drawRect(pos_x + size_x / 2 - content_x + 1, pos_y - size_y / 2, content_x, size_y);
+            break;
+        case DOWN:
+            this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2, size_x, content_y);
+            break;
+        case RIGHT:
+            this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2, content_x, size_y);
+            break;
+        default:
+            break;
+        }
+
+        // 绘制背景
+        this->setColor(SMArgb(0xFF, 0x0, 0x0, 0x0), SMArgb(alpha, 0xFF, 0xFF, 0xFF));
+        switch (direction) {
+        case UP:
+            this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2, size_x, size_y - content_y);
+            break;
+        case LEFT:
+            this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2, size_x - content_x, size_y);
+            break;
+        case DOWN:
+            this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2 + content_y, size_x, size_y - content_y);
+            break;
+        case RIGHT:
+            this->drawRect(pos_x - size_x / 2 + content_x, pos_y - size_y / 2, size_x - content_x, size_y);
+            break;
+        default:
+            break;
+        }
+
+        // 绘制边框
+        this->setColor(SMArgb(0xFF, 0x0, 0x0, 0x0), SMArgb(alpha, 0x00, 0x00, 0x00));
+        // 绘制上边框
+        this->drawRect(pos_x - size_x / 2 - frame_thickness, pos_y - size_y / 2 - frame_thickness, frame_thickness + size_x, frame_thickness);
+        // 绘制右边框
+        this->drawRect(pos_x + size_x / 2, pos_y - size_y / 2 - frame_thickness, frame_thickness, frame_thickness + size_y);
+        // 绘制下边框
+        this->drawRect(pos_x - size_x / 2, pos_y + size_y / 2, size_x + frame_thickness, frame_thickness);
+        // 绘制左边框
+        this->drawRect(pos_x - size_x / 2 - frame_thickness, pos_y - size_y / 2, frame_thickness, size_y + frame_thickness);
+
+        // 绘制分节线
+        for (auto each : separators) {
+            switch (direction) {
+            case UP:
+                this->drawRect(pos_x - size_x / 2, pos_y + size_y / 2 - each * size_y, size_x, frame_thickness);
+                break;
+            case LEFT:
+                this->drawRect(pos_x + size_x / 2 - each * size_x, pos_y - size_y / 2, frame_thickness, size_y);
+                break;
+            case DOWN:
+                this->drawRect(pos_x - size_x / 2, pos_y - size_y / 2 + each * size_y, size_x, frame_thickness);
+                break;
+            case RIGHT:
+                this->drawRect(pos_x - size_x / 2 + each * size_x, pos_y - size_y / 2, frame_thickness, size_y);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
     virtual void enterFight() override
     {
         // InstallDrawHook

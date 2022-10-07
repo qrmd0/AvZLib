@@ -6,6 +6,9 @@
  * @AvZ版本：220213
  */
 
+#ifndef __TickPlanter
+#define __TickPlanter
+
 #include "avz.h"
 using namespace AvZ;
 #include <vector>
@@ -168,3 +171,5 @@ private:
 };
 TickPlanter tick_planter;
 }
+
+#endif
