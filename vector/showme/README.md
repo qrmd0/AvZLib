@@ -1,4 +1,5 @@
 <!--
+
  * @Coding: utf-8
  * @Author: vector-wlc
  * @Date: 2022-10-01 16:10:38
@@ -60,6 +61,27 @@
     // drawText("hello", 100, 100) ------ 在游戏画面(100, 100) 处绘制 hello
     // drawText("hello", 100, 100, RIGHT_TOP) ------ 在游戏画面(100, 100) 处绘制 hello, 并且文本绘制是在 (100, 100) 的右上方
     void drawText(const SMText& text, int x, int y, int pos = RIGHT_BUTTOM);
+
+    // 控制进度条内容的增长方向
+    enum Direction {
+        UP = 0,
+        LEFT = 1,
+        DOWN = 2,
+        RIGHT = 3
+    };
+
+	// 绘制矩形进度条
+    // [painter] 填入用于绘制进度条的 SMPainter;
+    // [pos_x] 填入进度条中心所在的横坐标；
+    // [pos_y] 填入进度条中心所在的纵坐标；
+    // [rate] 填入进度条的进度比率，取值范围为 [0, 1]；
+    // [size_x] 填入进度条内容的横向长度，默认为 76；
+    // [size_y] 填入进度条内容的纵向长度，默认为 6；
+    // [frame_thickness] 填入进度条的边框粗细，默认为 1；
+    // [ARGB] 填入进度条内容的不透明度和RGB颜色信息，默认为不透明橙色。背景的不透明度与内容相同，颜色为白色，边框的不透明度与内容相同，颜色为黑色；
+    // [direction] 填入进度条内容的增长方向，参数前面需加上 SMPainter:: ，默认为 RIGHT；
+    // [seperators] 填入进度条的分节线位置，其元素取值范围为 [0, 1]，默认为空
+    void drawBar(int pos_x, int pos_y, double rate, int size_x = 76, int size_y = 6, int frame_thickness = 1, uint32_t ARGB = 0xFFFFFC000, Direction direction = RIGHT, std::vector<double> separators = {});
 ```
 
 `SMShowObj` 中的接口如下：
@@ -275,3 +297,6 @@ void Script()
 }
 ```
 
+## 更新记录
+### 2022_10_07
+支持绘制矩形进度条，更直观地展示战场，详见 SMPainter 的 drawBar 用法。
