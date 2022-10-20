@@ -5,3 +5,4 @@ qrmd/PlantFixerPlus
 qrmd/SelectCardsPlus
 qrmd/SetZombiesPlus
 qrmd/TickPlanter
+shallowdream/shallowdream
