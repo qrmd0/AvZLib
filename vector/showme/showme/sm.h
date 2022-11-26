@@ -7,98 +7,92 @@
 #ifndef __SM_H__
 #define __SM_H__
 
-#include "avz.h"
 #include "sm_obj.h"
 #include "sm_painter.h"
-#include <functional>
+#include <avz.h>
 
-class SMShowMe {
+class SMShowMe : public ATickRunnerWithNoStart {
 
 public:
     // 得到画家
-    SMPainter& getPainter()
+    SMPainter& GetPainter()
     {
         return painter;
     }
 
     // 得到植物信息显示设置
-    SMShowObj<Plant>& getPlantSettings()
+    SMShowObj<APlant>& GetPlantSettings()
     {
         return plant;
     }
 
     // 得到僵尸信息显示设置
-    SMShowObj<Zombie>& getZombieSettings()
+    SMShowObj<AZombie>& GetZombieSettings()
     {
         return zombie;
     }
 
     // 得到种子/卡片信息显示设置
-    SMShowObj<Seed>& getSeedSettings()
+    SMShowObj<ASeed>& GetSeedSettings()
     {
         return seed;
     }
 
     // 得到场地物品信息显示设置
-    SMShowObj<PlaceItem>& getPlaceItemSettings()
+    SMShowObj<APlaceItem>& GetPlaceItemSettings()
     {
-        return place_item;
+        return placeItem;
     }
 
-    bool draw()
+    void Start()
     {
-        if (!painter.isOk()) {
-            return false;
-        }
+        _tickManager.Start([this] {
+            auto mouseWindow = AGetPvzBase()->MouseWindow();
+            int mouseX = mouseWindow->MouseAbscissa();
+            int mouseY = mouseWindow->MouseOrdinate();
+            int txtPos = -1;
 
-        if (AvZ::GetPvzBase()->gameUi() != 3) {
-            return false;
-        }
-        auto mouse_window = AvZ::GetPvzBase()->mouseWindow();
-        int mouse_x = mouse_window->mouseAbscissa();
-        int mouse_y = mouse_window->mouseOrdinate();
-        int txt_pos = -1;
-
-        // Plant
-        if (plant.getTypeDict().back()) {
-            auto show_info = plant.getShowText(mouse_x, mouse_y);
-            if (!show_info.empty()) {
-                painter.drawText(show_info, mouse_x, mouse_y, ++txt_pos);
+            // Plant
+            if (plant.GetTypeDict().back()) {
+                auto showInfo = plant.GetShowText(mouseX, mouseY);
+                if (!showInfo.empty()) {
+                    painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
+                }
             }
-        }
 
-        // Zombie
-        if (zombie.getTypeDict().back()) {
-            auto show_info = zombie.getShowText(mouse_x, mouse_y);
-            if (!show_info.empty()) {
-                painter.drawText(show_info, mouse_x, mouse_y, ++txt_pos);
+            // Zombie
+            if (zombie.GetTypeDict().back()) {
+                auto showInfo = zombie.GetShowText(mouseX, mouseY);
+                if (!showInfo.empty()) {
+                    painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
+                }
             }
-        }
 
-        // Seed
-        if (seed.getTypeDict().back()) {
-            auto show_info = seed.getShowText(mouse_x, mouse_y);
-            if (!show_info.empty()) {
-                painter.drawText(show_info, mouse_x, mouse_y, ++txt_pos);
+            // Seed
+            if (seed.GetTypeDict().back()) {
+                auto showInfo = seed.GetShowText(mouseX, mouseY);
+                if (!showInfo.empty()) {
+                    painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
+                }
             }
-        }
 
-        // PlaceItem
-        if (place_item.getTypeDict().back()) {
-            auto show_info = place_item.getShowText(mouse_x, mouse_y);
-            if (!show_info.empty()) {
-                painter.drawText(show_info, mouse_x, mouse_y, ++txt_pos);
+            // PlaceItem
+            if (placeItem.GetTypeDict().back()) {
+                auto showInfo = placeItem.GetShowText(mouseX, mouseY);
+                if (!showInfo.empty()) {
+                    painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
+                }
             }
-        }
-        return true;
+        },
+            false);
     }
 
 protected:
     SMPainter painter;
-    SMShowObj<Plant> plant;
-    SMShowObj<Zombie> zombie;
-    SMShowObj<Seed> seed;
-    SMShowObj<PlaceItem> place_item;
+    SMShowObj<APlant> plant;
+    SMShowObj<AZombie> zombie;
+    SMShowObj<ASeed> seed;
+    SMShowObj<APlaceItem> placeItem;
 };
 
 #endif

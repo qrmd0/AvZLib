@@ -7,21 +7,34 @@
 
 #ifndef __SMIDCT_H__
 #define __SMIDCT_H__
-#include "avz_global.h"
-#include "libavz.h"
-#include "sm_types.h"
-#include <sstream>
-#include <string>
-#include <unordered_map>
-#include <vector>
+#include <avz.h>
 
-#define DEFAULT_STATE 0xffff
+constexpr int DEFAULT_STATE = 0xffff;
 
 template <typename T>
 class SMShowObj {
 public:
+    struct SMFindInfo {
+        float threshold;
+        float offsetX;
+        float offsetY;
+
+        SMFindInfo(float threshold, float offsetX, float offsetY)
+            : threshold(threshold)
+            , offsetX(offsetX)
+            , offsetY(offsetY)
+        {
+        }
+
+        SMFindInfo()
+            : threshold(40)
+            , offsetX(0.5f)
+            , offsetY(0.5f)
+        {
+        }
+    };
     template <typename F>
-    using InfoFunc = std::function<SMText(F*)>;
+    using InfoFunc = std::function<std::string(F*)>;
     using FindInfoDict = std::vector<std::unordered_map<int, SMFindInfo>>;
     SMShowObj()
     {
@@ -29,96 +42,98 @@ public:
 
     // 设置显示种类
     // 使用示例
-    // setShowType({YMJNP_47, HBG_14}) ----- 仅显示玉米加农炮和寒冰菇的内存信息
-    void setShowType(const std::vector<int>& type_vec)
+    // SetShowType({YMJNP_47, HBG_14}) ----- 仅显示玉米加农炮和寒冰菇的内存信息
+    void SetShowType(const std::vector<int>& typeVec)
     {
-        type_dict.assign(type_dict.size(), 0);
-        type_dict.back() = int(!type_vec.empty());
-        for (auto&& type : type_vec) {
-            if (type < type_dict.size()) {
-                type_dict[type] = 1;
+        _typeDict.assign(_typeDict.size(), 0);
+        _typeDict.back() = int(!typeVec.empty());
+        for (auto&& type : typeVec) {
+            if (type < _typeDict.size()) {
+                _typeDict[type] = 1;
             }
         }
     }
 
     // 设置显示函数
     // 使用示例
-    // setShowInfoFunc([=](Plant* plant) {
-    //     SMText text;
-    //     text += "类型:" + name_dict[plant->type()] + '\n';
+    // SetShowInfoFunc([=](APlant* plant) {
+    //     std::string text;
+    //     text += "类型:" + _nameDict[plant->type()] + '\n';
     //     text += "血量:" + std::to_string(plant->hp());
     //     return text;
     // }); ------- 显示植物中的 类型 和 血量 信息
-    void setShowInfoFunc(InfoFunc<Plant> func)
+    template <typename Func>
+        requires std::is_convertible_v<Func, InfoFunc<T>>
+    void SetShowInfoFunc(Func&& func)
     {
-        this->info_func = func;
+        this->_infoFunc = std::forward<Func>(func);
     }
 
-    T* findObject(int mouse_x, int mouse_y)
+    T* FindObject(int mouseX, int mouseY)
     {
         return nullptr;
     }
 
-    SMText getShowText(int mouse_x, int mouse_y)
+    std::string GetShowText(int mouseX, int mouseY)
     {
-        auto ptr = findObject(mouse_x, mouse_y);
+        auto ptr = FindObject(mouseX, mouseY);
         if (ptr) {
-            return info_func(ptr);
+            return _infoFunc(ptr);
         }
-        return {};
+        return std::string();
     }
 
     // 得到鼠标寻找对象的字典信息
     // 使用示例
-    // auto&& dict = getFindDict();
+    // auto&& dict = GetFindDict();
     // dict[Type][State].threshold = 50;  ---- 将类型为 Type、状态为 State 的对象的寻找阈值设置为 50
-    // dict[Type][State].offset_x = 0.3;  ---- 将类型为 Type、状态为 State 的对象的中心偏移量设置为 0.3
+    // dict[Type][State].offsetX = 0.3;  ---- 将类型为 Type、状态为 State 的对象的中心偏移量设置为 0.3
     // 进一步解释
     // threshold 指的是鼠标离游戏内对象"中心"的寻找距离，即当鼠标所在位置和游戏内对象的"中心"距离小于 50 时，就会显示对象的内存信息
     // 这里所说的距离是欧氏距离
-    // offset_x 指的是计算对象"中心"时用到的偏移量，由于在 PvZ 这个游戏中，没有直接的存储对象画面中心信息的内存，
-    // 这个中心需要通过计算得到， 在这里，中心横坐标的计算公式为 $center_x = 对象横坐标 + 对象的判定宽度 * offset_x$,
+    // offsetX 指的是计算对象"中心"时用到的偏移量，由于在 PvZ 这个游戏中，没有直接的存储对象画面中心信息的内存，
+    // 这个中心需要通过计算得到， 在这里，中心横坐标的计算公式为 $centerX = 对象横坐标 + 对象的判定宽度 * offsetX$,
     // 纵坐标同理
-    FindInfoDict& getFindDict()
+    FindInfoDict& GetFindDict()
     {
-        return find_info_dict;
+        return _findInfoDict;
     }
 
     // 得到对象的字符串名称
     // 使用示例
     // auto&& dict = getNameDict();
-    // dict[YMJNP_47] = "春哥";   ----- 将玉米加农炮的名称设置为 春哥
-    std::vector<std::string>& getNameDict()
+    // dict[int(AYMJNP_47)] = "春哥";   ----- 将玉米加农炮的名称设置为 春哥
+    std::vector<std::string>& GetNameDict()
     {
-        return name_dict;
+        return _nameDict;
     }
 
-    std::vector<uint8_t>& getTypeDict()
+    std::vector<uint8_t>& GetTypeDict()
     {
-        return type_dict;
+        return _typeDict;
     }
 
 protected:
-    std::vector<uint8_t> type_dict; // 最后一位用来记录是否用遍历
-    InfoFunc<T> info_func;
-    FindInfoDict find_info_dict;
-    std::vector<std::string> name_dict;
+    std::vector<uint8_t> _typeDict; // 最后一位用来记录是否用遍历
+    InfoFunc<T> _infoFunc;
+    FindInfoDict _findInfoDict;
+    std::vector<std::string> _nameDict;
 };
 
 template <>
-inline SMShowObj<Plant>::SMShowObj()
+inline SMShowObj<APlant>::SMShowObj()
 {
-    type_dict.assign(48 + 1, 1);
+    _typeDict.assign(48 + 1, 1);
 
     // 初始化字符串生成函数
-    info_func = [=](Plant* plant) {
-        SMText text;
-        text += "类型:" + name_dict[plant->type()] + '\n';
-        text += "血量:" + std::to_string(plant->hp());
+    _infoFunc = [=](APlant* plant) {
+        std::string text;
+        text += "类型:" + _nameDict[plant->Type()] + '\n';
+        text += "血量:" + std::to_string(plant->Hp());
         return text;
     };
 
-    name_dict = {
+    _nameDict = {
         "豌豆射手", "向日葵", "樱桃炸弹", "坚果", "土豆雷",
         "寒冰射手", "大嘴花", "双发射手", "小喷菇", "阳光菇",
         "大喷菇", "墓被吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
@@ -132,55 +147,55 @@ inline SMShowObj<Plant>::SMShowObj()
 
     std::pair<int, SMFindInfo> temp(DEFAULT_STATE, SMFindInfo(30, 0.5, 0.5));
     for (int type = 0; type < 48; ++type) {
-        find_info_dict.push_back({temp});
+        _findInfoDict.push_back({temp});
     }
-    find_info_dict[16][DEFAULT_STATE].offset_y = 1;
-    find_info_dict[30][DEFAULT_STATE].offset_x = 0.33;
-    find_info_dict[30][DEFAULT_STATE].offset_y = 0.66;
-    find_info_dict[33][DEFAULT_STATE].offset_y = 1;
+    _findInfoDict[16][DEFAULT_STATE].offsetY = 1;
+    _findInfoDict[30][DEFAULT_STATE].offsetX = 0.33;
+    _findInfoDict[30][DEFAULT_STATE].offsetY = 0.66;
+    _findInfoDict[33][DEFAULT_STATE].offsetY = 1;
 }
 
 template <>
-inline Plant* SMShowObj<Plant>::findObject(int mouse_x, int mouse_y)
+inline APlant* SMShowObj<APlant>::FindObject(int mouseX, int mouseY)
 {
 
-    float min_distance = 0xffff;
-    Plant* find_ptr = nullptr;
-    for (auto&& obj : AvZ::alive_plant_filter) {
-        auto type = obj.type();
-        if (!type_dict[type]) {
+    float minDistance = 0xffff;
+    APlant* findPtr = nullptr;
+    for (auto&& obj : aAlivePlantFilter) {
+        auto type = obj.Type();
+        if (!_typeDict[type]) {
             continue;
         }
 
-        auto&& find_map = find_info_dict[type];
-        auto info_iter = find_map.find(obj.state());
-        auto&& info = info_iter == find_map.end() ? find_map[DEFAULT_STATE] : info_iter->second;
-        float x_distance = mouse_x - obj.abscissa() - obj.hurtWidth() * info.offset_x;
-        float y_distance = mouse_y - obj.ordinate() - obj.hurtHeight() * info.offset_y;
-        float distance2 = x_distance * x_distance + y_distance * y_distance;
+        auto&& findMap = _findInfoDict[type];
+        auto infoIter = findMap.find(obj.State());
+        auto&& info = infoIter == findMap.end() ? findMap[DEFAULT_STATE] : infoIter->second;
+        float xDistance = mouseX - obj.Abscissa() - obj.HurtWidth() * info.offsetX;
+        float yDistance = mouseY - obj.Ordinate() - obj.HurtHeight() * info.offsetY;
+        float distance2 = xDistance * xDistance + yDistance * yDistance;
         float threshold2 = info.threshold * info.threshold;
         if (distance2 > threshold2) {
             continue;
         }
-        if (distance2 < min_distance) {
-            min_distance = distance2;
-            find_ptr = &obj;
+        if (distance2 < minDistance) {
+            minDistance = distance2;
+            findPtr = &obj;
         }
     }
-    return find_ptr;
+    return findPtr;
 }
 
 template <>
-inline SMShowObj<Zombie>::SMShowObj()
+inline SMShowObj<AZombie>::SMShowObj()
 {
-    type_dict.assign(33 + 1, 1);
-    info_func = [=](Zombie* zombie) {
-        SMText text;
-        text += "类型:" + name_dict[zombie->type()] + '\n';
-        text += "血量:" + std::to_string(zombie->hp());
+    _typeDict.assign(33 + 1, 1);
+    _infoFunc = [=](AZombie* zombie) {
+        std::string text;
+        text += "类型:" + _nameDict[zombie->Type()] + '\n';
+        text += "血量:" + std::to_string(zombie->Hp());
         return text;
     };
-    name_dict = {
+    _nameDict = {
         "普僵", "旗帜", "路障", "撑杆", "铁桶", "读报",
         "铁门", "橄榄", "舞王", "伴舞", "鸭子", "潜水",
         "冰车", "雪橇", "海豚", "小丑", "气球", "矿工",
@@ -191,61 +206,61 @@ inline SMShowObj<Zombie>::SMShowObj()
     std::pair<int, SMFindInfo> temp(DEFAULT_STATE, SMFindInfo(30, 1.2, 0.5));
 
     for (int type = 0; type < 48; ++type) {
-        find_info_dict.push_back({temp});
+        _findInfoDict.push_back({temp});
     }
-    find_info_dict[11][59] = {50, 0.5, 1};
-    find_info_dict[12][DEFAULT_STATE] = {50, 0.5, 0.5};
-    find_info_dict[14][DEFAULT_STATE] = {50, 1.2, 0.8};
-    find_info_dict[16][75] = {50, 1.2, 0.8};
-    find_info_dict[17][32] = {50, 2, 1};
-    find_info_dict[17][DEFAULT_STATE] = {50, 2, 0.5};
-    find_info_dict[20][DEFAULT_STATE] = {50, 0.4, 0.5};
-    find_info_dict[22][DEFAULT_STATE] = {50, 0.5, 0.5};
-    find_info_dict[23][DEFAULT_STATE] = {50, 0.5, 0.3};
-    find_info_dict[24][DEFAULT_STATE] = {50, 1.3, 0.8};
-    find_info_dict[32][DEFAULT_STATE] = {50, 0.5, 0.3};
+    _findInfoDict[11][59] = {50, 0.5, 1};
+    _findInfoDict[12][DEFAULT_STATE] = {50, 0.5, 0.5};
+    _findInfoDict[14][DEFAULT_STATE] = {50, 1.2, 0.8};
+    _findInfoDict[16][75] = {50, 1.2, 0.8};
+    _findInfoDict[17][32] = {50, 2, 1};
+    _findInfoDict[17][DEFAULT_STATE] = {50, 2, 0.5};
+    _findInfoDict[20][DEFAULT_STATE] = {50, 0.4, 0.5};
+    _findInfoDict[22][DEFAULT_STATE] = {50, 0.5, 0.5};
+    _findInfoDict[23][DEFAULT_STATE] = {50, 0.5, 0.3};
+    _findInfoDict[24][DEFAULT_STATE] = {50, 1.3, 0.8};
+    _findInfoDict[32][DEFAULT_STATE] = {50, 0.5, 0.3};
 }
 
 template <>
-inline Zombie* SMShowObj<Zombie>::findObject(int mouse_x, int mouse_y)
+inline AZombie* SMShowObj<AZombie>::FindObject(int mouseX, int mouseY)
 {
-    float min_distance = 0xffff;
-    Zombie* find_ptr = nullptr;
-    for (auto&& obj : AvZ::alive_zombie_filter) {
-        auto type = obj.type();
-        if (!type_dict[type]) {
+    float minDistance = 0xffff;
+    AZombie* findPtr = nullptr;
+    for (auto&& obj : aAliveZombieFilter) {
+        auto type = obj.Type();
+        if (!_typeDict[type]) {
             continue;
         }
 
-        auto&& find_map = find_info_dict[type];
-        auto info_iter = find_map.find(obj.state());
-        auto&& info = info_iter == find_map.end() ? find_map[DEFAULT_STATE] : info_iter->second;
-        float x_distance = mouse_x - obj.abscissa() - obj.hurtWidth() * info.offset_x;
-        float y_distance = mouse_y - obj.ordinate() - obj.hurtHeight() * info.offset_y;
-        float distance2 = x_distance * x_distance + y_distance * y_distance;
+        auto&& findMap = _findInfoDict[type];
+        auto infoIter = findMap.find(obj.State());
+        auto&& info = infoIter == findMap.end() ? findMap[DEFAULT_STATE] : infoIter->second;
+        float xDistance = mouseX - obj.Abscissa() - obj.HurtWidth() * info.offsetX;
+        float yDistance = mouseY - obj.Ordinate() - obj.HurtHeight() * info.offsetY;
+        float distance2 = xDistance * xDistance + yDistance * yDistance;
         float threshold2 = info.threshold * info.threshold;
         if (distance2 > threshold2) {
             continue;
         }
-        if (distance2 < min_distance) {
-            min_distance = distance2;
-            find_ptr = &obj;
+        if (distance2 < minDistance) {
+            minDistance = distance2;
+            findPtr = &obj;
         }
     }
-    return find_ptr;
+    return findPtr;
 }
 
 template <>
-inline SMShowObj<Seed>::SMShowObj()
+inline SMShowObj<ASeed>::SMShowObj()
 {
-    type_dict.assign(48 + 1, 1);
-    info_func = [=](Seed* seed) {
-        SMText text;
-        text += "类型:" + name_dict[seed->type()] + '\n';
-        text += "冷却:" + std::to_string(seed->isUsable() ? 0 : seed->initialCd() - seed->cd());
+    _typeDict.assign(48 + 1, 1);
+    _infoFunc = [=](ASeed* seed) {
+        std::string text;
+        text += "类型:" + _nameDict[seed->Type()] + '\n';
+        text += "冷却:" + std::to_string(seed->IsUsable() ? 0 : seed->InitialCd() - seed->Cd());
         return text;
     };
-    name_dict = {
+    _nameDict = {
         "豌豆射手", "向日葵", "樱桃炸弹", "坚果", "土豆雷",
         "寒冰射手", "大嘴花", "双发射手", "小喷菇", "阳光菇",
         "大喷菇", "墓被吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
@@ -259,22 +274,21 @@ inline SMShowObj<Seed>::SMShowObj()
 }
 
 template <>
-inline Seed* SMShowObj<Seed>::findObject(int mouse_x, int mouse_y)
+inline ASeed* SMShowObj<ASeed>::FindObject(int mouseX, int mouseY)
 {
-    float min_distance = 0xffff;
-    int seed_cnt = AvZ::GetMainObject()->seedArray()->count();
-    auto seed_array = AvZ::GetMainObject()->seedArray();
-    for (int idx = 0; idx < seed_cnt; ++idx) {
-        auto&& obj = seed_array[idx];
-        auto type = obj.type();
-        if (!type_dict[type]) {
+    int seedCnt = AGetMainObject()->SeedArray()->Count();
+    auto seedArray = AGetMainObject()->SeedArray();
+    for (int idx = 0; idx < seedCnt; ++idx) {
+        auto&& obj = seedArray[idx];
+        auto type = obj.Type();
+        if (!_typeDict[type]) {
             continue;
         }
-        int seed_x = obj.abscissa() + obj.xOffset();
-        int seed_y = obj.ordinate();
-        int seed_width = obj.width();
-        int seed_height = obj.height();
-        if (mouse_x - seed_x > 0 && mouse_x - seed_x < seed_width && mouse_y - seed_y > 0 && mouse_y - seed_y < seed_height) {
+        int seedX = obj.Abscissa() + obj.XOffset();
+        int seedY = obj.Ordinate();
+        int seedWidth = obj.Width();
+        int seedHeight = obj.Height();
+        if (mouseX - seedX > 0 && mouseX - seedX < seedWidth && mouseY - seedY > 0 && mouseY - seedY < seedHeight) {
             return &obj;
         }
     }
@@ -283,18 +297,18 @@ inline Seed* SMShowObj<Seed>::findObject(int mouse_x, int mouse_y)
 }
 
 template <>
-inline SMShowObj<PlaceItem>::SMShowObj()
+inline SMShowObj<APlaceItem>::SMShowObj()
 {
-    type_dict.assign(14 + 1, 0);
-    type_dict[2] = 1;
-    type_dict.back() = 1;
-    info_func = [=](PlaceItem* place_item) {
-        SMText text;
-        text += "类型:" + name_dict[place_item->type()] + '\n';
-        text += "特殊值:" + std::to_string(place_item->value());
+    _typeDict.assign(14 + 1, 0);
+    _typeDict[2] = 1;
+    _typeDict.back() = 1;
+    _infoFunc = [=](APlaceItem* place_item) {
+        std::string text;
+        text += "类型:" + _nameDict[place_item->Type()] + '\n';
+        text += "特殊值:" + std::to_string(place_item->Value());
         return text;
     };
-    name_dict = {
+    _nameDict = {
         "无", "墓碑", "弹坑", "梯子",
         "PORTAL_WHITE", "PORTAL_BLACK",
         "BRAIN_AQ", "VASE", "SQUIRRE",
@@ -303,14 +317,14 @@ inline SMShowObj<PlaceItem>::SMShowObj()
 }
 
 template <>
-inline PlaceItem* SMShowObj<PlaceItem>::findObject(int mouse_x, int mouse_y)
+inline APlaceItem* SMShowObj<APlaceItem>::FindObject(int mouseX, int mouseY)
 {
-    for (auto&& obj : AvZ::alive_place_item_filter) {
-        auto type = obj.type();
-        if (!type_dict[type]) {
+    for (auto&& obj : aAlivePlaceItemFilter) {
+        auto type = obj.Type();
+        if (!_typeDict[type]) {
             continue;
         }
-        if ((AvZ::MouseRow() == (obj.row() + 1)) && (std::abs(AvZ::MouseCol() - obj.col() - 1) < 0.5)) {
+        if ((AMouseRow() == (obj.Row() + 1)) && (std::abs(AMouseCol() - obj.Col() - 1) < 0.5)) {
             return &obj;
         }
     }
