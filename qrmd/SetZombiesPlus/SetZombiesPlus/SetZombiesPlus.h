@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-05 19:56:17
  * @LastEditors: qrmd
- * @LastEditTime: 2022-10-07 20:43:12
+ * @LastEditTime: 2022-11-27 22:37:24
  * @Description:SetZomies的增强版本，更自由地设置出怪
  * 使用方法：1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SetZombiesPlus.h" ；
@@ -13,9 +13,6 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
-
-#ifndef __SetZombiesPlus
-#define __SetZombiesPlus
 
 #include "avz.h"
 #include <ctime>
@@ -30,9 +27,10 @@ enum SetZombiesMethod {
     INTERNAL,
 };
 
-// 自然出怪的限定方式为变速
+// 自然出怪的限定方式
 enum SetZombiesLimitsMethod {
-    TRANS_WAVE
+    TRANS_WAVE,     //变速波次
+    TOTAL_WAVE = 21 //全部波次
 };
 
 // 为了满足限定条件刷新出怪列表的最长耗时（秒）
@@ -83,6 +81,7 @@ void SetZombiesPlus(std::vector<int> types, SetZombiesMethod method = INTERNAL);
 // [zombies_limits]的参数为：{int wave, int type, string method, int number}
 // [wave]为属于[1, 20]的整数时，表示以[method]方式限定第[wave]波的[type]种类僵尸的数量为[number]
 // [wave]为TRANS_WAVE时，[type]仅接受GIGA_GARGANTUAR或其别名，表示以[method]方式限定变速的波数为[number]
+// [wave]为TOTAL_WAVE时，表示以[method]方式限定全部波次的[type]种类僵尸的总数为[number]
 // [type]表示的僵尸种类必须属于本轮出怪种类
 // [method]可以取"==", "<", ">", "<=", ">=", "!="
 // 示例：// 限定第9波不刷出红眼巨人僵尸、第10波刷出至少10只普通僵尸以及变速的波数不小于15
@@ -110,6 +109,7 @@ using _qrmd::SetWaitLimit;
 using _qrmd::SetWaveZombieList;
 using _qrmd::SetZombiesLimits;
 using _qrmd::SetZombiesPlus;
+using _qrmd::TOTAL_WAVE;
 using _qrmd::TRANS_WAVE;
 
 void _qrmd::InternalSetZombies()
@@ -161,11 +161,11 @@ void _qrmd::SetZombiesAverage(std::vector<int> types)
     }
 
     // 生成蹦极僵尸
-    if (std::find(types.begin(), types.end(), BUNGEE_ZOMBIE) != types.end()) {
+    /*if (std::find(types.begin(), types.end(), BUNGEE_ZOMBIE) != types.end()) {
         for (auto index : {451, 452, 453, 454, 951, 952, 953, 954}) {
             (*(GetMainObject()->zombieList() + index)) = BUNGEE_ZOMBIE;
         }
-    }
+    }*/
 
     if (GetPvzBase()->gameUi() == 2) {
         Asm::killZombiesPreview();
@@ -337,8 +337,47 @@ void _qrmd::SetZombiesLimits(std::vector<ZombiesRefreshLimit> zombies_limits)
                         is_succeed = false;
                     }
                 }
+            } else if (each.wave == TOTAL_WAVE) {
+                zombie_number = 0;
+                for (int wave = 1; wave <= 20; ++wave) {
+                    for (int i = (wave - 1) * 50; i < wave * 50; ++i) {
+                        if (*(zombie_list + i) == each.type)
+                            zombie_number += 1;
+                    }
+                }
+                if (each.method == "==") {
+                    if (zombie_number != each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                } else if (each.method == "<") {
+                    if (zombie_number >= each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                } else if (each.method == ">") {
+                    if (zombie_number <= each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                } else if (each.method == "<=") {
+                    if (zombie_number > each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                } else if (each.method == ">=") {
+                    if (zombie_number < each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                } else if (each.method == "!=") {
+                    if (zombie_number == each.number) {
+                        InternalSetZombies();
+                        is_succeed = false;
+                    }
+                }
             } else {
-                ShowErrorNotInQueue("SetZombiesLimits的限定条件的第一个参数必须属于[1, 20]或为TRANS_WAVE");
+                ShowErrorNotInQueue("SetZombiesLimits的限定条件的第一个参数必须属于[1, 20]或为TRANS/TOTAL_WAVE");
                 return;
             }
         }
@@ -395,5 +434,3 @@ void _qrmd::SetWaveZombieList(int wave, std::vector<WaveZombies> wave_zombies)
         index += each.number;
     }
 }
-
-#endif

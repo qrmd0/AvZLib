@@ -1,4 +1,18 @@
-# AvZ SetZombiesPlus 20220708
+<!--
+ * @Author: qrmd
+ * @Date: 2022-07-06 09:56:07
+ * @LastEditors: qrmd
+ * @LastEditTime: 2022-11-27 22:51:17
+ * @Description: 
+ * 使用方法：1、前往https://gitee.com/vector-wlc/AsmVsZombies，根据教程下载并安装好AsmVsZombies
+ *          2、前往游戏存档文件夹C:/ProgramData/PopCap Games/PlantsVsZombies/userdata，备份原游戏存档，然后用脚本配套的存档文件替换同名文件
+ *          3、在Visul Studio Code中打开本脚本，右键点击编辑区空白处，在弹出菜单中选择“AvZ:Run Script”
+ * 来自AvZScript公开脚本仓库：
+ * 主库：https://github.com/qrmd0/AvZScript
+ * 镜像库：https://gitee.com/qrmd/AvZScript
+ * Copyright (c) 2022 by qrmd, All Rights Reserved. 
+-->
+# AvZ SetZombiesPlus 20221127
 
 ## 简介
 
@@ -35,11 +49,17 @@ SetZombies的增强版本，更自由地设置出怪。
     SetZombiesPlus({PJ_0, LZ_2, CG_3, WW_8, HT_14, XC_15, QQ_16, KG_17, TT_18, HY_32}, INTERNAL);
     // 显示为了满足限定条件刷新出怪列表的调试信息
     SetIsShowInfo(true);
-    // 限定第9波不刷出红眼巨人僵尸、第10波刷出至少10只普通僵尸以及变速的波数不小于15
-    SetZombiesLimits({{9, GIGA_GARGANTUAR, "==", 0}, {10, ZOMBIE, ">=", 10}, {TRANS_WAVE, GIGA_GARGANTUAR, ">=", 15}});
+    // 限定第9波不刷出小丑僵尸、全部波次刷出的红眼巨人僵尸合计不少于80只以及变速的波数不小于15
+    SetZombiesLimits({{9, JACK_IN_THE_BOX, "==", 0}, {TOTAL_WAVE, GIGA_GARGANTUAR, ">=", 80}, {TRANS_WAVE, GIGA_GARGANTUAR, ">=", 15}});
     // 设置第18波的出怪为：小鬼僵尸20只、蹦极僵尸14只和巨人僵尸16只
     SetWaveZombieList(18, {{IMP, 20}, {BUNGEE_ZOMBIE, 14}, {GARGANTUAR, 16}});
+
 ```
+## 更新记录
+
+### 20221127
+
+SetZombiesLimits函数支持全部波次（第1波到第20波）的限定条件。
 
 ## 关于出怪机制
 
