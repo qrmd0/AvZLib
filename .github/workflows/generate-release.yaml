@@ -1,0 +1,24 @@
+name: Generate Release
+
+on: [push, pull_request]
+
+jobs:
+  generate-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-ecosystem/action-regex-match@v2
+        id: match-commit-message
+        with:
+          text: ${{ github.event.head_commit.message }}
+          regex: '(.+\/.+): release (.+)'
+  
+      - name: Generate release
+        if: ${{ steps.match-commit-message.outputs.match != '' }}
+        run: bash generate-release.sh ${{ github.event.head_commit.message }}
+      
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        if: ${{ steps.match-commit-message.outputs.match != '' }}
+        with:
+          commit_message: '${{ steps.match-commit-message.outputs.group1 }}: generate ${{ steps.match-commit-message.outputs.group2 }} release files'
