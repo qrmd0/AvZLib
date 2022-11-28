@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-06 09:56:07
  * @LastEditors: qrmd
- * @LastEditTime: 2022-11-27 22:51:17
+ * @LastEditTime: 2022-11-28 10:36:56
  * @Description: 
  * 使用方法：1、前往https://gitee.com/vector-wlc/AsmVsZombies，根据教程下载并安装好AsmVsZombies
  *          2、前往游戏存档文件夹C:/ProgramData/PopCap Games/PlantsVsZombies/userdata，备份原游戏存档，然后用脚本配套的存档文件替换同名文件
@@ -60,6 +60,8 @@ SetZombies的增强版本，更自由地设置出怪。
 ### 20221127
 
 SetZombiesLimits函数支持全部波次（第1波到第20波）的限定条件。
+
+感谢 @SKOSKX 提供的相关代码。
 
 ## 关于出怪机制
 
