@@ -1,5 +1,4 @@
-vector/avz1
-vector/showme
+Reisen/DanceCheat
 qrmd/GetZombieAbscissas
 qrmd/KeyAssistant
 qrmd/PlantFixerPlus
@@ -7,3 +6,5 @@ qrmd/SelectCardsPlus
 qrmd/SetZombiesPlus
 qrmd/TickPlanter
 shallowdream/shallowdream
+vector/avz1
+vector/showme
