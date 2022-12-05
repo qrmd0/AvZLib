@@ -11,6 +11,8 @@ AsmVsZombies 的公开插件仓库
 
 # 上传说明
 
+**由于该项目为多人协作，提交之前请先`git pull`。**（使用网页版提交忽略此条）
+
 ## 文件夹结构
 
 请按照如下规范上传插件，以便 AvZ VSCode 扩展为用户进行一键式下载部署插件。
@@ -87,7 +89,7 @@ B 1.0.0
 6. `extension_list.txt`
    该文件内容为所有插件的列表, 当发布一个新插件的时候, 将 `作者/插件名` 追加到文件的最后一行即可
 
-`release/` 和 `version.txt` 可以被自动管理。当提交信息为 `作者/插件名: release 版本` 的格式（**注意英文冒号**）时，GitHub Actions 会自动打包版本。`information.txt` 和 `extension_list.txt` **仍需手动添加**。
+`release/` 和 `version.txt` 可以被自动管理。当**一次 push 的最近一次提交**（先 commit 再 merge 会使自动打包失效）为 `作者/插件名: release 版本` 的格式（**注意英文冒号**）时，GitHub Actions 会自动打包版本。`information.txt` 和 `extension_list.txt` **仍需手动处理**。
 
 最后, 希望大家能够依照上述规定上传打包自己的插件, 这会对使用 AvZ 插件的用户带来很多便利。
 
