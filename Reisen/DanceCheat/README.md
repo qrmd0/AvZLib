@@ -12,4 +12,5 @@ void SetDance(bool state);
 // mode = DanceCheatMode::SLOW: 减速模式
 // mode = DanceCheatMode::STOP: 关闭 dance 秘籍，恢复正常运动模式
 void DanceCheat(DanceCheatMode mode);
+ARelOp DanceCheatR(DanceCheatMode mode);
 ```

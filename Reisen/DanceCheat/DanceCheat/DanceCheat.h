@@ -26,8 +26,7 @@ SOFTWARE.
 #define _REISEN_DANCE_CHEAT_DANCE_CHEAT_H
 #include "avz.h"
 
-// Not In Queue
-// 将当前dance状态设为state（true = dance，false = 正常）
+// 将当前 dance 状态设为 state（true = dance，false = 正常）
 void SetDance(bool state) {
     if(state)
         __asm__ __volatile__(
@@ -57,26 +56,30 @@ enum class DanceCheatMode {
     FAST,
     SLOW,
     STOP
-};
+} _reisen_dance_cheat_state = DanceCheatMode::STOP;
 
-AvZ::TickRunner _reisen_dance_cheat_internal_runner;
+ATickRunner _reisen_dance_cheat_runner;
 
-// In Queue
+class : AStateHook {
+    void _EnterFight() override {
+        _reisen_dance_cheat_runner.Start([]{
+            if(_reisen_dance_cheat_state == DanceCheatMode::STOP)
+                return;
+            SetDance(_reisen_dance_cheat_state == DanceCheatMode::SLOW);
+        });
+    }
+} _reisen_dance_cheat_runner_starter;
+
 // mode = DanceCheatMode::FAST: 加速模式
 // mode = DanceCheatMode::SLOW: 减速模式
-// mode = DanceCheatMode::STOP: 关闭dance秘籍，恢复正常运动模式
+// mode = DanceCheatMode::STOP: 关闭 dance 秘籍，恢复正常运动模式
 void DanceCheat(DanceCheatMode mode) {
-    AvZ::InsertOperation([=](){
-        auto& r = _reisen_dance_cheat_internal_runner;
-        AvZ::InsertGuard _(false);
-        if(r.getStatus() != AvZ::STOPPED)
-            r.stop();
-        if(mode != DanceCheatMode::STOP)
-            r.pushFunc([=](){
-                SetDance(mode == DanceCheatMode::SLOW);
-            });
-        else
-            SetDance(false);
-    });
+    _reisen_dance_cheat_state = mode;
+    if(mode == DanceCheatMode::STOP)
+        SetDance(false);
+}
+
+ARelOp DanceCheatR(DanceCheatMode mode) {
+    return ARelOp([=]{ DanceCheat(mode); });
 }
 #endif
