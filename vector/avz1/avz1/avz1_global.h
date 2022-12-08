@@ -44,10 +44,10 @@ public:
     void virtual exitFight() { }
 
 protected:
-    void virtual BeforeScript() override { beforeScript(); }
-    void virtual AfterScript() override { afterScript(); }
-    void virtual EnterFight() override { enterFight(); }
-    void virtual ExitFight() override { exitFight(); }
+    void virtual _BeforeScript() override { beforeScript(); }
+    void virtual _AfterScript() override { afterScript(); }
+    void virtual _EnterFight() override { enterFight(); }
+    void virtual _ExitFight() override { exitFight(); }
 };
 
 template <class ReturnType>

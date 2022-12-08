@@ -35,7 +35,7 @@ template <typename FormatStr, typename... Args>
     requires std::is_convertible_v<FormatStr, std::string>
 void ShowError(FormatStr&& formatStr, Args&&... args)
 {
-    InsertOperation([=, formatStr = std::forward<FormatStr>(formatStr)]() mutable {
+    InsertOperation([... args = std::forward<Args>(args), formatStr = std::forward<FormatStr>(formatStr)]() mutable {
         ShowErrorNotInQueue(std::move(formatStr), std::move(args)...);
     });
 };
