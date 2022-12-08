@@ -1,2 +1,2 @@
-version 1.0.0+avz2pre
-avz 2022_11_24
+version 1.0.0+avz2
+avz 2.0.0_2022_12_08
