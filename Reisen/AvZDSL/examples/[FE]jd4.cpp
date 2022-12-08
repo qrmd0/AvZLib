@@ -15,7 +15,7 @@ ARelOp CardR(Ts... args) {
 
 ARelOp UseIceR(int row, int col) {
     return -100_cs[
-        AMkRelOp(ACard(AICE_SHROOM, row, col)),
+        CardR(AICE_SHROOM, row, col),
         InfoR("蓝冰")
     ];
 }
@@ -23,7 +23,7 @@ ARelOp UseIceR(int row, int col) {
 ARelOp UseImitatorIceR(int row, int col) {
     ARelTime t = rand() % 2 ? 419 : 420; // 模仿者生效时间可能取 319 或 320
     return -t[
-        CardR(AICE_SHROOM, row, col),
+        CardR(AM_ICE_SHROOM, row, col),
         AMkRelOp(AIce3(int(t))),
         InfoR("白冰")
     ];
