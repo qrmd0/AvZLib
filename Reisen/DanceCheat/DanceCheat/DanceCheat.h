@@ -79,6 +79,7 @@ void DanceCheat(DanceCheatMode mode) {
         SetDance(false);
 }
 
+[[nodiscard("ARelOp 需要绑定到时间才会执行")]]
 ARelOp DanceCheatR(DanceCheatMode mode) {
     return ARelOp([=]{ DanceCheat(mode); });
 }
