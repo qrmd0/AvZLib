@@ -33,7 +33,7 @@ public:
     // 1]，默认为空
     void DrawBar(int posX, int posY, double rate, int sizeX = 76,
         int sizeY = 6, int frameThickness = 1,
-        uint32_t ARGB = 0xFFFFC000, Direction direction = RIGHT,
+        uint32_t ARGB = 0xFFFFC00, Direction direction = RIGHT,
         std::vector<double> separators = {})
     {
         uint8_t alpha = (ARGB & (0xFF << 24)) >> 24;
