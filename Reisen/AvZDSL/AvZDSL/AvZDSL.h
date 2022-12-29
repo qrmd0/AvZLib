@@ -3,7 +3,8 @@
 
 #include "avz.h"
 
-struct _ARelOpIR {
+namespace _ReisenAvZDSL {
+struct ARelOpIR {
     int t;
     ARelOp o;
 
@@ -11,17 +12,40 @@ struct _ARelOpIR {
         return ARelOp(t, o);
     }
 
-    _ARelOpIR operator-() const {
-        return _ARelOpIR{-t, o};
+    ARelOpIR operator-() const {
+        return ARelOpIR{-t, o};
+    }
+};
+
+class WaveLengthModifier {
+private:
+    std::vector<int> waves;
+
+public:
+    WaveLengthModifier(const std::vector<int>& waves_) : waves(waves_) {}
+
+    void AssumeWaveLength(int wl) {
+        for(int w : waves)
+            if(!ARangeIn(w, {9, 19, 20}))
+                AAssumeWavelength({ATime(w, wl)});
+    }
+
+    void SetWaveLength(int wl) {
+        for(int w : waves)
+            if(!ARangeIn(w, {9, 19, 20}))
+                ASetWavelength({ATime(w, wl)});
     }
 };
 
 #if __cplusplus >= 202101L
 template <typename... Ts>
-ARelOp _RelOpSum(Ts... args) {
+ARelOp RelOpSum(Ts... args) {
     return (... + static_cast<ARelOp>(args));
 }
-#else
+#endif
+}; // namespace _ReisenAvZDSL
+
+#if __cplusplus < 202101L
 ARelOp operator,(const ARelOp& lhs, const ARelOp& rhs) {
     return lhs + rhs;
 }
@@ -40,12 +64,14 @@ public:
 
 #if __cplusplus >= 202101L
     template <typename... Ts>
-    _ARelOpIR operator[](Ts... args) const {
-        return _ARelOpIR{t, _RelOpSum(args...)};
+    [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
+    auto operator[](Ts... args) const {
+        return _ReisenAvZDSL::ARelOpIR{t, _ReisenAvZDSL::RelOpSum(args...)};
     }
 #else
-    _ARelOpIR operator[](const ARelOp& x) const {
-        return _ARelOpIR{t, x};
+    [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
+    auto operator[](const ARelOp& x) const {
+        return _ReisenAvZDSL::ARelOpIR{t, x};
     }
 #endif
 
@@ -61,71 +87,57 @@ public:
         return ARelTime(t - rhs.t);
     }
 
-    _ARelOpIR operator+(const _ARelOpIR& rhs) const {
-        return _ARelOpIR{t + rhs.t, rhs.o};
+    [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
+    auto operator+(const _ReisenAvZDSL::ARelOpIR& rhs) const {
+        return _ReisenAvZDSL::ARelOpIR{t + rhs.t, rhs.o};
     }
 
-    _ARelOpIR operator-(const _ARelOpIR& rhs) const {
-        return _ARelOpIR{t - rhs.t, rhs.o};
+    [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
+    auto operator-(const _ReisenAvZDSL::ARelOpIR& rhs) const {
+        return _ReisenAvZDSL::ARelOpIR{t - rhs.t, rhs.o};
     }
 };
 
 ARelTime operator""_cs(unsigned long long x) { return x; }
 
-class _ANowT {
+namespace _ReisenAvZDSL {
+class ANowT {
 private:
     int t;
 
 public:
-    _ANowT(int t_ = 0) : t(t_) {}
+    ANowT(int t_ = 0) : t(t_) {}
 
 #if __cplusplus >= 202101L
     template <typename... Ts>
     void operator[](Ts... args) const {
-        AConnect(ANowTime(), _RelOpSum(args...));
+        AConnect(ANowDelayTime(t), _ReisenAvZDSL::RelOpSum(args...));
     }
 #else
     void operator[](const ARelOp& x) const {
-        AConnect(ANowTime(), x);
+        AConnect(ANowDelayTime(t), x);
     }
 #endif
 
-    _ANowT operator+(const ARelTime rhs) const {
-        return _ANowT(t + int(rhs));
+    ANowT operator+(const ARelTime rhs) const {
+        return ANowT(t + int(rhs));
     }
 
-    _ANowT operator-(const ARelTime rhs) const {
-        return _ANowT(t - int(rhs));
+    ANowT operator-(const ARelTime rhs) const {
+        return ANowT(t - int(rhs));
     }
 
-    void operator+(const _ARelOpIR& rhs) const {
-        AConnect(ANowTime(), rhs);
+    void operator+(const ARelOpIR& rhs) const {
+        AConnect(ANowDelayTime(t), rhs);
     }
 
-    void operator-(const _ARelOpIR& rhs) const {
+    void operator-(const ARelOpIR& rhs) const {
         operator+(-rhs);
     }
-} ANow;
-
-class _AWavelengthModifier {
-private:
-    std::vector<int> waves;
-
-public:
-    _AWavelengthModifier(const std::vector<int>& waves_) : waves(waves_) {}
-
-    void AssumeWaveLength(int wl) {
-        for(int w : waves)
-            if(!ARangeIn(w, {9, 19, 20}))
-                AAssumeWavelength({ATime(w, wl)});
-    }
-
-    void SetWaveLength(int wl) {
-        for(int w : waves)
-            if(!ARangeIn(w, {9, 19, 20}))
-                ASetWavelength({ATime(w, wl)});
-    }
 };
+}; // namespace _ReisenAvZDSL
+
+_ReisenAvZDSL::ANowT ANow;
 
 class AWave {
 private:
@@ -140,16 +152,16 @@ public:
 
 #if __cplusplus >= 202101L
     template <typename... Ts>
-    _AWavelengthModifier operator[](Ts... args) {
+    auto operator[](Ts... args) {
         for(int w : waves)
-            AConnect(ATime(w, t), _RelOpSum(args...));
-        return waves;
+            AConnect(ATime(w, t), _ReisenAvZDSL::RelOpSum(args...));
+        return _ReisenAvZDSL::WaveLengthModifier(waves);
     }
 #else
-    _AWavelengthModifier operator[](const ARelOp& x) const {
+    auto operator[](const ARelOp& x) const {
         for(int w : waves)
             AConnect(ATime(w, t), x);
-        return waves;
+        return _ReisenAvZDSL::WaveLengthModifier(waves);
     }
 #endif
 
@@ -161,13 +173,13 @@ public:
         return AWave(waves, t - int(rhs));
     }
 
-    _AWavelengthModifier operator+(const _ARelOpIR& rhs) const {
+    auto operator+(const _ReisenAvZDSL::ARelOpIR& rhs) const {
         for(int w : waves)
             AConnect(ATime(w, t), rhs);
-        return waves;
+        return _ReisenAvZDSL::WaveLengthModifier(waves);
     }
 
-    _AWavelengthModifier operator-(const _ARelOpIR& rhs) const {
+    auto operator-(const _ReisenAvZDSL::ARelOpIR& rhs) const {
         return operator+(-rhs);
     }
 };
