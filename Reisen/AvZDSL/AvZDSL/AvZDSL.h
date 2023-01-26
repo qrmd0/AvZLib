@@ -2,6 +2,9 @@
 #define _REISEN_AVZDSL_AVZDSL_H
 
 #include "avz.h"
+#include <regex>
+#include <string>
+#include <vector>
 
 namespace _ReisenAvZDSL {
 struct ARelOpIR {
@@ -14,26 +17,6 @@ struct ARelOpIR {
 
     ARelOpIR operator-() const {
         return ARelOpIR{-t, o};
-    }
-};
-
-class WaveLengthModifier {
-private:
-    std::vector<int> waves;
-
-public:
-    WaveLengthModifier(const std::vector<int>& waves_) : waves(waves_) {}
-
-    void AssumeWaveLength(int wl) {
-        for(int w : waves)
-            if(!ARangeIn(w, {9, 19, 20}))
-                AAssumeWavelength({ATime(w, wl)});
-    }
-
-    void SetWaveLength(int wl) {
-        for(int w : waves)
-            if(!ARangeIn(w, {9, 19, 20}))
-                ASetWavelength({ATime(w, wl)});
     }
 };
 
@@ -83,7 +66,7 @@ public:
         return ARelTime(t + rhs.t);
     }
 
-    ARelTime operator-(const ARelTime rhs) const{
+    ARelTime operator-(const ARelTime rhs) const {
         return ARelTime(t - rhs.t);
     }
 
@@ -144,24 +127,49 @@ private:
     std::vector<int> waves;
     int t;
 
+    static void ParseWaveImpl(std::vector<int>& out, int x) {
+        out.push_back(x);
+    }
+
+    static void ParseWaveImpl(std::vector<int>& out, const std::string& str) {
+        std::regex expr(R"((\d+)(?:-(\d+)(?:\+(\d+))?)?)");
+        std::smatch result;
+        if(!std::regex_match(str, result, expr)) {
+            AGetInternalLogger()->Error("# 不是合法的波数范围", str);
+            return;
+        }
+        int l = std::stoi(result[1]);
+        int r = result[2].length() ? std::stoi(result[2]) : l;
+        int inc = result[3].length() ? std::stoi(result[3]) : 1;
+        for(int i = l; i <= r; i += inc)
+            out.push_back(i);
+    }
+
+    template <typename... Ts>
+    static std::vector<int> ParseWave(Ts... args) {
+        std::vector<int> out;
+        (ParseWaveImpl(out, args), ...);
+        return out;
+    }
+
 public:
     AWave(const std::vector<int>& waves_, int t_ = 0) : waves(waves_), t(t_) {}
 
     template <typename... Ts>
-    AWave(Ts... args) : waves({args...}), t(0) {}
+    AWave(Ts... args) : waves(ParseWave(args...)), t(0) {}
 
 #if __cplusplus >= 202101L
     template <typename... Ts>
-    auto operator[](Ts... args) {
+    AWave operator[](Ts... args) const {
         for(int w : waves)
             AConnect(ATime(w, t), _ReisenAvZDSL::RelOpSum(args...));
-        return _ReisenAvZDSL::WaveLengthModifier(waves);
+        return *this;
     }
 #else
-    auto operator[](const ARelOp& x) const {
+    AWave operator[](const ARelOp& x) const {
         for(int w : waves)
             AConnect(ATime(w, t), x);
-        return _ReisenAvZDSL::WaveLengthModifier(waves);
+        return *this;
     }
 #endif
 
@@ -173,14 +181,26 @@ public:
         return AWave(waves, t - int(rhs));
     }
 
-    auto operator+(const _ReisenAvZDSL::ARelOpIR& rhs) const {
+    AWave operator+(const _ReisenAvZDSL::ARelOpIR& rhs) const {
         for(int w : waves)
             AConnect(ATime(w, t), rhs);
-        return _ReisenAvZDSL::WaveLengthModifier(waves);
+        return *this;
     }
 
-    auto operator-(const _ReisenAvZDSL::ARelOpIR& rhs) const {
+    AWave operator-(const _ReisenAvZDSL::ARelOpIR& rhs) const {
         return operator+(-rhs);
+    }
+
+    void AssumeWaveLength(int wl) const {
+        for(int w : waves)
+            if(!ARangeIn(w, {9, 19, 20}))
+                AAssumeWavelength({ATime(w, wl)});
+    }
+
+    void SetWaveLength(int wl) const {
+        for(int w : waves)
+            if(!ARangeIn(w, {9, 19, 20}))
+                ASetWavelength({ATime(w, wl)});
     }
 };
 
