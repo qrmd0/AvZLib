@@ -1,4 +1,4 @@
-# AvZ sin20_tools 20230123
+# AvZ sin20_tools 20230207
 
 ## 运行环境
 
@@ -52,12 +52,22 @@ void PaoToOutside(int pao_row, int pao_col, int row, int x);
 void SetRowSpawnType(const std::vector<int> &lst, RowType type = RowType::NONE);
 
 // *** Not In Queue
-// 返回炸[pao_row]路的炮弹全收第[wave]波[pogo_row]路跳跳所需的爆心x范围
-// 若无法全收，返回{0, 0}；参数[wave]填-1表示任意波
-std::pair<int, int> PaoxForPogo(int pogo_row, int pao_row, bool isShowInfo = true, int wave = -1);
+// 返回炸[row]路的炮弹全收第[wave]波[pogo_row]路跳跳所需的爆心x范围
+std::pair<int, int> GetPaoxForPogo(int row, int pogo_row, bool isShowInfo = true, int wave = -1, int cob_col = 1);
 
 // *** In Queue
 // 设置音乐
-// 1-DE 2-NE 3-PE 4-FE 5-RE 8-禅境花园 11-x-10 12-僵王关
 void SetMusic(int musicId = 12);
+    
+// *** Not In Queue
+// 僵尸计数器，返回各行来自第[wave]波的[types]僵尸的数量
+std::vector<int> GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
+
+// *** Not In Queue
+// 返回来自第[wave]波的[types]僵尸最多的行
+int GetMostZombiesRow(int wave = -1, std::initializer_list<int> types = {FT_21, XC_15});
+
+// *** Not In Queue
+// 返回来自第[wave]波的[types]僵尸最多的半场
+int GetMoreZombiesField(int wave = -1, std::initializer_list<int> types = {HY_32});
 ```

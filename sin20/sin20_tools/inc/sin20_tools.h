@@ -1,6 +1,6 @@
 /*
  * @Author: SKOSKX
- * @Date: 2023-01-13
+ * @Date: 2023-02-07
  * @Description: 反正是杂七杂八的一些东西……
  */
 
@@ -85,14 +85,34 @@ namespace sin20 {
     void SetRowSpawnType(const std::vector<int> &lst, RowType type = NONE);
 
     // *** Not In Queue
-    // 返回炸[pao_row]路的炮弹全收第[wave]波[pogo_row]路跳跳所需的爆心x范围
+    // 返回炸[row]路的炮弹全收第[wave]波[pogo_row]路跳跳所需的爆心x范围
+    // 屋顶场合请指定炮尾列数，列数从1开始数
     // 若无法全收，返回{0, 0}；参数[wave]填-1表示任意波
-    std::pair<int, int> PaoxForPogo(int pogo_row, int pao_row, bool isShowInfo = true, int wave = -1);
+    std::pair<int, int> GetPaoxForPogo(int row, int pogo_row, bool isShowInfo = true, int wave = -1, int cob_col = 1);
 
     // *** In Queue
     // 设置音乐
     // 1-DE 2-NE 3-PE 4-FE 5-RE 8-禅境花园 11-x-10 12-僵王关
     void SetMusic(int musicId = 12);
+    
+    // *** Not In Queue
+    // 僵尸计数器
+    // 返回各行来自第[wave]波的[types]僵尸的数量，行编号从0开始数，[wave]填-1表示任意波
+    std::vector<int> GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
+    
+    // *** Not In Queue
+    // 返回来自第[wave]波的[types]僵尸最多的行，行编号从1开始数
+    // [types]参数默认为梯丑，[wave]填-1表示任意波
+    int GetMostZombiesRow(int wave = -1, std::initializer_list<int> types = {FT_21, XC_15});
+
+    // *** Not In Queue
+    // 返回来自第[wave]波的[types]僵尸最多的半场，六行场地返回2或5，五行场地返回2、3或4
+    // [types]参数默认为红眼，[wave]填-1表示任意波
+    // *** 使用示例：
+    // InsertTimeOperation(401 - 100, 10, [=]() {
+    //     CardNotInQueue(GetSeedIndex(CHERRY_BOMB) + 1, GetMoreZombiesField(10), 9);
+    // }); //中场智能消延迟
+    int GetMoreZombiesField(int wave = -1, std::initializer_list<int> types = {HY_32});
 
     /* >>> https://www.bilibili.com/video/BV1d54y1n7NX nya~ */
 
@@ -193,17 +213,15 @@ namespace sin20 {
     std::pair<int, int> BungeeCoord(int row, int col)
     {
         auto scene = GetMainObject()->scene();
-        if (RangeIn(scene, {0, 1, 6, 8})) // DE、NE、MGE、AQE
-            return {40 + (col - 1) * 80, 50 + (row - 1) * 100};
-        if (scene == 2 || scene == 3) //后院
+        if (scene == 2 || scene == 3)
             return {40 + (col - 1) * 80, 50 + (row - 1) * 85};
-        if (scene == 4 || scene == 5) //屋顶
-        {
+        if (scene == 4 || scene == 5) {
             int slopeHeight = 0;
-            if (col <= 5)
-                slopeHeight = 10 + 20 * (5 - col);
+            if (col <= 5) slopeHeight = 10 + 20 * (5 - col);
             return {40 + (col - 1) * 80, 40 + (row - 1) * 85 + slopeHeight};
         }
+        else
+            return {40 + (col - 1) * 80, 50 + (row - 1) * 100};
     }
 
     void BungeeManipulate(const std::vector<Grid> &lst, std::vector<int> mpwaves)
@@ -306,8 +324,20 @@ namespace sin20 {
 
     struct Pogostu { float x; float y; int dt; int paox; };
 
+    int GetPaoy(int row, int cob_col = 1)
+    {
+        auto scene = GetMainObject()->scene();
+        if (scene == 2 || scene == 3) return 35 + 85 * row;
+        if (scene == 4 || scene == 5) {
+            int slopeHeight = 0;
+            if (cob_col <= 6) slopeHeight = 11 + 20 * (6 - cob_col);
+            return 25 + 85 * row - slopeHeight;
+        }
+        else return 20 + 100 * row;
+    }
+
     // 计算跳跳僵尸的炮右距或炮左距
-    int PaoDistance(int y, int paoy, bool right = true, int type = TT_18)
+    int GetPaoDistance(int y, int paoy, bool right = true, int type = TT_18)
     {
         int yLower = y + 115; //y下边界
         int ydt = (paoy > yLower) ? (paoy - yLower) : ((paoy < y) ? (y - paoy) : 0); //y距离
@@ -317,13 +347,13 @@ namespace sin20 {
         else       return xdt - 36;
     }
 
-    std::pair<int, int> PaoxForPogo(int pogo_row, int pao_row, bool isShowInfo, int wave)
+    std::pair<int, int> GetPaoxForPogo(int row, int pogo_row, bool isShowInfo, int wave, int cob_col)
     {
         if (GetPvzBase()->gameUi() != 3) {
             ShowErrorNotInQueue("当前不在战斗界面，无法搜索跳跳！");
             return {0, 0};
         }
-        if (abs(pao_row - pogo_row) > 1) {
+        if (abs(row - pogo_row) > 1) {
             ShowErrorNotInQueue("炮只能炸三行，请检查输入的参数！");
             return {0, 0};
         }
@@ -331,7 +361,7 @@ namespace sin20 {
         Pogostu pogo1 = {1000, 1000, -100, 1000}; //x最小的跳跳
         Pogostu pogo2 = {1000, 1000, -100, 1000}; //右侧paox最小的跳跳
         Pogostu pogo3 = {10, 1000, -100, 10}; //左侧paox最大的跳跳
-        int paoy = 35 + 85 * pao_row; //炮弹y坐标
+        int paoy = GetPaoy(row, cob_col); //炮弹y坐标
         auto aa = GetPvzBase()->animationMain()->animationOffset()->animationArray();
         bool isPogoFound = false;
         for (auto& zf : alive_zombie_filter)
@@ -343,8 +373,8 @@ namespace sin20 {
                 uint16_t& animationCode = zf.mRef<uint16_t>(0x118);
                 float x = zf.abscissa();
                 float y = zf.ordinate() + aa[animationCode].mRef<float>(0x38) - 8;
-                int rdt = PaoDistance(y, paoy); //炮右距
-                int ldt = rdt - 78 - 36;        //炮左距
+                int rdt = GetPaoDistance(y, paoy); //炮右距
+                int ldt = rdt - 78 - 36;           //炮左距
                 int rpaox = int(x) + rdt;
                 int lpaox = int(x) - ldt;
                 if (x < pogo1.x || (x == pogo1.x && y < pogo1.y)) {
@@ -399,6 +429,38 @@ namespace sin20 {
                 : [musicId] "m"(musicId)
                 :);
         });
+    }
+    
+    std::vector<int> GetZombieCount(int wave, std::initializer_list<int> types)
+    {
+        std::vector<int> count(6, 0);
+        for (auto&& zf : alive_zombie_filter) {
+            if (RangeIn(zf.type(), types) && ((wave == -1 || zf.standState() == wave - 1)))
+                count[zf.row()] += 1;
+        }
+        return count;
+    }
+
+    int GetMostZombiesRow(int wave, std::initializer_list<int> types)
+    {
+        auto count = GetZombieCount(wave, types);
+        return std::max_element(count.begin(), count.end()) - count.begin() + 1;
+    }
+
+    int GetMoreZombiesField(int wave, std::initializer_list<int> types)
+    {
+        auto count = GetZombieCount(wave, types);
+        auto scene = GetMainObject()->scene();
+        if (scene == 2 || scene == 3 || scene == 8) {
+            if (count[0] + count[1] + count[2] >= count[3] + count[4] + count[5]) return 2;
+            else return 5;
+        }
+        else {
+            int a = count[0] + count[1], b = count[3] + count[4], c = count[1] + count[3];
+            if (a >= b && a >= c) return 2;
+            else if (b >= c)      return 4;
+            else                  return 3;
+        }
     }
 
 } // namespace sin20
