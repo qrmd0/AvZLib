@@ -1,4 +1,4 @@
-# AvZ sin20_tools 20230207
+# AvZ sin20_tools 20230215
 
 ## 运行环境
 
@@ -70,4 +70,12 @@ int GetMostZombiesRow(int wave = -1, std::initializer_list<int> types = {FT_21, 
 // *** Not In Queue
 // 返回来自第[wave]波的[types]僵尸最多的半场
 int GetMoreZombiesField(int wave = -1, std::initializer_list<int> types = {HY_32});
+    
+// *** Not In Queue
+// 智能骗锤，检测是否有巨人即将锤击外层南瓜、花盆上的高坚果或偏右蘑菇，如有则铲除
+void SmartShovelPlant(bool autoShovel = true);
+
+// *** Not In Queue
+// 屋顶场合根据冰车投篮的存在情况和速度情况智能放[row]行9列灰烬，保证其生效时间为[time]
+void SafeCol9Bomb(PlantType type, int row, int time, int wave = -1);
 ```

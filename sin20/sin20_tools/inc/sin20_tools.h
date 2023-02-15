@@ -1,6 +1,6 @@
 /*
  * @Author: SKOSKX
- * @Date: 2023-02-07
+ * @Date: 2023-02-15
  * @Description: 反正是杂七杂八的一些东西……
  */
 
@@ -12,8 +12,10 @@
 using namespace AvZ;
 
 bool temPause = false;
-namespace AvZ
-    { extern bool __is_advanced_pause; }
+namespace AvZ {
+    extern bool __is_advanced_pause;
+    extern TimeWave __time_wave_insert;
+}
 
 // *** Not In Queue
 // 启用部分A-TAS功能（键位可以自行修改）
@@ -98,7 +100,7 @@ namespace sin20 {
     // *** Not In Queue
     // 僵尸计数器
     // 返回各行来自第[wave]波的[types]僵尸的数量，行编号从0开始数，[wave]填-1表示任意波
-    std::vector<int> GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
+    std::vector<int>& GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
     
     // *** Not In Queue
     // 返回来自第[wave]波的[types]僵尸最多的行，行编号从1开始数
@@ -113,6 +115,17 @@ namespace sin20 {
     //     CardNotInQueue(GetSeedIndex(CHERRY_BOMB) + 1, GetMoreZombiesField(10), 9);
     // }); //中场智能消延迟
     int GetMoreZombiesField(int wave = -1, std::initializer_list<int> types = {HY_32});
+    
+    // *** Not In Queue
+    // 智能骗锤（建议配合TickRunner使用）
+    // 检测是否有巨人即将锤击外层南瓜、花盆上的高坚果或偏右蘑菇，如有则铲除
+    // 需要不打断鼠标时请将参数填为false，将以高级暂停代替铲除
+    void SmartShovelPlant(bool autoShovel = true);
+
+    // *** Not In Queue
+    // 屋顶智能放[row]行9列灰烬，保证其生效时间为[time]
+    // wave不填则承接上一次SetTime的波数
+    void SafeCol9Bomb(PlantType type, int row, int time, int wave = -1);
 
     /* >>> https://www.bilibili.com/video/BV1d54y1n7NX nya~ */
 
@@ -431,9 +444,9 @@ namespace sin20 {
         });
     }
     
-    std::vector<int> GetZombieCount(int wave, std::initializer_list<int> types)
+    std::vector<int>& GetZombieCount(int wave, std::initializer_list<int> types)
     {
-        std::vector<int> count(6, 0);
+        static std::vector<int> count(6, 0);
         for (auto&& zf : alive_zombie_filter) {
             if (RangeIn(zf.type(), types) && ((wave == -1 || zf.standState() == wave - 1)))
                 count[zf.row()] += 1;
@@ -443,13 +456,13 @@ namespace sin20 {
 
     int GetMostZombiesRow(int wave, std::initializer_list<int> types)
     {
-        auto count = GetZombieCount(wave, types);
+        auto& count = GetZombieCount(wave, types);
         return std::max_element(count.begin(), count.end()) - count.begin() + 1;
     }
 
     int GetMoreZombiesField(int wave, std::initializer_list<int> types)
     {
-        auto count = GetZombieCount(wave, types);
+        auto& count = GetZombieCount(wave, types);
         auto scene = GetMainObject()->scene();
         if (scene == 2 || scene == 3 || scene == 8) {
             if (count[0] + count[1] + count[2] >= count[3] + count[4] + count[5]) return 2;
@@ -461,6 +474,112 @@ namespace sin20 {
             else if (b >= c)      return 4;
             else                  return 3;
         }
+    }
+
+    struct GargInfo {
+        int index; int row; float x;
+    };
+
+    std::vector<GargInfo>& GetHammeringGargInfo(bool hammerDownSoon = false, int row = -1)
+    {
+        auto za = GetMainObject()->zombieArray();
+        auto aa = GetPvzBase()->animationMain()->animationOffset()->animationArray();
+        static std::vector<GargInfo> info;
+        for (int i = 0; i < GetMainObject()->zombieTotal(); ++i) {
+            if (za[i].isExist() && (za[i].type() == BY_23 || za[i].type() == HY_32) &&
+                !za[i].isDead() && (row == -1 || za[i].row() == row - 1) &&
+                za[i].state() == 70)
+            {
+                auto& animationCode = za[i].mRef<uint16_t>(0x118);
+                float cr = aa[animationCode].circulationRate();
+                if (hammerDownSoon && 0.643 < cr && cr < 0.647)
+                    info.push_back({i, za[i].row(), za[i].abscissa()});
+                else if (!hammerDownSoon && cr < 0.647)
+                    info.push_back({i, za[i].row(), za[i].abscissa()});
+            }
+        }
+        return info;
+    }
+
+    void SmartShovelPlant(bool autoShovel)
+    {
+        auto& info = GetHammeringGargInfo(true);
+        int grids[6][9] = {{0}};
+        for (auto&& pf : alive_plant_filter) {
+            switch (pf.type()) {
+                case PUMPKIN:
+                case TALL_NUT: {
+                    int dr = pf.abscissa() + (pf.type() == PUMPKIN ? 80 : 70);
+                    grids[pf.row()][pf.col()] += 1;
+                    for (GargInfo each : info) {
+                        if (each.row == pf.row() && int(each.x) - 30 <= dr) {
+                            grids[pf.row()][pf.col()] += 2; break;
+                        }
+                    }
+                } break;
+                case PUFF_SHROOM:
+                case SUN_SHROOM: {
+                    int dr = pf.abscissa() + 50;
+                    grids[pf.row()][pf.col()] += 1;
+                    for (GargInfo each : info) {
+                        if (each.row == pf.row() && int(each.x) - 30 <= dr &&
+                            (pf.abscissa() - 1) % 10 <= 3) {
+                            grids[pf.row()][pf.col()] += 2; break;
+                        }
+                    }
+                } break;
+                case COFFEE_BEAN: break;
+                default:
+                    grids[pf.row()][pf.col()] += 1;
+            }
+        }
+        for (int i = 0; i < 6; ++i) {
+            for (int j = 0; j < 9; ++j) {
+                if (grids[i][j] > 3) {
+                    if (autoShovel)
+                        ShovelNotInQueue(i + 1, j + 1, true);
+                    else {
+                        SetAdvancedPause(true);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    void SafeCol9Bomb(PlantType type, int row, int time, int wave)
+    {
+        if (GetMainObject()->scene() != 4 && GetMainObject()->scene() != 5) {
+            ShowErrorNotInQueue("SafeCol9Bomb函数只用于屋顶场合");
+            return;
+        }
+        if (!RangeIn(type, {CHERRY_BOMB, ICE_SHROOM, DOOM_SHROOM})) {
+            ShowErrorNotInQueue("SafeCol9Bomb函数只支持在9列释放A、I、N");
+            return;
+        }
+        if (wave == -1)
+            wave = __time_wave_insert.wave;
+        SetTime(time - 100, wave);
+        if (time <= 283)
+            Card({{FLOWER_POT, row, 9}, {type, row, 9}});
+        else
+            InsertOperation([=]() {
+                int __time = time - 100;
+                float nowx, speed;
+                for (auto&& zf : alive_zombie_filter) {
+                    if ((zf.type() == BC_12 || zf.type() == TL_22) && zf.row() == row - 1) {
+                        nowx = zf.abscissa();
+                        speed = zf.speed();
+                        if (zf.slowCountdown() > 0) speed *= 0.4;
+                        if (nowx - speed * (time - 1 - __time) < 720) {
+                            __time = time - 1;
+                            break;
+                        }
+                    }
+                }
+                SetTime(__time, wave);
+                Card({{FLOWER_POT, row, 9}, {type, row, 9}});
+            });
     }
 
 } // namespace sin20
