@@ -61,7 +61,7 @@ void SetMusic(int musicId = 12);
     
 // *** Not In Queue
 // 僵尸计数器，返回各行来自第[wave]波的[types]僵尸的数量
-std::vector<int> GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
+std::vector<int>& GetZombieCount(int wave = -1, std::initializer_list<int> types = {HY_32});
 
 // *** Not In Queue
 // 返回来自第[wave]波的[types]僵尸最多的行
