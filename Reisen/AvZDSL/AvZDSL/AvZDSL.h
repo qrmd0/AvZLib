@@ -131,7 +131,7 @@ private:
         out.push_back(x);
     }
 
-    static void ParseWaveImpl(std::vector<int>& out, const std::string& str) {
+    static void ParseWaveImplSingle(std::vector<int>& out, const std::string& str) {
         std::regex expr(R"((\d+)(?:-(\d+)(?:\+(\d+))?)?)");
         std::smatch result;
         if(!std::regex_match(str, result, expr)) {
@@ -143,6 +143,21 @@ private:
         int inc = result[3].length() ? std::stoi(result[3]) : 1;
         for(int i = l; i <= r; i += inc)
             out.push_back(i);
+    }
+
+    static void ParseWaveImpl(std::vector<int>& out, const std::string& str) {
+        int cur = 0, start = -1;
+        while(cur < str.size()) {
+            if(ARangeIn(str[cur], {',', ' '})) {
+                if(start >= 0)
+                    ParseWaveImplSingle(out, str.substr(start, cur - start));
+                start = -1;
+            } else if(start == -1)
+                start = cur;
+            cur++;
+        }
+        if(start >= 0)
+            ParseWaveImplSingle(out, str.substr(start, str.size() - start));
     }
 
     template <typename... Ts>
@@ -204,7 +219,8 @@ public:
     }
 };
 
-AWave operator""_wave(unsigned long long x) { return int(x); }
+AWave operator""_wave(unsigned long long x) { return x; }
+AWave operator""_wave(const char* x, size_t _) { return x; }
 
 #define AMkRelOp(...) ARelOp([=]{ __VA_ARGS__; })
 #endif

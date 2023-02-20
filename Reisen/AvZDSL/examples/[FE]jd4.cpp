@@ -1,7 +1,7 @@
 #include "avz.h"
 #include "AvZDSL/AvZDSL.h"
 
-ALogger<APvzGui> l;
+ALogger<AConsole> l;
 
 // AMkRelOp(...) 就是 ARelOp([=]{ ...; }) 的语法糖
 
@@ -50,6 +50,7 @@ void AScript() {
     ASetZombies({AZOMBIE, APOLE_VAULTING_ZOMBIE, ADANCING_ZOMBIE, AZOMBONI, ADOLPHIN_RIDER_ZOMBIE, AJACK_IN_THE_BOX_ZOMBIE, ABALLOON_ZOMBIE, ADIGGER_ZOMBIE, ACATAPULT_ZOMBIE, ABUNGEE_ZOMBIE, AGIGA_GARGANTUAR});
     ASelectCards({AICE_SHROOM, AM_ICE_SHROOM, ADOOM_SHROOM, ALILY_PAD, ASQUASH, ACHERRY_BOMB, APUMPKIN, APUFF_SHROOM, ASUN_SHROOM, AFLOWER_POT});
     aPlantFixer.Start(APUMPKIN, {}, 4000 / 3);
+    ASetInternalLogger(l);
 
     // 定义发炮操作：在 373cs 前发一对炮
     // 这样只构建复合操作，并不运行
@@ -59,27 +60,30 @@ void AScript() {
 
     // AWave可以接受任意多参数
     // 参数可以是以下几种：
-    // 1. 数字
+    // 1. 数字或其字符串形式
     // 2. 形如 "a-b" 的字符串（如 "2-5" 与 2, 3, 4, 5 等效）
     // 3. 形如 "a-b+c" 的字符串（如 "2-15+3" 与 2, 5, 8, 11, 14 等效）
     // C6u 是4波一循环，所以 +4
-    AWave("1-9+4", 14, "18-18")[
+    AWave("1-9+4", 14, "18")[
         749_cs - 200_cs[PP] // 注意，749_cs - 200_cs可以不加括号
     ].AssumeWaveLength(749);
     // 第 9 波的假定波长被自动忽略了，不会报错
 
-    AWave("2-9+4", "3-9+4", "11-19+4", "12-19+4")[
-        11_cs[IceNightR(3, 5)],
+    // 字符串可以包含用空格或逗号分隔的多个区间
+    // "..."_wave 与 AWave("...") 等效
+    // 这种写法是笔者最推荐的
+    "2-9+4 3-9+4 11-19+4 12-19+4"_wave[
+        11_cs[IceNightR(1, 1)],
         1976_cs[-200_cs[PP]]
         // 不同于 AvZ1 的 delay，同级的时间是互不影响的，嵌套的时间会累加。
         // IceNightR 在 11cs 生效，PP 在 1776cs 生效
     ].AssumeWaveLength(1976);
 
-    AWave("4-9+4", "13-19+4")[
+    "4, 8, 13, 17"_wave[
         750_cs - 200_cs - 100_cs[N]
     ].AssumeWaveLength(750);
 
-    AWave(10)[
+    " 10-10 "_wave[
         // w10 特化：PPAa 消延迟
         // 窝瓜放置到生效 182cs
         341_cs[PP],
