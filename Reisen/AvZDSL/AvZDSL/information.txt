@@ -1,2 +1,2 @@
-version 0.2.1+avz2
+version 0.2.2+avz2
 avz 2.1.0_2023_01_19

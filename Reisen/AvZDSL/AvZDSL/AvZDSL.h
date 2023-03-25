@@ -6,6 +6,10 @@
 #include <string>
 #include <vector>
 
+ARelOp operator,(const ARelOp& lhs, const ARelOp& rhs) {
+    return lhs + rhs;
+}
+
 namespace _ReisenAvZDSL {
 struct ARelOpIR {
     int t;
@@ -19,20 +23,7 @@ struct ARelOpIR {
         return ARelOpIR{-t, o};
     }
 };
-
-#if __cplusplus >= 202101L
-template <typename... Ts>
-ARelOp RelOpSum(Ts... args) {
-    return (... + static_cast<ARelOp>(args));
-}
-#endif
 }; // namespace _ReisenAvZDSL
-
-#if __cplusplus < 202101L
-ARelOp operator,(const ARelOp& lhs, const ARelOp& rhs) {
-    return lhs + rhs;
-}
-#endif
 
 class ARelTime {
 private:
@@ -45,18 +36,10 @@ public:
         return t;
     }
 
-#if __cplusplus >= 202101L
-    template <typename... Ts>
-    [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
-    auto operator[](Ts... args) const {
-        return _ReisenAvZDSL::ARelOpIR{t, _ReisenAvZDSL::RelOpSum(args...)};
-    }
-#else
     [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
     auto operator[](const ARelOp& x) const {
         return _ReisenAvZDSL::ARelOpIR{t, x};
     }
-#endif
 
     ARelTime operator-() const {
         return ARelTime(-t);
@@ -91,16 +74,9 @@ private:
 public:
     ANowT(int t_ = 0) : t(t_) {}
 
-#if __cplusplus >= 202101L
-    template <typename... Ts>
-    void operator[](Ts... args) const {
-        AConnect(ANowDelayTime(t), _ReisenAvZDSL::RelOpSum(args...));
-    }
-#else
     void operator[](const ARelOp& x) const {
         AConnect(ANowDelayTime(t), x);
     }
-#endif
 
     ANowT operator+(const ARelTime rhs) const {
         return ANowT(t + int(rhs));
@@ -173,20 +149,11 @@ public:
     template <typename... Ts>
     AWave(Ts... args) : waves(ParseWave(args...)), t(0) {}
 
-#if __cplusplus >= 202101L
-    template <typename... Ts>
-    AWave operator[](Ts... args) const {
-        for(int w : waves)
-            AConnect(ATime(w, t), _ReisenAvZDSL::RelOpSum(args...));
-        return *this;
-    }
-#else
     AWave operator[](const ARelOp& x) const {
         for(int w : waves)
             AConnect(ATime(w, t), x);
         return *this;
     }
-#endif
 
     AWave operator+(const ARelTime rhs) const {
         return AWave(waves, t + int(rhs));
@@ -222,5 +189,5 @@ public:
 AWave operator""_wave(unsigned long long x) { return x; }
 AWave operator""_wave(const char* x, size_t _) { return x; }
 
-#define AMkRelOp(...) ARelOp([=]{ __VA_ARGS__; })
+#define AMkRelOp(...) ARelOp([=]() mutable { __VA_ARGS__; })
 #endif
