@@ -113,7 +113,11 @@ public:
 
     static void gameExit()
     {
+        #if __AVZ_VERSION__ >= 230405
+        AAsm::CheckFightExit();
+        #else
         AAsm::GameExit();
+        #endif
     }
 
     static void killZombiesPreview()
