@@ -9,7 +9,10 @@
 #define __SMIDCT_H__
 #include <avz.h>
 
-constexpr int DEFAULT_STATE = 0xffff;
+constexpr int __SM_DEFAULT_STATE = 0xffff;
+constexpr int __SM_PLANT_TOTAL = 49;
+constexpr int __SM_ZOMBIE_TOTAL = 33;
+constexpr int __SM_PLACE_TOTAL = 14;
 
 template <typename T>
 class SMShowObj {
@@ -113,6 +116,21 @@ public:
         return _typeDict;
     }
 
+    void Pause()
+    {
+        _typeDict.back() = 0;
+    }
+
+    void GoOn()
+    {
+        _typeDict.back() = 1;
+    }
+
+    bool IsPaused()
+    {
+        return _typeDict.back() == 0;
+    }
+
 protected:
     std::vector<uint8_t> _typeDict; // 最后一位用来记录是否用遍历
     InfoFunc<T> _infoFunc;
@@ -123,7 +141,7 @@ protected:
 template <>
 inline SMShowObj<APlant>::SMShowObj()
 {
-    _typeDict.assign(48 + 1, 1);
+    _typeDict.assign(__SM_PLANT_TOTAL + 1, 1);
 
     // 初始化字符串生成函数
     _infoFunc = [=](APlant* plant) {
@@ -136,7 +154,7 @@ inline SMShowObj<APlant>::SMShowObj()
     _nameDict = {
         "豌豆射手", "向日葵", "樱桃炸弹", "坚果", "土豆雷",
         "寒冰射手", "大嘴花", "双发射手", "小喷菇", "阳光菇",
-        "大喷菇", "墓被吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
+        "大喷菇", "墓碑吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
         "毁灭菇", "睡莲", "倭瓜", "三线射手", "缠绕海藻",
         "火爆辣椒", "地刺", "火炬树桩", "高坚果", "海蘑菇",
         "路灯花", "仙人掌", "三叶草", "裂荚射手", "杨桃",
@@ -145,14 +163,14 @@ inline SMShowObj<APlant>::SMShowObj()
         "机枪射手", "双子向日葵", "忧郁蘑菇", "香蒲", "冰瓜",
         "吸金磁", "地刺王", "玉米加农炮", "模仿者"};
 
-    std::pair<int, SMFindInfo> temp(DEFAULT_STATE, SMFindInfo(30, 0.5, 0.5));
-    for (int type = 0; type < 48; ++type) {
+    std::pair<int, SMFindInfo> temp(__SM_DEFAULT_STATE, SMFindInfo(30, 0.5, 0.5));
+    for (int type = 0; type < __SM_PLANT_TOTAL; ++type) {
         _findInfoDict.push_back({temp});
     }
-    _findInfoDict[16][DEFAULT_STATE].offsetY = 1;
-    _findInfoDict[30][DEFAULT_STATE].offsetX = 0.33;
-    _findInfoDict[30][DEFAULT_STATE].offsetY = 0.66;
-    _findInfoDict[33][DEFAULT_STATE].offsetY = 1;
+    _findInfoDict[16][__SM_DEFAULT_STATE].offsetY = 1;
+    _findInfoDict[30][__SM_DEFAULT_STATE].offsetX = 0.33;
+    _findInfoDict[30][__SM_DEFAULT_STATE].offsetY = 0.66;
+    _findInfoDict[33][__SM_DEFAULT_STATE].offsetY = 1;
 }
 
 template <>
@@ -169,7 +187,7 @@ inline APlant* SMShowObj<APlant>::FindObject(int mouseX, int mouseY)
 
         auto&& findMap = _findInfoDict[type];
         auto infoIter = findMap.find(obj.State());
-        auto&& info = infoIter == findMap.end() ? findMap[DEFAULT_STATE] : infoIter->second;
+        auto&& info = infoIter == findMap.end() ? findMap[__SM_DEFAULT_STATE] : infoIter->second;
         float xDistance = mouseX - obj.Abscissa() - obj.HurtWidth() * info.offsetX;
         float yDistance = mouseY - obj.Ordinate() - obj.HurtHeight() * info.offsetY;
         float distance2 = xDistance * xDistance + yDistance * yDistance;
@@ -188,7 +206,7 @@ inline APlant* SMShowObj<APlant>::FindObject(int mouseX, int mouseY)
 template <>
 inline SMShowObj<AZombie>::SMShowObj()
 {
-    _typeDict.assign(33 + 1, 1);
+    _typeDict.assign(__SM_ZOMBIE_TOTAL + 1, 1);
     _infoFunc = [=](AZombie* zombie) {
         std::string text;
         text += "类型:" + _nameDict[zombie->Type()] + '\n';
@@ -203,22 +221,22 @@ inline SMShowObj<AZombie>::SMShowObj()
         "小鬼", "僵博", "豌豆", "坚果", "辣椒", "机枪",
         "倭瓜", "高墙", "红眼"};
 
-    std::pair<int, SMFindInfo> temp(DEFAULT_STATE, SMFindInfo(30, 1.2, 0.5));
+    std::pair<int, SMFindInfo> temp(__SM_DEFAULT_STATE, SMFindInfo(30, 1.2, 0.5));
 
-    for (int type = 0; type < 48; ++type) {
+    for (int type = 0; type < __SM_ZOMBIE_TOTAL; ++type) {
         _findInfoDict.push_back({temp});
     }
     _findInfoDict[11][59] = {50, 0.5, 1};
-    _findInfoDict[12][DEFAULT_STATE] = {50, 0.5, 0.5};
-    _findInfoDict[14][DEFAULT_STATE] = {50, 1.2, 0.8};
+    _findInfoDict[12][__SM_DEFAULT_STATE] = {50, 0.5, 0.5};
+    _findInfoDict[14][__SM_DEFAULT_STATE] = {50, 1.2, 0.8};
     _findInfoDict[16][75] = {50, 1.2, 0.8};
     _findInfoDict[17][32] = {50, 2, 1};
-    _findInfoDict[17][DEFAULT_STATE] = {50, 2, 0.5};
-    _findInfoDict[20][DEFAULT_STATE] = {50, 0.4, 0.5};
-    _findInfoDict[22][DEFAULT_STATE] = {50, 0.5, 0.5};
-    _findInfoDict[23][DEFAULT_STATE] = {50, 0.5, 0.3};
-    _findInfoDict[24][DEFAULT_STATE] = {50, 1.3, 0.8};
-    _findInfoDict[32][DEFAULT_STATE] = {50, 0.5, 0.3};
+    _findInfoDict[17][__SM_DEFAULT_STATE] = {50, 2, 0.5};
+    _findInfoDict[20][__SM_DEFAULT_STATE] = {50, 0.4, 0.5};
+    _findInfoDict[22][__SM_DEFAULT_STATE] = {50, 0.5, 0.5};
+    _findInfoDict[23][__SM_DEFAULT_STATE] = {50, 0.5, 0.3};
+    _findInfoDict[24][__SM_DEFAULT_STATE] = {50, 1.3, 0.8};
+    _findInfoDict[32][__SM_DEFAULT_STATE] = {50, 0.5, 0.3};
 }
 
 template <>
@@ -234,7 +252,7 @@ inline AZombie* SMShowObj<AZombie>::FindObject(int mouseX, int mouseY)
 
         auto&& findMap = _findInfoDict[type];
         auto infoIter = findMap.find(obj.State());
-        auto&& info = infoIter == findMap.end() ? findMap[DEFAULT_STATE] : infoIter->second;
+        auto&& info = infoIter == findMap.end() ? findMap[__SM_DEFAULT_STATE] : infoIter->second;
         float xDistance = mouseX - obj.Abscissa() - obj.HurtWidth() * info.offsetX;
         float yDistance = mouseY - obj.Ordinate() - obj.HurtHeight() * info.offsetY;
         float distance2 = xDistance * xDistance + yDistance * yDistance;
@@ -253,7 +271,7 @@ inline AZombie* SMShowObj<AZombie>::FindObject(int mouseX, int mouseY)
 template <>
 inline SMShowObj<ASeed>::SMShowObj()
 {
-    _typeDict.assign(48 + 1, 1);
+    _typeDict.assign(__SM_PLANT_TOTAL + 1, 1);
     _infoFunc = [=](ASeed* seed) {
         std::string text;
         text += "类型:" + _nameDict[seed->Type()] + '\n';
@@ -263,7 +281,7 @@ inline SMShowObj<ASeed>::SMShowObj()
     _nameDict = {
         "豌豆射手", "向日葵", "樱桃炸弹", "坚果", "土豆雷",
         "寒冰射手", "大嘴花", "双发射手", "小喷菇", "阳光菇",
-        "大喷菇", "墓被吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
+        "大喷菇", "墓碑吞噬者", "魅惑菇", "胆小菇", "寒冰菇",
         "毁灭菇", "睡莲", "倭瓜", "三线射手", "缠绕海藻",
         "火爆辣椒", "地刺", "火炬树桩", "高坚果", "海蘑菇",
         "路灯花", "仙人掌", "三叶草", "裂荚射手", "杨桃",
@@ -299,7 +317,7 @@ inline ASeed* SMShowObj<ASeed>::FindObject(int mouseX, int mouseY)
 template <>
 inline SMShowObj<APlaceItem>::SMShowObj()
 {
-    _typeDict.assign(14 + 1, 0);
+    _typeDict.assign(__SM_PLACE_TOTAL + 1, 0);
     _typeDict[2] = 1;
     _typeDict.back() = 1;
     _infoFunc = [=](APlaceItem* place_item) {

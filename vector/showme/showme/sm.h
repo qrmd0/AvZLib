@@ -15,45 +15,30 @@ class SMShowMe : public ATickRunnerWithNoStart {
 
 public:
     // 得到画家
-    SMPainter& GetPainter()
-    {
-        return painter;
-    }
+    SMPainter& GetPainter() { return painter; }
 
     // 得到植物信息显示设置
-    SMShowObj<APlant>& GetPlantSettings()
-    {
-        return plant;
-    }
+    SMShowObj<APlant>& GetPlantSettings() { return plant; }
 
     // 得到僵尸信息显示设置
-    SMShowObj<AZombie>& GetZombieSettings()
-    {
-        return zombie;
-    }
+    SMShowObj<AZombie>& GetZombieSettings() { return zombie; }
 
     // 得到种子/卡片信息显示设置
-    SMShowObj<ASeed>& GetSeedSettings()
-    {
-        return seed;
-    }
+    SMShowObj<ASeed>& GetSeedSettings() { return seed; }
 
     // 得到场地物品信息显示设置
-    SMShowObj<APlaceItem>& GetPlaceItemSettings()
-    {
-        return placeItem;
-    }
+    SMShowObj<APlaceItem>& GetPlaceItemSettings() { return placeItem; }
 
     void Start()
     {
-        _tickManager.Start([this] {
+        ATickRunner::Start([this] {
             auto mouseWindow = AGetPvzBase()->MouseWindow();
             int mouseX = mouseWindow->MouseAbscissa();
             int mouseY = mouseWindow->MouseOrdinate();
             int txtPos = -1;
 
             // Plant
-            if (plant.GetTypeDict().back()) {
+            if (!plant.IsPaused()) {
                 auto showInfo = plant.GetShowText(mouseX, mouseY);
                 if (!showInfo.empty()) {
                     painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
@@ -61,7 +46,7 @@ public:
             }
 
             // Zombie
-            if (zombie.GetTypeDict().back()) {
+            if (!zombie.IsPaused()) {
                 auto showInfo = zombie.GetShowText(mouseX, mouseY);
                 if (!showInfo.empty()) {
                     painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
@@ -69,7 +54,7 @@ public:
             }
 
             // Seed
-            if (seed.GetTypeDict().back()) {
+            if (!seed.IsPaused()) {
                 auto showInfo = seed.GetShowText(mouseX, mouseY);
                 if (!showInfo.empty()) {
                     painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
@@ -77,7 +62,7 @@ public:
             }
 
             // PlaceItem
-            if (placeItem.GetTypeDict().back()) {
+            if (!placeItem.IsPaused()) {
                 auto showInfo = placeItem.GetShowText(mouseX, mouseY);
                 if (!showInfo.empty()) {
                     painter.Draw(AText(showInfo, mouseX, mouseY, APos(++txtPos)));
