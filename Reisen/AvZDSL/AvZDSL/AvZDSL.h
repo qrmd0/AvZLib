@@ -32,7 +32,7 @@ private:
 public:
     ARelTime(int t_) : t(t_) {}
 
-    explicit operator int() const {
+    operator int() const {
         return t;
     }
 
@@ -73,6 +73,10 @@ private:
 
 public:
     ANowT(int t_ = 0) : t(t_) {}
+
+    ANowT operator()(int t_) {
+        return ANowT(t + t_);
+    }
 
     void operator[](const ARelOp& x) const {
         AConnect(ANowDelayTime(t), x);
@@ -190,4 +194,5 @@ AWave operator""_wave(unsigned long long x) { return x; }
 AWave operator""_wave(const char* x, size_t _) { return x; }
 
 #define AMkRelOp(...) ARelOp([=]() mutable { __VA_ARGS__; })
+#define RFunc [[nodiscard("ARelOp 需要绑定到时间才会执行")]] ARelOp
 #endif

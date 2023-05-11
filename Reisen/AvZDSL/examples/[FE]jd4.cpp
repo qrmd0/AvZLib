@@ -3,16 +3,18 @@
 
 ALogger<AConsole> l;
 
-// AMkRelOp(...) 就是 ARelOp([=]{ ...; }) 的语法糖
-
+// 定义返回 ARelOp 的函数时，推荐将返回类型写作 RFunc
+// 这会在返回值未被绑定时使编译器发出警告，降低出错概率
+// 注意 static 和 RFunc 同时使用时 RFunc 要在 static 前面
 template <typename... Ts>
-ARelOp InfoR(Ts... args) {
+RFunc InfoR(Ts... args) {
+    // AMkRelOp(...) 就是 ARelOp([=]{ ...; }) 的语法糖
     return AMkRelOp(l.Info(args...));
 }
 
 #define CardR(...) AMkRelOp(ACard(__VA_ARGS__))
 
-ARelOp UseIceR(int row, int col) {
+RFunc UseIceR(int row, int col) {
     // 构建复合操作的基本语法是 时间[操作1, 操作2, ...]
     // 相当于 ARelOp(-100, CardR(AICE_SHROOM, row, col) + InfoR("蓝冰"))
     return -100_cs[
@@ -21,24 +23,28 @@ ARelOp UseIceR(int row, int col) {
     ];
 }
 
-ARelOp UseImitatorIceR(int row, int col) {
+RFunc UseImitatorIceR(int row, int col) {
     ARelTime t = rand() % 2 ? 419 : 420; // 模仿者生效时间可能取 319 或 320
     return -t[
         CardR(AM_ICE_SHROOM, row, col),
-        AMkRelOp(AIce3(int(t))),
+        AMkRelOp(AIce3(t)),
         InfoR("白冰")
     ];
 }
 
-ARelOp IceNightR(int row, int col) {
+RFunc IceNightR(int row, int col) {
     return -420_cs[AMkRelOp(
         // 由于它被 AMkRelOp 包裹，这段代码会在操作时间点执行
-        int idx = AGetSeedIndex(AICE_SHROOM, true);
-        if(idx != -1 && AGetMainObject()->SeedArray()[idx].IsUsable()) // 复制冰可用
-            ANow + 420_cs[UseImitatorIceR(row, col)];
+        if(AIsSeedUsable(AM_ICE_SHROOM))
+            // ANow(420) 就是在当前时间 420cs 后执行
+            ANow(420)[UseImitatorIceR(row, col)];
         else
-            ANow + 420_cs[UseIceR(row, col)];
+            ANow(420)[UseIceR(row, col)];
         // 为什么要先 -420cs 再 +420cs 呢？因为 -420cs 是「决策」的时间（你得在复制冰生效前 420cs 就想到把它放下去）
+
+        // 让 ARelOp 立即执行也需要把它用 ANow[] 包裹
+        // 得益于 RFunc，编译器会警告这种错误用法
+        InfoR("这条语句不会被执行");
     )];
 }
 
@@ -46,11 +52,11 @@ ARelOp IceNightR(int row, int col) {
 // 邻C6u: I-PP|I-PP|N|PP 1976|1976|750|749
 
 void AScript() {
+    ASetInternalLogger(l);
     ASetReloadMode(AReloadMode::MAIN_UI_OR_FIGHT_UI);
     ASetZombies({AZOMBIE, APOLE_VAULTING_ZOMBIE, ADANCING_ZOMBIE, AZOMBONI, ADOLPHIN_RIDER_ZOMBIE, AJACK_IN_THE_BOX_ZOMBIE, ABALLOON_ZOMBIE, ADIGGER_ZOMBIE, ACATAPULT_ZOMBIE, ABUNGEE_ZOMBIE, AGIGA_GARGANTUAR});
     ASelectCards({AICE_SHROOM, AM_ICE_SHROOM, ADOOM_SHROOM, ALILY_PAD, ASQUASH, ACHERRY_BOMB, APUMPKIN, APUFF_SHROOM, ASUN_SHROOM, AFLOWER_POT});
     aPlantFixer.Start(APUMPKIN, {}, 4000 / 3);
-    ASetInternalLogger(l);
 
     // 定义发炮操作：在 373cs 前发一对炮
     // 这样只构建复合操作，并不运行
@@ -58,7 +64,7 @@ void AScript() {
     ARelOp N = AMkRelOp(ACard(ALILY_PAD, {{3, 9}, {4, 9}, {3, 8}})) +
                AMkRelOp(ACard(ADOOM_SHROOM, {{3, 9}, {4, 9}, {3, 8}}));
 
-    // AWave可以接受任意多参数
+    // AWave 可以接受任意多参数
     // 参数可以是以下几种：
     // 1. 数字或其字符串形式
     // 2. 形如 "a-b" 的字符串（如 "2-5" 与 2, 3, 4, 5 等效）
