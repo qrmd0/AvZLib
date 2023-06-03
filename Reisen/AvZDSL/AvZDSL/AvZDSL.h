@@ -22,6 +22,10 @@ struct ARelOpIR {
     ARelOpIR operator-() const {
         return ARelOpIR{-t, o};
     }
+
+    friend ARelOpIR operator*(const int n, const ARelOpIR& x) {
+        return ARelOpIR{n * x.t, x.o};
+    }
 };
 }; // namespace _ReisenAvZDSL
 
@@ -61,6 +65,10 @@ public:
     [[nodiscard("ARelOp 需要绑定到时间才会执行")]]
     auto operator-(const _ReisenAvZDSL::ARelOpIR& rhs) const {
         return _ReisenAvZDSL::ARelOpIR{t - rhs.t, rhs.o};
+    }
+
+    friend ARelTime operator*(const int lhs, const ARelTime rhs) {
+        return ARelTime(lhs * rhs.t);
     }
 };
 
@@ -140,8 +148,7 @@ private:
             ParseWaveImplSingle(out, str.substr(start, str.size() - start));
     }
 
-    template <typename... Ts>
-    static std::vector<int> ParseWave(Ts... args) {
+    static std::vector<int> ParseWave(auto... args) {
         std::vector<int> out;
         (ParseWaveImpl(out, args), ...);
         return out;
@@ -150,8 +157,7 @@ private:
 public:
     AWave(const std::vector<int>& waves_, int t_ = 0) : waves(waves_), t(t_) {}
 
-    template <typename... Ts>
-    AWave(Ts... args) : waves(ParseWave(args...)), t(0) {}
+    AWave(auto... args) : waves(ParseWave(args...)), t(0) {}
 
     AWave operator[](const ARelOp& x) const {
         for(int w : waves)

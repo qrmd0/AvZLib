@@ -7,7 +7,8 @@ qrmd/TickPlanter
 Reisen/AvZDSL
 Reisen/DanceCheat
 Reisen/fodder
+Reisen/MousePosPatch
 shallowdream/shallowdream
+sin20/sin20_tools
 vector/avz1
 vector/showme
-sin20/sin20_tools

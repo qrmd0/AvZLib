@@ -58,7 +58,8 @@ void AScript() {
     ASelectCards({AICE_SHROOM, AM_ICE_SHROOM, ADOOM_SHROOM, ALILY_PAD, ASQUASH, ACHERRY_BOMB, APUMPKIN, APUFF_SHROOM, ASUN_SHROOM, AFLOWER_POT});
     aPlantFixer.Start(APUMPKIN, {}, 4000 / 3);
 
-    // 定义发炮操作：在 373cs 前发一对炮
+    // 定义发炮操作：在 373cs 前发射一对炮
+    // 这样绑定的时间就对应炮生效时间，使代码更加直观和简短
     // 这样只构建复合操作，并不运行
     ARelOp PP = -373_cs[AMkRelOp(aCobManager.Fire({{2, 8.75}, {5, 8.75}}))];
     ARelOp N = AMkRelOp(ACard(ALILY_PAD, {{3, 9}, {4, 9}, {3, 8}})) +
@@ -86,15 +87,19 @@ void AScript() {
     ].AssumeWaveLength(1976);
 
     "4, 8, 13, 17"_wave[
-        750_cs - 200_cs - 100_cs[N]
+        // ARelTime 支持 int * time 运算，但不能调换顺序
+        -200_cs - 100_cs - 75 * -10_cs[N]
     ].AssumeWaveLength(750);
 
+    const int w10_card_time = 401;
+    // w10 特化：PPAa 消延迟
+    // 窝瓜放置到生效 182cs
     " 10-10 "_wave[
-        // w10 特化：PPAa 消延迟
-        // 窝瓜放置到生效 182cs
         341_cs[PP],
-        401_cs - 100_cs[CardR(ACHERRY_BOMB, 2, 9)],
-        401_cs - 182_cs[CardR(ASQUASH, 5, 9)]
+        // 只有数字才能接_cs，w10_card_time_cs 是不可以的！
+        // 有如下两种方法将 int 转化为时间：
+        ARelTime(w10_card_time) - 100_cs[CardR(ACHERRY_BOMB, 2, 9)],
+        w10_card_time * 1_cs - 182_cs[CardR(ASQUASH, 5, 9)]
     ].AssumeWaveLength(601);
 
     // 收尾
