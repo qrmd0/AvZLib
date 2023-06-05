@@ -9,6 +9,12 @@
 
 AsmVsZombies 的公开插件仓库
 
+# 镜像库
+
+如果主库访问受限，请访问镜像库。如果要上传代码，请传入主库，主库的更新会被定期推送至镜像库，而镜像库的变更不会影响到主库。
+镜像库1：https://gitee.com/qrmd/AvZLib
+镜像库2：https://gitlab.com/avzlib/AvZLib
+
 # 上传说明
 
 **由于该项目为多人协作，提交之前请先`git pull`。**（使用网页版提交忽略此条）
