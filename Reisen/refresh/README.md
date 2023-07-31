@@ -12,7 +12,7 @@
 Task task = TaskBuilder()
     .output_folder("D:\\refresh") // 存储结果的目录，需要提前创建好
     .prefix("PP-225") // 测试项目的名称
-    .total(500) // 测试的选卡数（每选卡20波）
+    .total(1000) // 测试的选卡数（每选卡20波）
     .assume_refresh(true) // 激活为true，分离为false
     .huge(false) // 旗帜波为true，普通波为false
     .required_types({GIGA_GARGANTUAR, GARGANTUAR}) // 锁定必出的出怪种类
@@ -24,7 +24,7 @@ Task task = TaskBuilder()
     .check_time(401) // max(激活时间, 401)
     // 以下为可选参数
     .debug(false) // 关闭跳帧，默认为false
-    .card_selection({}) // 选卡类型，默认为{ICE_SHROOM, CHERRY_BOMB, JALAPENO, DOOM_SHROOM, SQUASH, SPIKEWEED, BLOVER}
+    .card_selection({STARFRUIT}) // 选卡类型，默认为寒冰菇、毁灭菇、樱桃、辣椒、窝瓜、地刺、三叶草、高坚果、大蒜、土豆
     .clear_zombies(true) // 每波结束时清空僵尸（io测试可能需要关闭），默认为true
     .dance_cheat(true) // 开启女仆秘籍和Dance秘籍（会自动根据assume_refresh选择类型），默认为true
     .giga_count(-1) // 锁定每波红眼数，用于变速测试。默认为-1，即不限制
@@ -61,6 +61,7 @@ vector<Task> get_tasks() {
 - 玉米炮无冷却
 - 无视阳光
 - 卡片无冷却
+- 随意放置
 - 蘑菇免唤醒（**写测试脚本时需注意**）
 - 植物无敌
 - 不长墓碑，不出墓碑、珊瑚、空降僵尸
@@ -71,11 +72,11 @@ vector<Task> get_tasks() {
 为加速测试，可以使用 [AvZ 多实例注入器](https://github.com/alumkal/avz-multi-instance-tools/tree/main/injector)，用其替换 AvZ1 自带的 `injector.exe`。
 准备好多个脚本（或者把一个脚本里的测试项目分成多份），开启与脚本数量相同的 PvZ 进程，运行每个脚本各一次即可。成功注入的 PvZ 进程的窗口标题会带上 `(1)` `(2)` 等标记。
 
-参考脚本见 `example/PE-activate.cpp`。
+参考脚本见 `examples/PE-activate.cpp`。
 
 ## 解读结果
 
-刷新测试器会生成类似 `example/output/PP-225.xlsx` 的文件，其中有三张表格。在进行简单分析时只需使用 `stats` 表。
+刷新测试器会生成类似 `examples/output/PP-225.xlsx` 的文件，其中有三张表格。在进行简单分析时只需使用 `stats` 表。
 
 ### `stats`
 

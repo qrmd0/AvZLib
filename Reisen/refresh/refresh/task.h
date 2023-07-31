@@ -59,7 +59,8 @@ class TaskBuilder {
     _REISEN_TASK_H_MEMBER_OPTIONAL(bool, clear_zombies, true)
     _REISEN_TASK_H_MEMBER_OPTIONAL(bool, dance_cheat, true)
     _REISEN_TASK_H_MEMBER_OPTIONAL(int, giga_count, -1)
-    _REISEN_TASK_H_MEMBER_OPTIONAL(std::vector<int>, card_selection, {ICE_SHROOM, CHERRY_BOMB, JALAPENO, DOOM_SHROOM, SQUASH, SPIKEWEED, BLOVER})
+    _REISEN_TASK_H_MEMBER_OPTIONAL(std::vector<int>, card_selection, {ICE_SHROOM, DOOM_SHROOM,
+        CHERRY_BOMB, JALAPENO, SQUASH, SPIKEWEED, BLOVER, TALL_NUT, GARLIC, POTATO_MINE})
 
     public:
     Task build() const {
