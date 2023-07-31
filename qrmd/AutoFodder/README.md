@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-07-31 19:42:13
+ * @LastEditTime: 2023-07-31 20:25:29
  * @Description: 
 -->
 # AvZ AutoFodder
@@ -46,7 +46,7 @@
 // // PE纯二十炮(P5u)垫跳跳和舞王
 // for (auto wave : {4, 6, 9, 12, 14, 17, 19}) {
 //     AConnect(ATime(wave, 170), [] { AAutoFodder({{1, 9}}, {APOGO_ZOMBIE}, {}, 79); });
-//     AConnect(ATime(wave, 195), [] { AAutoFodder({{1, 9}, {2, 9}, {5, 9}, {6, 9}}, {ADANCING_ZOMBIE}, {}, 4); });
+//     AConnect(ATime(wave, 195), [] { AAutoFodder({{1, 9}, {2, 9}, {5, 9}, {6, 9}}, {ADANCING_ZOMBIE}, {}, 79); });
 // }
 // // DE双冰六炮(ch5)垫红眼拖收尾
 // for (auto wave : {9, 19, 20}) {
