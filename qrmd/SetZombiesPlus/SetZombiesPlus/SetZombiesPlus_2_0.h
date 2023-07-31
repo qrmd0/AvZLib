@@ -230,7 +230,7 @@ void _qrmd::ASetIsShowInfo(bool is_true)
 }
 struct _qrmd::ZombiesRefreshLimit {
     int wave;
-    int type;
+    AZombieType type;
     std::string method;
     int number;
 };
@@ -397,12 +397,6 @@ void _qrmd::ASetZombiesLimits(ZombiesRefreshLimit each)
 {
     std::vector<ZombiesRefreshLimit> temp = {each};
     ASetZombiesLimits(temp);
-}
-void _qrmd::ASetZombiesLimits(int wave, int type, std::string method, int number)
-{
-    ZombiesRefreshLimit temp1 = {wave, type, method, number};
-    std::vector<ZombiesRefreshLimit> temp2 = {temp1};
-    ASetZombiesLimits(temp2);
 }
 void _qrmd::ASetWaitLimit(int time)
 {

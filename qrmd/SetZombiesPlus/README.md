@@ -2,17 +2,10 @@
  * @Author: qrmd
  * @Date: 2022-07-06 09:56:07
  * @LastEditors: qrmd
- * @LastEditTime: 2023-07-31 13:37:21
+ * @LastEditTime: 2023-07-31 19:56:52
  * @Description: 
- * 使用方法：1、前往https://gitee.com/vector-wlc/AsmVsZombies，根据教程下载并安装好AsmVsZombies
- *          2、前往游戏存档文件夹C:/ProgramData/PopCap Games/PlantsVsZombies/userdata，备份原游戏存档，然后用脚本配套的存档文件替换同名文件
- *          3、在Visul Studio Code中打开本脚本，右键点击编辑区空白处，在弹出菜单中选择“AvZ:Run Script”
- * 来自AvZScript公开脚本仓库：
- * 主库：https://github.com/qrmd0/AvZScript
- * 镜像库：https://gitee.com/qrmd/AvZScript
- * Copyright (c) 2022 by qrmd, AAll Rights Reserved. 
 -->
-# AvZ SetZombiesPlus 20221127
+# AvZ SetZombiesPlus
 
 ## 简介
 
@@ -30,17 +23,15 @@ SetZombies的增强版本，更自由地设置出怪。
 
 ## 运行环境
 
-本插件针对 AvZ 220213 版本开发，不确保对其它 AvZ 版本的兼容性。
+本插件针对 AvZ 2.4.4_2023_06_15 版本开发，支持自 AvZ 220213 到 AvZ 2.4.4_2023_06_15 大部分版本。
 
 ## 使用方法
 
-将 SetZombiesPlus.h 置于 AsmVsZombies/inc 目录后，编写脚本并运行即可。
+1、在VsCode中运行命令AvZ:Get AvZ Extension，在列表中选择本插件；
 
-在 Script() 外添加下面的代码以在编译时包含此库:
+2、在{AvZ安装目录}/inc文件夹中找到本插件，浏览README和代码注释了解调用方法；
 
-```c++
-#include "SetZombiesPlus.h"
-```
+3、在要使用本插件的脚本开头加上 #include "SetZombiesPlus/main.h"
 
 ## 使用示例
 
@@ -49,8 +40,8 @@ SetZombies的增强版本，更自由地设置出怪。
     ASetZombiesPlus({APJ_0, ALZ_2, ACG_3, AWW_8, AHT_14, AXC_15, AQQ_16, AKG_17, ATT_18, AHY_32}, INTERNAL);
     // 显示为了满足限定条件刷新出怪列表的调试信息
     ASetIsShowInfo(true);
-    // 限定第9波不刷出小丑僵尸、全部波次刷出的红眼巨人僵尸合计不少于80只以及变速的波数不小于15
-    ASetZombiesLimits({{9, AJACK_IN_THE_BOX, "==", 0}, {TOTAL_WAVE, AGIGA_GARGANTUAR, ">=", 80}, {TRANS_WAVE, AGIGA_GARGANTUAR, ">=", 15}});
+    // 限定第9波不刷出小丑僵尸、全部波次刷出的红眼巨人僵尸合计不少于60只以及变速的波数不小于15
+    ASetZombiesLimits({{9, AJACK_IN_THE_BOX, "==", 0}, {TOTAL_WAVE, AGIGA_GARGANTUAR, ">=", 60}, {TRANS_WAVE, AGIGA_GARGANTUAR, ">=", 15}});
     // 设置第18波的出怪为：小鬼僵尸20只、蹦极僵尸14只和巨人僵尸16只
     ASetWaveZombieList(18, {{AIMP, 20}, {ABUNGEE_ZOMBIE, 14}, {AGARGANTUAR, 16}});
 
@@ -62,7 +53,7 @@ SetZombies的增强版本，更自由地设置出怪。
 
 ### 20230731
 
-支持在AvZ2中调用。
+支持在AvZ2中使用。
 
 ### 20221127
 
