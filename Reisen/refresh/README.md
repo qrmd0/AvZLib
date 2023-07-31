@@ -10,7 +10,7 @@
 
 ```cpp
 Task task = TaskBuilder()
-    .output_folder("D:\\refresh") // 存储结果的目录
+    .output_folder("D:\\refresh") // 存储结果的目录，需要提前创建好
     .prefix("PP-225") // 测试项目的名称
     .total(500) // 测试的选卡数（每选卡20波）
     .assume_refresh(true) // 激活为true，分离为false
@@ -71,7 +71,7 @@ vector<Task> get_tasks() {
 为加速测试，可以使用 [AvZ 多实例注入器](https://github.com/alumkal/avz-multi-instance-tools/tree/main/injector)，用其替换 AvZ1 自带的 `injector.exe`。
 准备好多个脚本（或者把一个脚本里的测试项目分成多份），开启与脚本数量相同的 PvZ 进程，运行每个脚本各一次即可。成功注入的 PvZ 进程的窗口标题会带上 `(1)` `(2)` 等标记。
 
-参考脚本见 `example/cobless.cpp`。
+参考脚本见 `example/PE-activate.cpp`。
 
 ## 解读结果
 

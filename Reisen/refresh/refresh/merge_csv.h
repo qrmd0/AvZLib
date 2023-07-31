@@ -40,18 +40,3 @@ void merge_csv() {
         cmd += string(" && del \"") + prefix + s + '"';
     WinExec(cmd.c_str(), SW_HIDE);
 }
-
-/*
-void merge_csv() {
-    string bat_path = string(getenv("TEMP")) + "\\merge_csv.bat";
-    ofstream fout(bat_path);
-    fout << to_gbk("\"%TEMP%\\csv2xlsx.exe\" -f 等线 --fontsize 11 -c , -s stats -s data -s raw -o");
-    string prefix = cur_task->output_folder + "\\" + cur_task->prefix;
-    for(auto s : {".xlsx", "-stats.csv", "-data.csv", "-raw.csv"})
-        fout << " \"" << prefix << s << '"';
-    for(auto s : {"-stats.csv", "-data.csv", "-raw.csv"})
-        fout << "\ndel \"" << prefix << s << '"';
-    fout.close();
-    WinExec(string("\"") + bat_path + '"', SW_HIDE);
-}
-*/
