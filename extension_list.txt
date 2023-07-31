@@ -4,6 +4,7 @@ qrmd/PlantFixerPlus
 qrmd/SelectCardsPlus
 qrmd/SetZombiesPlus
 qrmd/TickPlanter
+qrmd/AutoFodder
 Reisen/AvZDSL
 Reisen/DanceCheat
 Reisen/fodder
