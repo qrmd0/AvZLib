@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-06 09:56:07
  * @LastEditors: qrmd
- * @LastEditTime: 2022-11-28 10:36:56
+ * @LastEditTime: 2023-07-31 13:37:21
  * @Description: 
  * 使用方法：1、前往https://gitee.com/vector-wlc/AsmVsZombies，根据教程下载并安装好AsmVsZombies
  *          2、前往游戏存档文件夹C:/ProgramData/PopCap Games/PlantsVsZombies/userdata，备份原游戏存档，然后用脚本配套的存档文件替换同名文件
@@ -10,7 +10,7 @@
  * 来自AvZScript公开脚本仓库：
  * 主库：https://github.com/qrmd0/AvZScript
  * 镜像库：https://gitee.com/qrmd/AvZScript
- * Copyright (c) 2022 by qrmd, All Rights Reserved. 
+ * Copyright (c) 2022 by qrmd, AAll Rights Reserved. 
 -->
 # AvZ SetZombiesPlus 20221127
 
@@ -46,16 +46,23 @@ SetZombies的增强版本，更自由地设置出怪。
 
 ```c++
     // 以自然（游戏原生）方式设置出怪为{普通僵尸、路障僵尸、撑杆僵尸、舞王僵尸、海豚僵尸、小丑僵尸、气球僵尸、矿工僵尸、跳跳僵尸、红眼巨人僵尸}
-    SetZombiesPlus({PJ_0, LZ_2, CG_3, WW_8, HT_14, XC_15, QQ_16, KG_17, TT_18, HY_32}, INTERNAL);
+    ASetZombiesPlus({APJ_0, ALZ_2, ACG_3, AWW_8, AHT_14, AXC_15, AQQ_16, AKG_17, ATT_18, AHY_32}, INTERNAL);
     // 显示为了满足限定条件刷新出怪列表的调试信息
-    SetIsShowInfo(true);
+    ASetIsShowInfo(true);
     // 限定第9波不刷出小丑僵尸、全部波次刷出的红眼巨人僵尸合计不少于80只以及变速的波数不小于15
-    SetZombiesLimits({{9, JACK_IN_THE_BOX, "==", 0}, {TOTAL_WAVE, GIGA_GARGANTUAR, ">=", 80}, {TRANS_WAVE, GIGA_GARGANTUAR, ">=", 15}});
+    ASetZombiesLimits({{9, AJACK_IN_THE_BOX, "==", 0}, {TOTAL_WAVE, AGIGA_GARGANTUAR, ">=", 80}, {TRANS_WAVE, AGIGA_GARGANTUAR, ">=", 15}});
     // 设置第18波的出怪为：小鬼僵尸20只、蹦极僵尸14只和巨人僵尸16只
-    SetWaveZombieList(18, {{IMP, 20}, {BUNGEE_ZOMBIE, 14}, {GARGANTUAR, 16}});
+    ASetWaveZombieList(18, {{AIMP, 20}, {ABUNGEE_ZOMBIE, 14}, {AGARGANTUAR, 16}});
 
 ```
+在AvZ1中调用时，应去掉函数名和僵尸名开头的"A"字母。
+
 ## 更新记录
+
+
+### 20230731
+
+支持在AvZ2中调用。
 
 ### 20221127
 
