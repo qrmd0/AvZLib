@@ -5,6 +5,7 @@ qrmd/SelectCardsPlus
 qrmd/SetZombiesPlus
 qrmd/TickPlanter
 qrmd/AutoFodder
+qrmd/qmLib
 Reisen/AvZDSL
 Reisen/DanceCheat
 Reisen/fodder
