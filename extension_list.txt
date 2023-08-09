@@ -11,6 +11,7 @@ Reisen/DanceCheat
 Reisen/fodder
 Reisen/MousePosPatch
 Reisen/refresh
+Reisen/test
 shallowdream/shallowdream
 sin20/sin20_tools
 vector/avz1
