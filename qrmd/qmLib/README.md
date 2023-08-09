@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-09 21:09:56
+ * @LastEditTime: 2023-08-09 21:20:42
  * @Description: 
 -->
 # AvZ qmLib
@@ -35,7 +35,7 @@
 
 ## 函数说明
 ```c++
-// --------------全局--------------
+// --------------------------------全局--------------------------------
 
 // 返回能否在向量A中找到b
 inline bool AGetIsHave(const std::vector<T>& A, T& b);
@@ -91,9 +91,9 @@ inline bool AGetIsPlantAllowable(APlantType plt, int row, int col);
 // ------------参数------------
 // keys 要检测的按键的虚拟键码，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
 bool AGetIsKeysDown(const std::vector<int>& keys);
-// --------------------------------
+// --------------------------------------------------------------------
 
-// --------------工具--------------
+// --------------------------------工具--------------------------------
 
 // 移除场上所有的植物
 void ARemoveAllPlants();
@@ -204,7 +204,9 @@ inline void ASetCardImmediatelyFlyToSlot(bool isEnable = true);
 // isEnable 为true时启用，为false时停用
 inline void ASetNoFlagWaveEvent(bool isEnable = true);
 
-// --------------内存--------------
+// --------------------------------------------------------------------
+
+// --------------------------------内存--------------------------------
 
 // 写内存数组
 // ------------参数------------
@@ -214,9 +216,10 @@ inline void ASetNoFlagWaveEvent(bool isEnable = true);
 // WriteArray(0x52B308, std::vector<uint8_t> {0x90, 0x90});
 void WriteArray(DstAddr dstAddr, SrcArray&& srcArr);
 
-// --------------------------------
+// --------------------------------------------------------------------
 
-// --------------战斗--------------
+
+// --------------------------------战斗--------------------------------
 
 // 计算指定波次僵尸在指定行的血量之和，用于智能激活或抗压
 // ------------参数------------
@@ -234,7 +237,6 @@ int GetZombiesHp(int wave, int row);
 //     PPEndingTheWave(wave, 869 - 200 + 869 - 373, 869);
 // }
 void PPEndingTheWave(int wave, int time, int delay);
-
 
 // 自动种植三叶草吹走漏掉的气球僵尸
 // ------------参数------------
@@ -254,7 +256,88 @@ void AShowZombiesList();
 // types 要检测的植物种类，默认为{玉米加农炮、忧郁蘑菇、冰瓜、双子向日葵}
 void ASmartSkipTick(const int& startKey, const int& stopKey, const std::vector<AGrid>& grids, const std::vector<APlantType>& types = {ACOB_CANNON, AGLOOM_SHROOM, AWINTER_MELON, ATWIN_SUNFLOWER});
 
-// --------------------------------
+// --------------------------------------------------------------------
+
+// --------------------------------绘制--------------------------------
+
+class APainterEx{
+public:
+    // 绘制按指定比例填充的信息条，ABar的参数为：
+    // ------------参数------------
+    // x 信息条中心的横坐标
+    // y 信息条中心的纵坐标
+    // rate 信息条的填充比例
+    // sizeX 信息条内容的水平长度
+    // sizeY 信息条内容的垂直长度
+    // fillARGB 填充颜色与透明度
+    // backgroundARGB 背景颜色和透明度
+    // frameThickness 边框粗细
+    // direction 信息条的填充方向
+    // separators 在指定比例处绘制与填充方向垂直的分节线
+    void Draw(const ABar& bar, int duration = 1)
+}
+
+// 在游戏窗口左上角显示僵尸刷新信息，格式为：
+// 波次：[当前波次]/[总波次] 时间：[本波时刻]|[刷新倒计时]/[刷新倒计时初始值]
+// 血量：[当前本波总血量]/[本波总血量初始值]([本波当前血量占总血量百分比]/[本波刷新血量占总血量百分比])
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void AShowRefreshingInfo(bool isEnable = true);
+
+class AStateShower{
+public:
+    // 在指定植物附近显示其属性信息条，其中属性为：
+    // 所有植物：血量；
+    // 射手类、投手类：发射倒计时进度；
+    // 土豆地雷：准备就绪倒计时进度；
+    // 向日葵、阳光菇、金盏花、双子向日葵：生产倒计时进度；
+    // 樱桃炸弹、寒冰菇、毁灭菇和火爆辣椒：生效倒计时进度；
+    // 三叶草：消失倒计时进度；
+    // 大嘴花、磁力菇、玉米加农炮：复用倒计时进度；
+    // ------------参数------------
+    // pred 对象过滤器，以一个APlant*为参数的，返回bool值的lambda表达式，该断言将被用于场上的每个植物，结果为true的显示信息条。默认总为true，即始终显示所有植物的信息条
+    // ------------示例------------
+    // // 显示不满血的后轮在7列或8列的玉米加农炮的属性信息条
+    // ShowPlants([](APlant* plt) { return plt->Type() == ACOB_CANNON && plt->Col() + 1 >= 7 && plt->Hp() < plt->HpMax(); });
+    void ShowPlants(std::function<bool(APlant*)> pred = [](APlant* plt) { return true; });
+    // 在指定僵尸附近显示其属性信息条，其中属性为：
+    // 所有僵尸：血量（不计入持有的二类饰品）；
+    // 撑杆僵尸、海豚僵尸：跳过植物动画进度；
+    // 读报僵尸：失去报纸动画进度；
+    // 潜水僵尸、海豚僵尸：跳入泳池动画进度；
+    // 小丑僵尸：开盒倒计时进度；
+    // 气球僵尸：气球破裂落地动画进度；
+    // 矿工僵尸：自然出土后眩晕动画进度；
+    // 蹦极僵尸：准备抓取植物动画进度；
+    // 投篮僵尸：投篮动画进度；
+    // 巨人僵尸：锤击动画进度、投掷小鬼动画进度；
+    // 可被冰冻僵尸：冰冻倒计时进度；
+    // ------------参数------------
+    // pred 对象过滤器，以一个AZombie*为参数的，返回bool值的lambda表达式，该断言将被用于场上的每只僵尸，结果为true的显示信息条。默认总为true，即始终显示所有僵尸的信息条
+    // ------------示例------------
+    // // 显示6列以左的未被减速的巨人僵尸的属性信息条
+    // ShowZombies([](AZombie* zmb) { return (zmb->Type() == AGARGANTUAR || zmb->Type() == AGIGA_GARGANTUAR) && zmb->Abscissa() <= 410 && zmb->SlowCountdown() == 0; });
+    void ShowZombies(std::function<bool(AZombie*)> pred = [](AZombie* zmb) { return true; });
+    // 在指定场地物品附近显示其属性信息条，其中属性为：
+    // 弹坑：消失倒计时
+    // ------------参数------------
+    // pred 对象过滤器，以一个APlaceItem*为参数的，返回bool值的lambda表达式，该断言将被用于场上的每个场地物品，结果为true的显示信息条。默认总为true，即始终显示所有场地物品的信息条
+    // ------------示例------------
+    // 显示位于3行的8列和9列的弹坑的消失倒计时信息条
+    // ShowPlaceItems([](APlaceItem* plcItm) { return plcItm->Type() == 2 && plcItm->Row() + 1 == 3 && plcItm->Col() + 1 >= 8; });
+    void ShowPlaceItems(std::function<bool(APlaceItem*)> pred = [](APlaceItem* plcItm) { return true; });
+    // 显示所有植物、僵尸和场地物品的属性信息条
+    void ShowAll();
+    // 不再显示植物的属性信息条
+    void StopPlants();
+    // 不再显示僵尸的属性信息条
+    void StopZombies();
+    // 不再显示场地物品的属性信息条
+    void StopPlaceItems();
+    // 不再显示植物、僵尸和场地物品的属性信息条
+    void StopAll();
+}
+
 ```
 
 ## 代码模板说明
