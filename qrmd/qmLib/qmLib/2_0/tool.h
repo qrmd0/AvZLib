@@ -95,22 +95,20 @@ std::vector<AZombie*> APutZombie(AZombieType type, std::vector<AGrid> grids)
     return result;
 }
 
-// 按键调节游戏运行速度。
-// F1：原速；F2：2倍速；F3：5倍速；F4：10倍速
-void AKeySetSpeed()
+extern ALogger<AConsole> _csLog;
+// 按键调节游戏运行速度
+// ------------参数------------
+// _1x 设置游戏速度倍率为1.0的快捷键，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
+// _2x 设置游戏速度倍率为2.0的快捷键
+// _5x 设置游戏速度倍率为5.0的快捷键
+// _10x 设置游戏速度倍率为10.0的快捷键
+void AKeySetSpeed(const int& _1x = VK_F1, const int& _2x = VK_F2, const int& _5x = VK_F3, const int& _10x = VK_F4)
 {
-    AConnect(VK_F1, [] {
-        ASetGameSpeed(1);
-    });
-    AConnect(VK_F2, [] {
-        ASetGameSpeed(2);
-    });
-    AConnect(VK_F3, [] {
-        ASetGameSpeed(5);
-    });
-    AConnect(VK_F4, [] {
-        ASetGameSpeed(10);
-    });
+    AConnect(_1x, [] { ASetGameSpeed(1); });
+    AConnect(_2x, [] { ASetGameSpeed(2); });
+    AConnect(_5x, [] { ASetGameSpeed(5); });
+    AConnect(_10x, [] { ASetGameSpeed(10); });
+    _csLog.Info("\n游戏变速控制已启用，快捷键为：\n    #：1.0倍速\n    #：2.0倍速\n    #：5.0倍速\n    #：10.0倍速", AGetValue(_keyNames, _1x), AGetValue(_keyNames, _2x), AGetValue(_keyNames, _5x), AGetValue(_keyNames, _10x));
 }
 
 // 移除浓雾，启用时雾夜模式不显示浓雾
@@ -183,22 +181,22 @@ void ASetPlantInvincible(bool isEnable = true)
         WriteArray(0X462B80, std::vector<uint8_t> {0X53, 0X55, 0X8B});
     }
 }
-// 植物自由种植（无视阳光+种子零冷却+紫卡直接种植+随意放置+蘑菇免唤醒）
+// 植物自由种植（不花费阳光+种子零冷却+紫卡直接种植+随意放置+蘑菇免唤醒）
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
 void ASetFreePlant(bool isEnable = true)
 {
-    // 无视阳光
+    // 不花费阳光
     AMRef<uint8_t>(0x41BA72) = isEnable ? 0X70 : 0X7F;
     AMRef<uint8_t>(0x41BA74) = isEnable ? 0X3B : 0X2B;
     AMRef<uint8_t>(0x41BAC0) = isEnable ? 0X91 : 0X9E;
     AMRef<uint8_t>(0x427A92) = isEnable ? 0X80 : 0X8F;
     AMRef<uint8_t>(0x427DFD) = isEnable ? 0X80 : 0X8F;
     AMRef<uint8_t>(0x42487F) = isEnable ? 0XEB : 0X74;
-    // 取消冷却
+    // 种子零冷却
     AMRef<uint8_t>(0x487296) = isEnable ? 0X70 : 0X7E;
     AMRef<uint8_t>(0x488250) = isEnable ? 0XEB : 0X75;
-    // 紫卡直种
+    // 紫卡直接种植
     AMRef<uint8_t>(0x40E477) = isEnable ? 0XEB : 0X74;
     // 随意放置
     AMRef<uint8_t>(0x40FE30) = isEnable ? 0X81 : 0X84;

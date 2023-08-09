@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-04 00:14:27
+ * @LastEditTime: 2023-08-09 21:09:56
  * @Description: 
 -->
 # AvZ qmLib
@@ -27,9 +27,18 @@
 
 3、在要使用本插件的脚本开头加上 #include "qmLib/main.h"
 
+## 更新记录
+
+### 2023_08_09
+
+新增信息条绘制、智能跳帧等新函数。
+
 ## 函数说明
 ```c++
 // --------------全局--------------
+
+// 返回能否在向量A中找到b
+inline bool AGetIsHave(const std::vector<T>& A, T& b);
 
 // 取被b包含的a中的元素组成的向量，顺序与a相同，包含重复项
 // ------------参数------------
@@ -58,6 +67,30 @@ void ARemoveElement(std::vector<T>& vec, T element);
 // 将向量中的指定元素移动至指定位置，如果失败，返回false
 bool AMoveElement(std::vector<T>& vec, T element, int toIndex);
 
+// 根据键名返回一个映射的键值，如果键名不存在抛出异常
+ValueType AGetValue(const std::map<KeyType, ValueType>& myMap, const KeyType& key);
+
+// 返回数字的字符串
+// ------------参数------------
+// t 要转换的数字
+// decimalDigits 四舍五入保留的小数位数，默认0位
+// integerDigits 要保留的整数位数，不足则前导补0
+// ------------示例------------
+// AGetString(35.475, 2, 4); // 返回 0035.48
+std::string AGetString(const T& num, int decimalDigits, int integerDigits);
+
+// 返回指定格子的状态是否为允许种植指定种子的状态
+// ------------参数------------
+// plt 种子类型
+// row 要检查是否允许种植的格子行数
+// col 要检查是否允许种植的格子列数
+inline bool AGetIsPlantAllowable(APlantType plt, int row, int col);
+
+
+// 当前窗口为PvZ且指定键均被按下时，返回true。
+// ------------参数------------
+// keys 要检测的按键的虚拟键码，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
+bool AGetIsKeysDown(const std::vector<int>& keys);
 // --------------------------------
 
 // --------------工具--------------
@@ -103,9 +136,13 @@ AZombie* APutZombie(AZombieType type, int row, int col);
 AZombie* APutZombie(AZombieType type, AGrid grid);
 std::vector<AZombie*> APutZombie(AZombieType type, std::vector<AGrid> grids);
 
-// 按键调节游戏运行速度。
-// F1：原速；F2：2倍速；F3：5倍速；F4：10倍速
-void AKeySetSpeed();
+// 按键调节游戏运行速度
+// ------------参数------------
+// _1x 设置游戏速度倍率为1.0的快捷键，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
+// _2x 设置游戏速度倍率为2.0的快捷键
+// _5x 设置游戏速度倍率为5.0的快捷键
+// _10x 设置游戏速度倍率为10.0的快捷键
+void AKeySetSpeed(const int& _1x = VK_F1, const int& _2x = VK_F2, const int& _5x = VK_F3, const int& _10x = VK_F4);
 
 // 移除浓雾，启用时雾夜模式不显示浓雾
 // ------------参数------------
@@ -197,6 +234,25 @@ int GetZombiesHp(int wave, int row);
 //     PPEndingTheWave(wave, 869 - 200 + 869 - 373, 869);
 // }
 void PPEndingTheWave(int wave, int time, int delay);
+
+
+// 自动种植三叶草吹走漏掉的气球僵尸
+// ------------参数------------
+// row 种植三叶草的格子行数
+// col 种植三叶草的格子列数
+// threshold 存在横坐标小于多少的气球僵尸时种植三叶草
+void AAutoBlover(int row, int col, float threshold = 250);
+
+// 在控制台中显示本轮出怪逐波统计表
+void AShowZombiesList();
+
+// 智能跳帧，按键启停，检测到指定位置的指定植物不血量全满时自动停止，用于挂机冲关
+// ------------参数------------
+// startKey 启动键的虚拟按键码，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
+// stopKey 停止键的虚拟按键码
+// grids 要检测的格子列表，玉米加农炮为后轮格子
+// types 要检测的植物种类，默认为{玉米加农炮、忧郁蘑菇、冰瓜、双子向日葵}
+void ASmartSkipTick(const int& startKey, const int& stopKey, const std::vector<AGrid>& grids, const std::vector<APlantType>& types = {ACOB_CANNON, AGLOOM_SHROOM, AWINTER_MELON, ATWIN_SUNFLOWER});
 
 // --------------------------------
 ```

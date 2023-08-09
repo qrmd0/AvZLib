@@ -6,8 +6,8 @@
  * @Description:全麦的常用AvZ函数
  */
 
-#ifndef _AUTOFODDER
-#define _AUTOFODDER
+#ifndef __QMLIB__
+#define __QMLIB__
 
 #include "avz.h"
 
