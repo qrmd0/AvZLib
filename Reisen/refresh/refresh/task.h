@@ -11,8 +11,8 @@ using namespace AvZ;
 struct Task {
     std::string output_folder, prefix;
     bool huge, assume_refresh, dance_cheat, debug, clear_zombies;
-    int giga_count, check_time, total;
-    std::vector<int> required_types, banned_types, card_selection;
+    int giga_count, total;
+    std::vector<int> check_time, required_types, banned_types, card_selection;
     std::function<void(int)> operation;
 };
 
@@ -37,7 +37,7 @@ struct Task {
     void _set_##name(const type& val) { \
         name##_ = val; \
     } \
-    auto name(const type& val) const { \
+    TaskBuilder name(const type& val) const { \
         TaskBuilder x = *this; \
         x._set_##name(val); \
         return x; \
@@ -50,7 +50,7 @@ class TaskBuilder {
     _REISEN_TASK_H_MEMBER_REQUIRED(std::string, prefix)
     _REISEN_TASK_H_MEMBER_REQUIRED(bool, huge)
     _REISEN_TASK_H_MEMBER_REQUIRED(bool, assume_refresh)
-    _REISEN_TASK_H_MEMBER_REQUIRED(int, check_time)
+    _REISEN_TASK_H_MEMBER_REQUIRED(std::vector<int>, check_time)
     _REISEN_TASK_H_MEMBER_REQUIRED(int, total)
     _REISEN_TASK_H_MEMBER_REQUIRED(std::vector<int>, required_types)
     _REISEN_TASK_H_MEMBER_REQUIRED(std::vector<int>, banned_types)
@@ -62,14 +62,18 @@ class TaskBuilder {
     _REISEN_TASK_H_MEMBER_OPTIONAL(std::vector<int>, card_selection, {ICE_SHROOM, DOOM_SHROOM,
         CHERRY_BOMB, JALAPENO, SQUASH, SPIKEWEED, BLOVER, TALL_NUT, GARLIC, POTATO_MINE})
 
+    TaskBuilder check_time(const int& val) const {
+        return check_time(std::vector<int>{val});
+    }
+
     public:
     Task build() const {
         if(initalized.size() != 9) {
             ShowErrorNotInQueue("Task 未完成初始化");
             throw Exception("");
         }
-        return {to_gbk(output_folder_), to_gbk(prefix_), huge_, assume_refresh_, dance_cheat_, debug_, clear_zombies_, giga_count_,
-        std::max(check_time_, 401), total_, required_types_, banned_types_, card_selection_, operation_};
+        return {to_gbk(output_folder_), to_gbk(prefix_), huge_, assume_refresh_, dance_cheat_, debug_, clear_zombies_,
+        giga_count_, total_, check_time_, required_types_, banned_types_, card_selection_, operation_};
     }
 
     operator Task() const {

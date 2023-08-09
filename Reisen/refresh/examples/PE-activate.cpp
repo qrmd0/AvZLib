@@ -46,7 +46,7 @@ C:\ProgramData\PopCap Games\PlantsVsZombies\refresh
    │  └─激活
    └─红白
        └─激活
-测试用阵型的布阵码：LI43NHRYSFpudKQY0xA4dpBUVBNeXi9W
+测试用阵型的布阵码：LI43bJyUlFSWXNR1tiSEVdUzbnA2RzV0lkhU5K1E11Y=
 直接运行该脚本需要50-60h，应考虑拆分各项测试，并行执行以节约时间
 */
 vector<Task> get_tasks() {
@@ -179,6 +179,53 @@ vector<Task> get_tasks() {
                 })
             );
         }
+
+        // 控制变量测试：比较相同的僵尸分布下不同激活操作的表现
+        // 原理是把一组内所有操作重叠在一起执行，每个操作完成后记录数据并“恢复状态”
+        // 这一测试方法要求时间越晚的操作能收的僵尸越多，所以只能测试有限的几个项目
+        vector<int> times = {225, 260, 295, 318, 341, 359, 401};
+        tasks.push_back(hb_n_a
+            .prefix("PPDD")
+            .check_time(times) // 设置多个检查时间，以观察多个操作面对同一波僵尸的结果
+            .operation([=](int wave){
+                // 巨人不丢小鬼（避免225PP激活产生的小鬼影响后面的数据）
+                InsertTimeOperation(0, wave, []{ *(uint8_t*)0x527205 = 0xeb; });
+                InsertTimeOperation(401, wave, []{ *(uint8_t*)0x527205 = 0x7d; });
+                for(int t : times) {
+                    float col = (t == 401) ? 8.75 : 9;
+                    SetTime(t - 373); pao_operator.pao({{2, col}, {5, col}});
+                    // 恢复巨人血量，以进行下一个时间的测试
+                    InsertTimeOperation(t + 1, wave, []{
+                        for(auto& z : alive_zombie_filter)
+                            if(z.type() == GARGANTUAR)
+                                z.hp() = 3000;
+                            else if(z.type() == GIGA_GARGANTUAR)
+                                z.hp() = 6000;
+                    });
+                }
+            })
+        );
+        times = {1050, 1150, 1250, 1350, 1450, 1550};
+        tasks.push_back(hb_n_a
+            .prefix("IPP-PP")
+            .check_time(times)
+            .operation([=](int wave){
+                InsertTimeOperation(0, wave, []{ *(uint8_t*)0x527205 = 0xeb; });
+                InsertTimeOperation(1550, wave, []{ *(uint8_t*)0x527205 = 0x7d; });
+                SetTime(1 - 100); Card(ICE_SHROOM, 1, 1);
+                SetTime(301 - 373); pao_operator.pao({{1, 9}, {5, 9}});
+                for(int t : times) {
+                    SetTime(t - 373); pao_operator.pao({{2, 8.75}, {5, 8.75}});
+                    InsertTimeOperation(t + 1, wave, []{
+                        for(auto& z : alive_zombie_filter)
+                            if(z.type() == GARGANTUAR)
+                                z.hp() = 3000;
+                            else if(z.type() == GIGA_GARGANTUAR)
+                                z.hp() = 6000;
+                    });
+                }
+            })
+        );
     }
     return tasks;
 }

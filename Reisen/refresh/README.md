@@ -21,7 +21,7 @@ Task task = TaskBuilder()
         SetTime(225 - 373); // 不用设置wave
         pao_operator.pao({{2, 9}, {5, 9}});
     })
-    .check_time(401) // max(激活时间, 401)
+    .check_time(401) // 检查刷新情况的时间；可以填多个（如{200, 300, 400}），会为每个时间单独生成一份数据
     // 以下为可选参数
     .debug(false) // 关闭跳帧，默认为false
     .card_selection({STARFRUIT}) // 选卡类型，默认为寒冰菇、毁灭菇、樱桃、辣椒、窝瓜、地刺、三叶草、高坚果、大蒜、土豆

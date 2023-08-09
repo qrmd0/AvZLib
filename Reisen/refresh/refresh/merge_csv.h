@@ -24,19 +24,27 @@ void extract_exe() {
             v >>= 8;
         }
     }
-    string path = string(getenv("TEMP")) + "\\csv2xlsx.exe";
-    auto fp = fopen(path.c_str(), "wb");
+    auto fp = fopen("C:\\ProgramData\\csv2xlsx.exe", "wb");
     fwrite(output, 1, n * 4 / 5, fp);
     fclose(fp);
     delete[] output;
 }
 
-void merge_csv() {
-    string cmd = to_gbk("cmd /C %TEMP%\\csv2xlsx.exe -f 等线 --fontsize 11 -c , -s stats -s data -s raw -o");
-    string prefix = cur_task->output_folder + "\\" + cur_task->prefix;
-    for(auto s : {".xlsx", "-stats.csv", "-data.csv", "-raw.csv"})
-        cmd += string(" \"") + prefix + s + '"';
-    for(auto s : {"-stats.csv", "-data.csv", "-raw.csv"})
-        cmd += string(" && del \"") + prefix + s + '"';
+void merge_csv(const vector<string>& idents) {
+    string cmd;
+    bool first = true;
+    for(auto& ident : idents) {
+        if(first) {
+            first = false;
+            cmd += "cmd /C";
+        } else
+            cmd += " &&";
+        cmd += to_gbk(" C:\\ProgramData\\csv2xlsx.exe -f 等线 --fontsize 11 -c , -s stats -s data -s raw -o");
+        string prefix = cur_task->output_folder + "\\" + cur_task->prefix;
+        for(auto s : {".xlsx", "-stats.csv", "-data.csv", "-raw.csv"})
+            cmd += string(" \"") + prefix + ident + s + '"';
+        for(auto s : {"-stats.csv", "-data.csv", "-raw.csv"})
+            cmd += string(" && del \"") + prefix + ident + s + '"';
+    }
     WinExec(cmd.c_str(), SW_HIDE);
 }
