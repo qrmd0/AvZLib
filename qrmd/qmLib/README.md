@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-09 21:20:42
+ * @LastEditTime: 2023-08-09 21:41:26
  * @Description: 
 -->
 # AvZ qmLib
@@ -224,6 +224,7 @@ void WriteArray(DstAddr dstAddr, SrcArray&& srcArr);
 // 计算指定波次僵尸在指定行的血量之和，用于智能激活或抗压
 // ------------参数------------
 // wave 波次
+// row 行数
 int GetZombiesHp(int wave, int row);
 
 // 不断开炮直到前场不存在本波僵尸，用于收尾
@@ -277,7 +278,7 @@ public:
     void Draw(const ABar& bar, int duration = 1)
 }
 
-// 在游戏窗口左上角显示僵尸刷新信息，格式为：
+// 在游戏窗口底部显示僵尸刷新信息，格式为：
 // 波次：[当前波次]/[总波次] 时间：[本波时刻]|[刷新倒计时]/[刷新倒计时初始值]
 // 血量：[当前本波总血量]/[本波总血量初始值]([本波当前血量占总血量百分比]/[本波刷新血量占总血量百分比])
 // ------------参数------------
