@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-05 23:32:40
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 11:21:06
+ * @LastEditTime: 2023-08-14 20:51:46
  * @Description: 
 -->
 # AvZ SelectCardsPlus 极速选卡
@@ -49,4 +49,6 @@ SelectCardsPlus();
 
 ### 2023年8月14日
 
-更新了支持AvZ2的版本，在AvZ2中修复了进入不需要选卡的模式时游戏会意外加速的Bug。
+1、更新了支持AvZ2的版本，在AvZ2中修复了进入不需要选卡的模式时游戏会意外加速的Bug。
+
+2、选卡函数将阻塞到战斗状态，与AvZ2本身的选卡函数保持一致。

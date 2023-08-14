@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-05 17:20:33
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 11:18:53
+ * @LastEditTime: 2023-08-14 20:41:24
  * @Description:SelectCards的增强版本，能瞬间完成选卡并自动填充剩余卡槽
  *          1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "SelectCardsPlus.h" ；
@@ -178,6 +178,7 @@ void ASelectCardsPlus(const std::vector<int>& list, bool isAccelerate = true)
     }
     SetCardFlyTime(0);
     cardSelector.Start(_SelectCardsFast, true);
+    AWaitForFight();
 }
 void ASelectCardsPlus()
 {
