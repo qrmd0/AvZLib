@@ -4,6 +4,8 @@
 #include "avz.h"
 #include <vector>
 using namespace AvZ;
+
+namespace _qrmd {
 struct ZombieAdd : public Zombie {
     // 僵尸动画编号
     uint16_t& animationCode()
@@ -296,5 +298,6 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
     }
     return result;
 }
-
+}; // namespace _qrmd
+using _qrmd::GetZombieAbscissas;
 #endif

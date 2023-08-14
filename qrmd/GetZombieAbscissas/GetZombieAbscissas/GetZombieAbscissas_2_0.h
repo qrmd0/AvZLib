@@ -2,13 +2,15 @@
  * @Author: qrmd
  * @Date: 2023-08-14 01:05:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 01:34:05
+ * @LastEditTime: 2023-08-14 09:42:18
  * @Description:
  */
 #ifndef __GETZOMBIEABSCISSAS_2_0__
 #define __GETZOMBIEABSCISSAS_2_0__
 
 #include "avz.h"
+
+namespace _qrmd {
 
 const std::vector<float> __zombie_walk_a = {-9.8, -8.4, -7, -5.6, -4.1, -2.7, -1.3, 0, 1.4, 2.8, 4.2, 5.7, 7.1, 7.9, 8.8, 9.7, 10.5, 10.6, 10.8, 10.9, 11, 11, 11, 11, 11, 13.4, 15.8, 18.1, 20.5, 22.8, 25.2, 27.6, 29.9, 31.1, 32.3, 33.5, 34.6, 35.9, 37, 38.2, 39.4, 39.5, 39.6, 39.7, 39.8, 39.9, 40};
 const std::vector<float> __zombie_walk_b = {-9.8, -8.5, -7.3, -6, -4.7, -3.4, -2.1, -0.9, 0.3, 1.6, 2.8, 4.1, 5.4, 6.7, 8, 9.2, 10.5, 10.6, 10.7, 10.7, 10.8, 10.8, 10.9, 11, 12.8, 14.5, 16.3, 18.1, 19.9, 21.6, 23.4, 25.2, 27, 28.8, 30.5, 32.3, 34, 35.9, 37.6, 39.4, 39.5, 39.5, 39.6, 39.8, 39.9, 39.9, 40};
@@ -52,7 +54,6 @@ const std::vector<float> __imp_walk = {-59.8, -56.5, -53.2, -49.9, -47.8, -45.7,
 // }
 std::vector<float> AGetZombieAbscissas(int index, int timeLength)
 {
-
     auto zombies = AGetMainObject()->ZombieArray();
     int zombie_type = zombies[index].Type();
     float zombie_speed = zombies[index].Speed();
@@ -288,5 +289,7 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
     }
     return result;
 }
+}; // namespace _qrmd
 
+using _qrmd::AGetZombieAbscissas;
 #endif
