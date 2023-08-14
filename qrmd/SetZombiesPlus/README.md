@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-07-06 09:56:07
  * @LastEditors: qrmd
- * @LastEditTime: 2023-07-31 19:56:52
+ * @LastEditTime: 2023-08-14 11:23:32
  * @Description: 
 -->
 # AvZ SetZombiesPlus
@@ -31,8 +31,10 @@ SetZombies的增强版本，更自由地设置出怪。
 
 2、在{AvZ安装目录}/inc文件夹中找到本插件，浏览README和代码注释了解调用方法；
 
-3、在要使用本插件的脚本开头加上 #include "SetZombiesPlus/main.h"
-
+3、在要使用本插件的脚本开头加上：
+```c++
+#include "SetZombiesPlus/main.h"
+```
 ## 使用示例
 
 ```c++

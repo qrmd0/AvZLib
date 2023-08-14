@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-07-31 20:25:29
+ * @LastEditTime: 2023-08-14 11:22:47
  * @Description: 
 -->
 # AvZ AutoFodder
@@ -25,8 +25,10 @@
 
 2、在{AvZ安装目录}/inc文件夹中找到本插件，浏览README和代码注释了解调用方法；
 
-3、在要使用本插件的脚本开头加上 #include "AutoFodder/main.h"
-
+3、在要使用本插件的脚本开头加上：
+```c++
+#include "AutoFodder/main.h"
+```
 ## 函数说明
 
 ```c++

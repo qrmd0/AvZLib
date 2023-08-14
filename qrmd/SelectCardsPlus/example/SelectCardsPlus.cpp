@@ -2,13 +2,13 @@
  * @Author: qrmd
  * @Date: 2022-04-24 19:52:51
  * @LastEditors: qrmd
- * @LastEditTime: 2022-08-16 19:51:45
+ * @LastEditTime: 2023-08-14 11:13:26
  * @Description:SelectCardsPlus的示例脚本
  * 来自AvZLib公开插件仓库：
  * 主库：https://github.com/qrmd0/AvZLib
  * 镜像库1：https://gitee.com/qrmd/AvZLib
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
- * Copyright (c) 2022 by qrmd, All Rights Reserved.
+ * Copyright (c) 2022 by qrmd
  */
 #include "SelectCardsPlus.h"
 #include "avz.h"
