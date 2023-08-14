@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-08-13 13:20:20
  * @LastEditors: qrmd
- * @LastEditTime: 2022-10-07 20:37:29
+ * @LastEditTime: 2023-08-14 15:53:33
  * @Description:PlantFixer的增强版本，支持紫卡修补、咖啡豆修补等功能
  * 使用方法：1、将本文件粘贴到AsmVsZombies/inc；
  *          2、在要应用此库的脚本开头添加 #include "PlantFixerPlus.h" ；
@@ -13,8 +13,8 @@
  * 镜像库2：https://gitlab.com/avzlib/AvZLib
  * Copyright (c) 2022 by qrmd, All Rights Reserved.
  */
-#ifndef __PlantFixerPlus
-#define __PlantFixerPlus
+#ifndef __PLANTFIXERPLUS_1_0__
+#define __PLANTFIXERPLUS_1_0__
 #include "avz.h"
 
 using namespace AvZ;
@@ -26,21 +26,21 @@ private:
     // 待修补植物的格子位置列表
     std::vector<Grid> _grids;
     // 修补血量阈值
-    double _fix_hp_threshold;
+    double _fixHpThreshold;
     // 种子序号列表
-    std::vector<int> _seed_index_list = {-1, -1, -1};
+    std::vector<int> _seedIndexList = {-1, -1, -1};
     // 是否在战斗开始时检查是否携带待修补植物的种子
-    bool _is_check_cards = true;
+    bool _isCheckCards = true;
     // 是否同时使用模仿种子执行修补
-    bool _is_use_imitator_seed = true;
+    bool _isUseImitatorSeed = true;
     // 是否不打断手动操作
-    bool _is_not_interrupt = true;
+    bool _isNotInterrupt = true;
     // 是否不修补上面有植物的睡莲叶或花盆
-    bool _is_not_fix_lily_pad_or_flower_pot_with_plant = true;
+    bool _isNotFixLilyPadOrFlowerPotWithPlant = true;
     // 修补阳光阈值
-    int _fix_sun_threshold = 0;
+    int _fixSunThreshold = 0;
     // 执行修补判断与操作的时间间隔（厘秒）
-    int _run_interval = 1;
+    int _runInterval = 1;
 
     // 定时执行的修补判断与操作
     void _Run();
@@ -115,19 +115,19 @@ public:
 void PlantFixerPlus::_Run()
 {
     // 定时启用
-    if (GetMainObject()->globalClock() % _run_interval != 0)
+    if (GetMainObject()->globalClock() % _runInterval != 0)
         return;
 
     // 不打断手动操作
-    if (_is_not_interrupt && GetMainObject()->mouseAttribution()->type() != 0)
+    if (_isNotInterrupt && GetMainObject()->mouseAttribution()->type() != 0)
         return;
 
     // 阳光数量小于阈值时不修补
-    if (GetMainObject()->sun() < _fix_sun_threshold)
+    if (GetMainObject()->sun() < _fixSunThreshold)
         return;
 
     // 升级植物不可用时不修补
-    if (_GetIsUpdateType(_type) && !_GetIsSeedUsable(_type, _seed_index_list[2]))
+    if (_GetIsUpdateType(_type) && !_GetIsSeedUsable(_type, _seedIndexList[2]))
         return;
 
     // 确定待修补植物血量最低的格子位置列表
@@ -148,14 +148,14 @@ void PlantFixerPlus::_Run()
 
     for (Grid each_min_hp_grid : min_hp_grids) {
         // 睡莲叶或花盆上有植物时不对其修补
-        if (_is_not_fix_lily_pad_or_flower_pot_with_plant && (_type == LILY_PAD || _type == FLOWER_POT)) {
+        if (_isNotFixLilyPadOrFlowerPotWithPlant && (_type == LILY_PAD || _type == FLOWER_POT)) {
             if (GetPlantIndex(each_min_hp_grid.row, each_min_hp_grid.col) >= 0 || GetPlantIndex(each_min_hp_grid.row, each_min_hp_grid.col, PUMPKIN) >= 0)
                 return;
         }
         // 玉米加农炮即将可用或正在发射且炮弹未出膛时不对其修补
         if (_type == COB_CANNON && GetPlantIndex(each_min_hp_grid.row, each_min_hp_grid.col, COB_CANNON) >= 0) {
             int cannon_recover_time = _GetCannonRecoverTime(each_min_hp_grid.row, each_min_hp_grid.col);
-            if (cannon_recover_time <= 625 + 751 + _run_interval || cannon_recover_time >= 3475 - (205 + 1))
+            if (cannon_recover_time <= 625 + 751 + _runInterval || cannon_recover_time >= 3475 - (205 + 1))
                 return;
         }
         // 修补判断
@@ -167,9 +167,9 @@ void PlantFixerPlus::_Run()
         auto seeds = GetMainObject()->seedArray();
         int seed_type;
         int plant_type;
-        if (min_hp <= _fix_hp_threshold) {
+        if (min_hp <= _fixHpThreshold) {
             for (Grid each_grid : fix_grids) {
-                for (int each_seed_index : _seed_index_list) {
+                for (int each_seed_index : _seedIndexList) {
                     if (each_seed_index >= 0) {
                         seed_type = seeds[each_seed_index].type();
                         plant_type = seed_type == IMITATOR ? _GetPrePlantType(_type) : seed_type;
@@ -307,13 +307,13 @@ void PlantFixerPlus::start(int type, std::vector<Grid> grids, float fix_threshol
         _type = type;
         // 获取种子序号数组
         // 种子序号或其前置植物种子的序号
-        _seed_index_list[0] = _GetSeedIndex(_GetPrePlantType(_type));
+        _seedIndexList[0] = _GetSeedIndex(_GetPrePlantType(_type));
         // 模仿种子序号或其前置植物模仿种子的序号
-        _seed_index_list[1] = _is_use_imitator_seed ? _GetSeedIndex(_GetImitatorType(_GetPrePlantType(_type))) : -1;
+        _seedIndexList[1] = _isUseImitatorSeed ? _GetSeedIndex(_GetImitatorType(_GetPrePlantType(_type))) : -1;
         // 升级植物的种子序号
-        _seed_index_list[2] = _GetIsUpdateType(type) ? _GetSeedIndex(_type) : -1;
+        _seedIndexList[2] = _GetIsUpdateType(type) ? _GetSeedIndex(_type) : -1;
         // 卡槽可用性检查
-        if (_is_check_cards && (_seed_index_list[0] == -1 && _seed_index_list[1] == -1 && _seed_index_list[2] == -1)) {
+        if (_isCheckCards && (_seedIndexList[0] == -1 && _seedIndexList[1] == -1 && _seedIndexList[2] == -1)) {
             ShowErrorNotInQueue("PlantFixerPlus:\n    由于您未携带种类代号为 # 的植物的相关种子，无法执行修补操作。\n    您可以在void Scrpit()中执行 setIsCheckCards(false) 方法以关闭此提示", _type);
             return;
         }
@@ -322,35 +322,35 @@ void PlantFixerPlus::start(int type, std::vector<Grid> grids, float fix_threshol
             _AutoSetGrids();
 
         if (fix_threshold > 1) {
-            _fix_hp_threshold = int(fix_threshold);
+            _fixHpThreshold = int(fix_threshold);
         } else {
             const std::vector<int> max_hps = {300, 300, 300, 4000, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 8000, 300, 300, 300, 300, 300, 300, 4000, 300, 300, 300, 300, 300, 400, 300, 300, 300, 300, 300, 300, 300, 300, 300, 450, 300};
-            _fix_hp_threshold = int(max_hps[_type] * fix_threshold);
+            _fixHpThreshold = int(max_hps[_type] * fix_threshold);
         }
-        _is_use_imitator_seed = is_use_imitator_seed;
+        _isUseImitatorSeed = is_use_imitator_seed;
         pushFunc([=]() { _Run(); });
     },
         "PlantFixerPlus started");
 }
 void PlantFixerPlus::setIsCheckCards(bool is_check_cards)
 {
-    _is_check_cards = is_check_cards;
+    _isCheckCards = is_check_cards;
 }
 void PlantFixerPlus::setIsNotInterrupt(bool is_not_interrupt)
 {
-    InsertOperation([=]() { _is_not_interrupt = is_not_interrupt; }, "setIsNotInterrupt:" + std::to_string(is_not_interrupt));
+    InsertOperation([=]() { _isNotInterrupt = is_not_interrupt; }, "setIsNotInterrupt:" + std::to_string(is_not_interrupt));
 }
 void PlantFixerPlus::setIsNotFixLilyPadOrFlowerPot(bool is_not_fix_lily_pad_or_flower_pot_with_plant)
 {
-    InsertOperation([=]() { _is_not_fix_lily_pad_or_flower_pot_with_plant = is_not_fix_lily_pad_or_flower_pot_with_plant; }, "setIsNotFixLilyPadOrFlowerPot:" + std::to_string(is_not_fix_lily_pad_or_flower_pot_with_plant));
+    InsertOperation([=]() { _isNotFixLilyPadOrFlowerPotWithPlant = is_not_fix_lily_pad_or_flower_pot_with_plant; }, "setIsNotFixLilyPadOrFlowerPot:" + std::to_string(is_not_fix_lily_pad_or_flower_pot_with_plant));
 }
 void PlantFixerPlus::setFixSunThreshold(unsigned int fix_sun_threshold)
 {
-    InsertOperation([=]() { _fix_sun_threshold = fix_sun_threshold; }, "setFixSunThreshold:" + std::to_string(fix_sun_threshold));
+    InsertOperation([=]() { _fixSunThreshold = fix_sun_threshold; }, "setFixSunThreshold:" + std::to_string(fix_sun_threshold));
 }
 void PlantFixerPlus::setRunInterval(unsigned int run_interval)
 {
-    InsertOperation([=]() { _run_interval = run_interval; }, "setRunInterval:" + std::to_string(run_interval));
+    InsertOperation([=]() { _runInterval = run_interval; }, "setRunInterval:" + std::to_string(run_interval));
 }
 void PlantFixerPlus::resetFixList(std::vector<Grid> grids)
 {
@@ -358,7 +358,7 @@ void PlantFixerPlus::resetFixList(std::vector<Grid> grids)
 }
 void PlantFixerPlus::resetFixHpThreshold(unsigned int fix_hp_threshold)
 {
-    InsertOperation([=]() { _fix_hp_threshold = fix_hp_threshold; }, "resetFixHp:" + std::to_string(fix_hp_threshold));
+    InsertOperation([=]() { _fixHpThreshold = fix_hp_threshold; }, "resetFixHp:" + std::to_string(fix_hp_threshold));
 }
 
 #endif

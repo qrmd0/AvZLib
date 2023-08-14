@@ -1,4 +1,4 @@
-# AvZ PlantFixerPlus  220816
+# AvZ PlantFixerPlus
 
 ## 简介
 
@@ -28,59 +28,54 @@ PlantFixer的增强版本，添加了更多功能与特性：
 
 ## 运行环境
 
-本插件针对 AvZ 220630版本开发，不确保对其它 AvZ 版本的兼容性。
+本插件针对 AvZ 2.4.4_2023_06_15 版本开发，支持 AvZ 2022_06_30 以及更高的大部分版本。
 
 ## 使用方法
 
-将 PlantFixerPlus.h 置于AsmVsZombies/inc 目录后，编写脚本并运行即可。
 
-在 Script() 外添加下面的代码以在编译时包含此库:
+1、在VsCode中运行命令AvZ:Get AvZ Extension，在列表中选择本插件；
 
+2、在{AvZ安装目录}/inc文件夹中找到本插件，浏览README和代码注释了解调用方法；
+
+3、在要使用本插件的脚本开头加上：
 ```c++
-#include "PlantFixerPlus.h"
+#include "PlantFixerPlus/main.h"
 ```
 
 ## 函数说明
 ```c++
-// *** In Queue
 // 启用自动修补
-// [type]为植物种类，填入一个属于[0, 47]的整数
+// ------------参数------------
+// [type]为植物种类，填入一个属于[0, 47]的整数或APlantType（模仿植物除外）
 // [grids]为待修补的格子位置列表，不填或为空时自动获取场上的[type]植物的格子位置列表
-// [fix_threshold]为修补血量阈值，植物血量不高于此值时触发修补操作，小于 1 的值被视为最大血量的比例，不填时为 0.9999
-// [is_use_imitator_seed]为是否同时使用模仿种子修补，不填时为 是
-// *** 使用示例：
-// start(PUMPKIN, {}, 1200, false) // 修补全场的南瓜头，血量阈值为1200，不使用模仿种子
-// start(GLOOM_SHROOM) // 修补全场的忧郁菇，血量阈值为299，同时使用模仿种子
-// start(COB_CANNON, {{1, 1}, {2, 1}}, 0.3)------修补位于{1，1}，{2，1}的玉米加农炮，血量阈值为90，同时使用模仿种子
-void start(int type, std::vector<Grid> grids = {}, float fix_threshold = 0.9999, bool is_use_imitator_seed = true);
+// [fixThreshold]为修补血量阈值，植物血量不高于此值时触发修补操作，小于 1 的值被视为最大血量的比例，不填时为 0.9999
+// [isUseImitatorSeed]为是否同时使用模仿种子修补，不填时为 是
+// ------------示例------------
+// Start(APUMPKIN, {}, 1200, false) // 修补全场的南瓜头，血量阈值为1200，不使用模仿种子
+// Start(AGLOOM_SHROOM) // 修补全场的忧郁菇，血量阈值为299，同时使用模仿种子
+// Start(ACOB_CANNON, {{1, 1}, {2, 1}}, 0.3)------修补位于{1，1}，{2，1}的玉米加农炮，血量阈值为90，同时使用模仿种子
+void Start(const int& type, const std::vector<AGrid>& grids = {}, const float& fixThreshold = 0.9999, const bool& isUseImitatorSeed = true);
 
-// *** Not In Queue
 // 设置是否在战斗开始时检查是否携带待修补植物的种子，默认为 是
-void setIsCheckCards(bool is_check_cards);
+void SetIsCheckCards(bool is_check_cards);
 
-// *** In Queue
 // 设置是否不打断手动操作，默认为 是
-void setIsNotInterrupt(bool is_not_interrupt);
+void SetIsNotInterrupt(bool is_not_interrupt);
 
-// *** In Queue
 // 设置是否不修补上面有植物的睡莲叶或花盆
-void setIsNotFixLilyPadOrFlowerPot(bool is_not_fix_lily_pad_or_flower_pot_with_plant);
+void SetIsNotFixLilyPadOrFlowerPot(bool is_not_fix_lily_pad_or_flower_pot_with_plant);
 
-// *** In Queue
 // 设置修补阳光阈值，阳光数量小于此值时不修补，默认为 0
-void setFixSunThreshold(unsigned int fix_sun_threshold);
+void SetFixSunThreshold(unsigned int fix_sun_threshold);
 
-// *** In Queue
 // 设置执行修补判断的时间间隔（厘秒），默认为 1
-void setRunInterval(unsigned int run_interval);
+void SetRunInterval(unsigned int run_interval);
 
-// *** In Queue
 // 重置植物修补位置
-void resetFixList(std::vector<Grid> grids);
+void ResetFixList(std::vector<AGrid> grids);
 
-// *** In Queue
 // 重置修补血量阈值
-void resetFixHpThreshold(unsigned int fix_hp_threshold);
+void ResetFixHpThreshold(unsigned int fix_hp_threshold);
 ```
 
 
@@ -88,7 +83,9 @@ void resetFixHpThreshold(unsigned int fix_hp_threshold);
 
 ### 控制启用自动修补的时机
 
-自动修补咖啡豆常被用于唤醒自动修补的蘑菇类植物，但运阵往往需要使用咖啡豆，为了不影响运阵的正常使用，您可以指定一些安全的时间段启用自动修补：
+自动修补咖啡豆常被用于唤醒自动修补的蘑菇类植物，但运阵往往需要使用咖啡豆，为了不影响运阵的正常使用，您可以指定一些安全的时间段启用自动修补：  
+
+以下代码适用于AvZ1：
 ```c++
 PlantFixerPlus lily_pad_fixer;
 PlantFixerPlus pumpkin_fixer;
@@ -154,6 +151,9 @@ void Script()
 ![演示](演示.gif)
 
 为了避免上述情况，您可以定时判断场上僵尸的状态，在有啃食威胁的时机停用自动修补：
+
+以下代码适用于AvZ1：
+
 ```c++
 PlantFixerPlus lily_pad_fixer;
 PlantFixerPlus dolphinrider_pumpkin_fixer;
@@ -199,3 +199,5 @@ void Script()
     });
 }
 ```
+
+在AvZ2中，可以使用条件AConnet更简洁地实现以上效果。
