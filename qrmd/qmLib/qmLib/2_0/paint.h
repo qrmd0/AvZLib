@@ -76,7 +76,7 @@ public:
                     barY = plt.Ordinate();
                 rate = float(plt.Hp()) / plt.HpMax();
                 fillARGB = AArgb(0xFF, 0x00, 0xFF, 0x00);
-                backgroundARGB = AArgb(0xFF, 0xFF, 0xFF, 0xFF);
+                backgroundARGB = AArgb(0xFF, 0x00, 0x00, 0x0);
                 if (AGetIsHave(std::vector<int> {AWALL_NUT, APUMPKIN}, plt.Type()))
                     separators = {1.0 / 4, 2.0 / 4, 3.0 / 4};
                 else if (plt.Type() == ATALL_NUT)
@@ -209,7 +209,7 @@ public:
                     break;
                 }
                 fillARGB = AArgb(0xFF, 0xFF, 0xC0, 0x00);
-                backgroundARGB = AArgb(0xFF, 0xFF, 0xFF, 0xFF);
+                backgroundARGB = AArgb(0xFF, 0x00, 0x00, 0x00);
                 _qmPainterEx.Draw(ABar(barX, barY, rate, sizeX, sizeY, fillARGB, backgroundARGB, _frameThickness, direct, separators));
             }
         };
@@ -252,7 +252,7 @@ public:
                 sizeY = zmb.MRef<int>(0x98);
                 rate = float(zmb.Hp() + zmb.OneHp()) / (zmb.MRef<int>(0xCC) + zmb.MRef<int>(0xD4));
                 fillARGB = AArgb(0xFF, 0xFF, 0x00, 0x00);
-                backgroundARGB = AArgb(0xFF, 0xFF, 0xFF, 0xFF);
+                backgroundARGB = AArgb(0xFF, 0x00, 0x00, 0x00);
                 if (zmb.Type() == AGARGANTUAR)
                     separators = {1800.0 / 3000};
                 else if (zmb.Type() == AGIGA_GARGANTUAR)
@@ -349,7 +349,7 @@ public:
                     break;
                 }
                 fillARGB = AArgb(0xFF, 0xFF, 0xC0, 0x00);
-                backgroundARGB = AArgb(0xFF, 0xFF, 0xFF, 0xFF);
+                backgroundARGB = AArgb(0xFF, 0x00, 0x00, 0x00);
                 direct = ABar::UP;
                 _qmPainterEx.Draw(ABar(barX, barY, rate, sizeX, sizeY, fillARGB, backgroundARGB, _frameThickness, direct, separators));
             }
@@ -405,7 +405,7 @@ public:
                     break;
                 }
                 fillARGB = AArgb(0xFF, 0xFF, 0xC0, 0x00);
-                backgroundARGB = AArgb(0xFF, 0xFF, 0xFF, 0xFF);
+                backgroundARGB = AArgb(0xFF, 0x00, 0x00, 0x00);
                 direct = ABar::RIGHT;
                 separators = {};
                 _qmPainterEx.Draw(ABar(barX, barY, rate, sizeX, sizeY, fillARGB, backgroundARGB, _frameThickness, direct, separators));
@@ -454,7 +454,7 @@ public:
 
 APainterEx _qmPainter;
 ATickRunner _qmTickPainter;
-// 在游戏窗口左上角显示僵尸刷新信息，格式为：
+// 在游戏窗口底部显示僵尸刷新信息，格式为：
 // 波次：[当前波次]/[总波次] 时间：[本波时刻]|[刷新倒计时]/[刷新倒计时初始值]
 // 刷新：[当前本波总血量]/[本波总血量初始值]([本波当前血量占总血量百分比]/[本波刷新血量占总血量百分比])
 // ------------参数------------
@@ -519,6 +519,9 @@ void AShowRefreshingInfo(bool isEnable = true)
 
             uint32_t tempARGB = refreshingCountdown > 200 ? AArgb(0xFF, 0xA1, 0x48, 0xB2) : AArgb(0xFF, 0xFF, 0xFF, 0x00);
             _qmPainter.Draw(ABar(_barLength / 2, 600 - (_barWidth / 2), float(refreshingCountdown) / initialRefreshingCountdown, _barLength, _barWidth, tempARGB, AArgb(0x00, 0x00, 0x00, 0x00), 1, ABar::LEFT));
+
+            _qmPainter.SetRectColor(AArgb(0xFF, 0x00, 0x00, 0x00));
+            _qmPainter.Draw(ARect(_barX + 400, _barY, _barLength, _barWidth));
 
             tempARGB = zmbHpAtWaveNow > zmbHpToRefreshing ? AArgb(0xFF, 0xF9, 0x00, 0x93) : AArgb(0xFF, 0xFF, 0xFF, 0x00);
             _qmPainter.Draw(ABar(_barLength + _barLength / 2, 600 - (_barWidth / 2), float(zmbHpAtWaveNow) / zmbHpAtWave, _barLength, _barWidth, tempARGB, AArgb(0xFF, 0x00, 0x00, 0x00), 1, ABar::RIGHT, {float(zmbHpToRefreshing) / zmbHpAtWave}));

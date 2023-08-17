@@ -7,5 +7,6 @@
 #include "paint.h"
 #include "tool.h"
 #include "drawBar.h"
+#include "click.h"
 
 #endif

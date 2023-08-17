@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-07-31 19:06:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 11:23:15
+ * @LastEditTime: 2023-08-17 16:21:56
  * @Description: 
 -->
 # AvZ qmLib
@@ -35,12 +35,16 @@
 
 新增信息条绘制、智能跳帧等新函数。
 
+### 2023_08_17
+
+新增了启动脚本后自动进入指定游戏模式、巨人不扔小鬼、僵尸停滞不前等实用功能。
+
 ## 函数说明
 ```c++
 // --------------------------------全局--------------------------------
 
 // 返回能否在向量A中找到b
-inline bool AGetIsHave(const std::vector<T>& A, T& b);
+bool AGetIsHave(const std::vector<T>& A, T& b);
 
 // 取被b包含的a中的元素组成的向量，顺序与a相同，包含重复项
 // ------------参数------------
@@ -86,7 +90,7 @@ std::string AGetString(const T& num, int decimalDigits, int integerDigits);
 // plt 种子类型
 // row 要检查是否允许种植的格子行数
 // col 要检查是否允许种植的格子列数
-inline bool AGetIsPlantAllowable(APlantType plt, int row, int col);
+bool AGetIsPlantAllowable(APlantType plt, int row, int col);
 
 
 // 当前窗口为PvZ且指定键均被按下时，返回true。
@@ -149,27 +153,27 @@ void AKeySetSpeed(const int& _1x = VK_F1, const int& _2x = VK_F2, const int& _5x
 // 移除浓雾，启用时雾夜模式不显示浓雾
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetNoFog(bool isEnable = true);
+void ASetNoFog(bool isEnable = true);
 
 // 存档只读，启用时游戏进度不会被更改
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetSaveFileNoChange(bool isEnable = true);
+void ASetSaveFileNoChange(bool isEnable = true);
 
 // 设置阳光数
 // ------------参数------------
 // num 阳光数，不得大于9990或小于0
-inline void ASetSun(int num = 8000);
+void ASetSun(int num = 8000);
 
 // 僵尸死亡时不掉落战利品（钱、礼物盒、巧克力）
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetZombieNoFalling(bool isEnable = true);
+void ASetZombieNoFalling(bool isEnable = true);
 
 // 暂停出怪，启用时僵尸不会刷新
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetZombieNoSpawn(bool isEnable = true);
+void ASetZombieNoSpawn(bool isEnable = true);
 
 // 植物无敌，启用时植物受到攻击时不会损失血量
 // ------------参数------------
@@ -184,28 +188,83 @@ void ASetFreePlant(bool isEnable = true);
 // 移除轰炸陆地的炮弹的引信延迟机制
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetNoFireDelay(bool isEnable = true);
+void ASetNoFireDelay(bool isEnable = true);
 
 // 僵尸进家后不食脑
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetZombieNoEnterHome(bool isEnable = true);
+void ASetZombieNoEnterHome(bool isEnable = true);
 
 // 立刻装填，启用时玉米炮发射后很快可以再次发射
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetCobCannonNoCd(bool isEnable = true);
+void ASetCobCannonNoCd(bool isEnable = true);
 
 // 选卡时植物卡直接进入卡槽
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetCardImmediatelyFlyToSlot(bool isEnable = true);
+void ASetCardImmediatelyFlyToSlot(bool isEnable = true);
 
 // 不发生旗帜波事件，即启用时泳池不出珊瑚、黑夜不冒墓碑、屋顶不落空降
 // ------------参数------------
 // isEnable 为true时启用，为false时停用
-inline void ASetNoFlagWaveEvent(bool isEnable = true);
+void ASetNoFlagWaveEvent(bool isEnable = true);
 
+// 解锁所有游戏模式，再次进入游戏主界面生效
+void AUnlockAllMode();
+
+// 设置当前已存活轮数，适用于Survival:Endless、模式
+// ------------参数------------
+// num 已存活轮数，在Survival:Endless模式中为旗帜数的一半
+void ASetSurvivalRound(int num);
+
+// 设置钱数
+// ------------参数------------
+// num 单位为1美元，与游戏界面显示的一致
+inline void ASetMoney(int num = 999990);
+
+// 锁定黄油或玉米粒，启用时玉米投手只发射黄油或玉米粒
+// ------------参数------------
+// mode 锁定方式，为1时锁定黄油，为2时锁定玉米粒，为0时还原默认
+void ALockKernelPult(int mode = 1);
+
+// 毁灭菇爆炸不留弹坑
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void ASetNoCrater(bool isEnable = true);
+
+// 设置植物（樱桃炸弹、寒冰菇、毁灭菇、火爆辣椒）爆炸准备时长
+// ------------参数------------
+// mode 准备方式，为1时立即爆炸，为2时永不爆炸，为0时还原默认
+void ASetPlantExplodeMode(int mode);
+
+// 设置僵尸（小丑僵尸、辣椒僵尸）爆炸准备时长
+// ------------参数------------
+// mode 准备方式，为1时立即爆炸，为2时永不爆炸，为0时还原默认
+void ASetZombieExplodeMode(int mode);
+
+// 僵尸停滞不前。启用时僵尸仍做行进动作但横坐标不会变化
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void ASetZombieNotMove(bool isEnable = true);
+
+// 移除冰道，启用时移除场上的冰道且冰车不会留下冰道
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void ASetNoIceTrail(bool isEnable = true);
+
+// 巨人不扔小鬼，启用时巨人即使血量低于一半也不会投掷小鬼
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void AGargNotThrowImp(bool isEnable = true);
+
+// 立即刷新下一波僵尸
+void ASpawningNextWave();
+
+// 启用内部调试功能
+// ------------参数------------
+// mode 为1时显示僵尸刷新信息，为2时显示背景音乐信息为3时显示内存信息，为4时显示游戏对象的碰撞判定信息（红色框为攻击域，绿色为防御域），为0时停用
+void ASetDebugMode(int mode);
 // --------------------------------------------------------------------
 
 // --------------------------------内存--------------------------------
@@ -217,6 +276,9 @@ inline void ASetNoFlagWaveEvent(bool isEnable = true);
 // ------------示例------------
 // WriteArray(0x52B308, std::vector<uint8_t> {0x90, 0x90});
 void WriteArray(DstAddr dstAddr, SrcArray&& srcArr);
+
+// 返回当前游戏模式（关卡序号）
+int AGetGameMode();
 
 // --------------------------------------------------------------------
 
@@ -340,6 +402,27 @@ public:
     // 不再显示植物、僵尸和场地物品的属性信息条
     void StopAll();
 }
+
+// --------------------------------------------------------------------
+
+// --------------------------------点击--------------------------------
+
+// 从主菜单界面进入指定的游戏模式，必须在void AScipt()前使用本宏
+// ------------参数------------
+// mode 要进入的游戏模式，先填写前缀 APvZGameMode::，右键点击这个前缀，在弹出菜单中点击“查看类型定义”查看可选的游戏模式
+// ------------示例------------
+// #include "avz.h"
+// #include "qmLib/main.h"
+// // 进入泳池生存无尽模式
+// APlayTheMode(APvZGameMode::SurvivalPoolEndless);
+// void AScript()
+// {
+//     /*选卡和运阵等代码*/
+// }
+#define APlayTheMode(mode) GameModeStarter _gameModeStarter(mode);
+
+// --------------------------------------------------------------------
+
 
 ```
 

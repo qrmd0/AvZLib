@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-08-03 23:07:41
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-09 17:20:43
+ * @LastEditTime: 2023-08-17 15:52:49
  * @Description:
  */
 #ifndef __FIGHTING__
@@ -15,6 +15,7 @@
 // 计算指定波次僵尸在指定行的血量之和，用于智能激活或抗压
 // ------------参数------------
 // wave 波次
+// row 行数
 int GetZombiesHp(int wave, int row)
 {
     int hp = 0;
@@ -27,7 +28,7 @@ int GetZombiesHp(int wave, int row)
     return hp;
 }
 
-// 不断开炮直到前场不存在本波僵尸，用于收尾
+// 不断开炮直到前场不存在本波僵尸（伴舞除外），用于收尾
 // ------------参数------------
 // wave 要收尾的波次
 // time 第一次开炮的本波时刻
@@ -42,7 +43,7 @@ void PPEndingTheWave(int wave, int time, int delay)
     AConnect(ATime(wave, time), [=] {
         bool isCleared = true;
         AAliveFilter<AZombie> zombieAtFrontFromThisWave([=](AZombie* zmb) {
-            return zmb->AtWave() == wave - 1 && zmb->Abscissa() > 320;
+            return zmb->AtWave() == wave - 1 && zmb->Abscissa() > 320 && zmb->Type() != ABACKUP_DANCER;
         });
         for (auto&& zmb : zombieAtFrontFromThisWave) {
             (void)zmb;
@@ -80,7 +81,8 @@ void AAutoBlover(int row, int col, float threshold = 250)
         } });
 }
 
-ALogger<AConsole> _csLog;
+ALogger<AConsole> _qmConsoleLogger;
+bool _qmIsSkipping = false;
 // 智能跳帧，按键启停，检测到指定位置的指定植物不血量全满时自动停止，用于挂机冲关
 // ------------参数------------
 // startKey 启动键的虚拟按键码，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
@@ -89,7 +91,7 @@ ALogger<AConsole> _csLog;
 // types 要检测的植物种类，默认为{玉米加农炮、忧郁蘑菇、冰瓜、双子向日葵}
 void ASmartSkipTick(const int& startKey, const int& stopKey, const std::vector<AGrid>& grids, const std::vector<APlantType>& types = {ACOB_CANNON, AGLOOM_SHROOM, AWINTER_MELON, ATWIN_SUNFLOWER})
 {
-    _csLog.Info("智能跳帧已就绪，按 # 开始，按 # 键或阵型受损时停止", AGetValue(_keyNames, startKey), AGetValue(_keyNames, stopKey));
+    _qmConsoleLogger.Info("智能跳帧已就绪，按 # 开始，按 # 或阵型受损时停止", AGetValue(_keyNames, startKey), AGetValue(_keyNames, stopKey));
     auto GetIsPlantsFullHp = [=]() -> bool {
         for (auto each : grids) {
             for (auto type : types) {
@@ -104,17 +106,24 @@ void ASmartSkipTick(const int& startKey, const int& stopKey, const std::vector<A
         return true;
     };
     auto condition = [=]() -> bool {
-        return GetIsPlantsFullHp() && !AGetIsKeysDown(stopKey);
+        return GetIsPlantsFullHp() && !AGetIsKeysDown(stopKey, false);
     };
-    auto callback = [&] {
-        ALeftClick(740, 13);
+    auto callback = [=]() mutable {
+        // ALeftClick(740, 13);
+        _qmIsSkipping = false;
+        HWND _pvzHwnd = AGetPvzBase()->MRef<HWND>(0x350);
+        ShowWindow(_pvzHwnd, SW_RESTORE);
+        SetForegroundWindow(_pvzHwnd);
         ALogger<AMsgBox> _msgLogger;
         _msgLogger.Info("您按下了停止键或阵型受损，停止跳帧");
     };
-    AConnect(startKey, [=] {
-        _csLog.Info("跳帧运行中，按 # 或阵型受损时停止", AGetValue(_keyNames, stopKey));
+    AConnect(startKey, [=]() mutable {
+        _qmIsSkipping = true;
+        _qmConsoleLogger.Info("跳帧运行中，按 # 或阵型受损时停止", AGetValue(_keyNames, stopKey));
         ASkipTick(condition, callback);
     });
+    if (_qmIsSkipping)
+        ASkipTick(condition, callback);
 }
 
 // 在控制台中显示本轮出怪逐波统计表
@@ -138,7 +147,7 @@ void AShowZombiesList()
     std::string text = "本轮已通过旗帜数为：" + std::to_string(flagNumNow) + "，出怪情况：\n\n";
     text += "波次 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 合计\n";
     text += "--------------------------------------------------------------------\n";
-    for (int type = 0; type < 20; ++type) {
+    for (int type = 0; type < 33; ++type) {
         if (zmbNumAtWave[0][type] == 0)
             continue;
         text += zmbName[type] + " ";
@@ -151,7 +160,6 @@ void AShowZombiesList()
         std::string _temp2 = std::string(3 - _temp.length(), '0') + _temp;
         text += _temp2 + "\n";
     }
-
-    _csLog.Info(text);
+    _qmConsoleLogger.Info(text);
 }
 #endif

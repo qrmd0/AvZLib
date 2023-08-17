@@ -1,3 +1,10 @@
+/*
+ * @Author: qrmd
+ * @Date: 2023-08-03 23:07:35
+ * @LastEditors: qrmd
+ * @LastEditTime: 2023-08-10 20:59:33
+ * @Description:
+ */
 #ifndef __MEMORY__
 #define __MEMORY__
 
@@ -16,4 +23,9 @@ void WriteArray(DstAddr dstAddr, SrcArray&& srcArr)
     std::copy(srcArr.begin(), srcArr.end(), ptr);
 }
 
+// 返回当前游戏模式（关卡序号）
+inline int AGetGameMode()
+{
+    return AMPtr<APvzStruct>(0x6a9ec0)->MRef<int>(0x7F8);
+}
 #endif

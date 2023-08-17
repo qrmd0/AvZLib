@@ -95,7 +95,7 @@ std::vector<AZombie*> APutZombie(AZombieType type, std::vector<AGrid> grids)
     return result;
 }
 
-extern ALogger<AConsole> _csLog;
+extern ALogger<AConsole> _qmConsoleLogger;
 // 按键调节游戏运行速度
 // ------------参数------------
 // _1x 设置游戏速度倍率为1.0的快捷键，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
@@ -108,7 +108,7 @@ void AKeySetSpeed(const int& _1x = VK_F1, const int& _2x = VK_F2, const int& _5x
     AConnect(_2x, [] { ASetGameSpeed(2); });
     AConnect(_5x, [] { ASetGameSpeed(5); });
     AConnect(_10x, [] { ASetGameSpeed(10); });
-    _csLog.Info("\n游戏变速控制已启用，快捷键为：\n    #：1.0倍速\n    #：2.0倍速\n    #：5.0倍速\n    #：10.0倍速", AGetValue(_keyNames, _1x), AGetValue(_keyNames, _2x), AGetValue(_keyNames, _5x), AGetValue(_keyNames, _10x));
+    _qmConsoleLogger.Info("\n游戏变速控制已启用，快捷键为：\n    #：1.0倍速\n    #：2.0倍速\n    #：5.0倍速\n    #：10.0倍速", AGetValue(_keyNames, _1x), AGetValue(_keyNames, _2x), AGetValue(_keyNames, _5x), AGetValue(_keyNames, _10x));
 }
 
 // 移除浓雾，启用时雾夜模式不显示浓雾
@@ -255,5 +255,156 @@ inline void ASetNoFlagWaveEvent(bool isEnable = true)
     AMRef<uint8_t>(0x42694A) = isEnable ? 0xEB : 0x75;
     AMRef<uint8_t>(0x413083) = isEnable ? 0xEB : 0x75;
 }
+
+// 解锁所有游戏模式，再次进入游戏主界面生效
+void AUnlockAllMode()
+{
+    AMRef<uint8_t>(0x0044A514) = 0x70;
+    WriteArray(0x0042E440, std::vector<uint8_t> {0x31, 0xC0, 0xC3});
+    AMRef<uint8_t>(0x0044A5AF) = 0x70;
+    AMRef<uint8_t>(0x00454109) = 0x70;
+    AMRef<uint8_t>(0x00449E7A) = 0xEB;
+    AMRef<uint8_t>(0x00449E9D) = 0xEB;
+    AMRef<uint8_t>(0x00453AD1) = 0xEB;
+    AMRef<int>(0x00403A10) = 0x5BEB01B0;
+    WriteArray(0x00403B30, std::vector<uint8_t> {0xB0, 0x01, 0xC3});
+    AMRef<int>(0x0069DCA0) = 0x00;
+    WriteArray(0x0048AAD0, std::vector<uint8_t> {0x30, 0xC0, 0xC3});
+    AMRef<uint8_t>(0x0048A54C) = 0xEB;
+    AMRef<uint8_t>(0x0048D32B) = 0xEB;
+    AMRef<uint8_t>(0x0048C491) = 0xEB;
+}
+
+// 设置当前已存活轮数，适用于Survival:Endless、模式
+// ------------参数------------
+// num 已存活轮数，在Survival:Endless模式中为旗帜数的一半
+inline void ASetSurvivalRound(int num)
+{
+    int mode = AGetGameMode();
+    if (mode == 60 || mode == 70 || (mode >= 11 && mode <= 15))
+        AMPtr<APvzStruct>(0x6A9EC0)->MPtr<APvzStruct>(0x768)->MPtr<APvzStruct>(0x160)->MRef<int>(0x6C) = num;
+}
+
+// 设置钱数
+// ------------参数------------
+// num 单位为1美元，与游戏界面显示的一致
+inline void ASetMoney(int num = 999990)
+{
+    AMPtr<APvzStruct>(0x6A9EC0)->MPtr<APvzStruct>(0x82C)->MRef<int>(0x28) = num / 10;
+}
+
+// 锁定黄油或玉米粒，启用时玉米投手只发射黄油或玉米粒
+// ------------参数------------
+// mode 锁定方式，为1时锁定黄油，为2时锁定玉米粒，为0时还原默认
+void ALockKernelPult(int mode = 1)
+{
+    switch (mode) {
+    case 0:
+        AMRef<uint8_t>(0x0045f1ec) = 0x75;
+        break;
+    case 1:
+        AMRef<uint8_t>(0x0045f1ec) = 0x70;
+        break;
+    case 2:
+        AMRef<uint8_t>(0x0045f1ec) = 0xEB;
+        break;
+    default:
+        break;
+    }
+}
+
+// 毁灭菇爆炸不留弹坑
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+inline void ASetNoCrater(bool isEnable = true)
+{
+    AMRef<uint8_t>(0x41D79E) = isEnable ? 0x70 : 0x75;
+}
+
+// 设置植物（樱桃炸弹、寒冰菇、毁灭菇、火爆辣椒）爆炸准备时长
+// ------------参数------------
+// mode 准备方式，为1时立即爆炸，为2时永不爆炸，为0时还原默认
+void ASetPlantExplodeMode(int mode)
+{
+    switch (mode) {
+    case 0:
+        AMRef<uint8_t>(0x00463408) = 0x75;
+        break;
+    case 1:
+        AMRef<uint8_t>(0x00463408) = 0x74;
+        break;
+    case 2:
+        AMRef<uint8_t>(0x00463408) = 0xEB;
+        break;
+    default:
+        break;
+    }
+}
+
+// 设置僵尸（小丑僵尸、辣椒僵尸）爆炸准备时长
+// ------------参数------------
+// mode 准备方式，为1时立即爆炸，为2时永不爆炸，为0时还原默认
+void ASetZombieExplodeMode(int mode)
+{
+    switch (mode) {
+    case 0:
+        AMRef<uint8_t>(0x00526afc) = 0x8f;
+        AMRef<uint8_t>(0x005275dd) = 0x85;
+        break;
+    case 1:
+        AMRef<uint8_t>(0x00526afc) = 0x80;
+        AMRef<uint8_t>(0x005275dd) = 0x80;
+        break;
+    case 2:
+        AMRef<uint8_t>(0x00526afc) = 0x81;
+        AMRef<uint8_t>(0x005275dd) = 0x81;
+        break;
+    default:
+        break;
+    }
+}
+// 僵尸停滞不前。启用时僵尸仍做行进动作但横坐标不会变化
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+inline void ASetZombieNotMove(bool isEnable = true)
+{
+    AMRef<uint8_t>(0x0052ab2b) = isEnable ? 0x54 : 0x64;
+    AMRef<uint8_t>(0x0052ab34) = isEnable ? 0x54 : 0x44;
+}
+
+// 移除冰道，启用时移除场上的冰道且冰车不会留下冰道
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+void ASetNoIceTrail(bool isEnable = true)
+{
+    AMRef<uint8_t>(0x0052a7b0) = isEnable ? 0xc3 : 0x51;
+    AMRef<uint8_t>(0x0041f79a) = isEnable ? 0xeb : 0x75;
+    if (isEnable)
+        for (size_t i = 0; i < 6; ++i)
+            AMPtr<APvzStruct>(0x6A9EC0)->MPtr<APvzStruct>(0x768)->MRef<int>(0x624 + i * 4) = 1;
+}
+
+// 巨人不扔小鬼，启用时巨人即使血量低于一半也不会投掷小鬼
+// ------------参数------------
+// isEnable 为true时启用，为false时停用
+inline void AGargNotThrowImp(bool isEnable = true)
+{
+    AMRef<uint8_t>(0x00527205) = isEnable ? 0xeb : 0x7d;
+}
+
+// 立即刷新下一波僵尸
+inline void ASpawningNextWave()
+{
+    AMPtr<APvzStruct>(0x6A9EC0)->MPtr<APvzStruct>(0x768)->MRef<int>(0x559C) = 1;
+}
+
+// 启用内部调试功能
+// ------------参数------------
+// mode 为1时显示僵尸刷新信息，为2时显示背景音乐信息为3时显示内存信息，为4时显示游戏对象的碰撞判定信息（红色框为攻击域，绿色为防御域），为0时停用
+inline void ASetDebugMode(int mode)
+{
+    AMPtr<APvzStruct>(0x6A9EC0)->MPtr<APvzStruct>(0x768)->MRef<int>(0x55F8) = mode;
+}
+
 
 #endif

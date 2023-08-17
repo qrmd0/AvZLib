@@ -12,6 +12,7 @@ inline bool AGetIsHave(const std::vector<T>& A, T& b)
 {
     return std::find(A.begin(), A.end(), b) != A.end();
 }
+
 // 根据键名返回一个映射的键值，如果键名不存在抛出异常
 template <typename KeyType, typename ValueType>
 ValueType AGetValue(const std::map<KeyType, ValueType>& myMap, const KeyType& key)
@@ -123,6 +124,7 @@ bool AMoveElement(std::vector<T>& vec, T element, int toIndex)
     vec.insert(vec.begin() + toIndex, element);
     return true;
 }
+
 // 返回数字的字符串
 // ------------参数------------
 // t 要转换的数字
@@ -163,14 +165,20 @@ inline bool AGetIsPlantAllowable(APlantType plt, int row, int col)
     return AAsm::GetPlantRejectType(plt, row - 1, col - 1) == AAsm::NIL;
 }
 
-// 当前窗口为PvZ且指定键均被按下时，返回true。
+// 指定键均被按下时，返回true。
 // ------------参数------------
 // keys 要检测的按键的虚拟键码，详见：https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes
-bool AGetIsKeysDown(const std::vector<int>& keys)
+// isRequirePvZActive 是否要求PvZ窗口是当前窗口
+// ------------示例------------
+// AConnect([] { return true; }, [] {
+//     if(AGetIsKeysDown({VK_CONTROL, VK_SHIFT, 'D'}, false)){
+//         ALogger<AMsgBox> _log;
+//         _log.Debug("您按下了全局快捷键 Ctrl+Shift+D");
+//     } });
+bool AGetIsKeysDown(const std::vector<int>& keys, bool isRequirePvZActive = true)
 {
-
     auto pvzHandle = AGetPvzBase()->MRef<HWND>(0x350);
-    if (GetForegroundWindow() != pvzHandle)
+    if (isRequirePvZActive && GetForegroundWindow() != pvzHandle)
         return false;
     for (auto each : keys) {
         if ((GetAsyncKeyState(each) & 0x8000) == 0)
@@ -178,10 +186,10 @@ bool AGetIsKeysDown(const std::vector<int>& keys)
     }
     return true;
 }
-bool AGetIsKeysDown(const int& key)
+bool AGetIsKeysDown(const int& key, bool isRequirePvZActive = true)
 {
     std::vector<int> vec = {key};
-    return AGetIsKeysDown(vec);
+    return AGetIsKeysDown(vec, isRequirePvZActive);
 }
 
 #endif
