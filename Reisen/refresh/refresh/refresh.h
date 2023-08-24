@@ -128,7 +128,7 @@ void Script() {
                 double prob = (0.65 - min(max(rd.hp_ratio[wave], 0.5), 0.65)) / 0.15;
                 rd.wave_prob[wave] = cur_task->assume_refresh ? 1 - prob : prob;
             });
-        if(cur_task->clear_zombies)
+        if(cur_task->clear_zombies || RangeIn(wave, {9, 19, 20}))
             killAllZombie({wave}, {}, last_time);
     }
 

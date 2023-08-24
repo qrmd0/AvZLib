@@ -18,16 +18,18 @@ Task task = TaskBuilder()
     .required_types({GIGA_GARGANTUAR, GARGANTUAR}) // 锁定必出的出怪种类
     .banned_types({}) // 锁定不出的出怪种类
     .operation([](int wave){
-        SetTime(225 - 373); // 不用设置wave
+        SetTime(225 - 373); // wave已经被设置好了
         pao_operator.pao({{2, 9}, {5, 9}});
     })
     .check_time(401) // 检查刷新情况的时间；可以填多个（如{200, 300, 400}），会为每个时间单独生成一份数据
-    // 以下为可选参数
+    // 以下为可选参
     .debug(false) // 关闭跳帧，默认为false
     .card_selection({STARFRUIT}) // 选卡类型，默认为寒冰菇、毁灭菇、樱桃、辣椒、窝瓜、地刺、三叶草、高坚果、大蒜、土豆
-    .clear_zombies(true) // 每波结束时清空僵尸（io测试可能需要关闭），默认为true
+    .clear_zombies(true) // 效果为消灭本波全部僵尸才会触发刷新，且最后一个检查时间后会清除全场僵尸
+                         // 若开启该选项，则以上设置会在每一波生效，否则只在w9、w19、w20生效，默认开启
+                         // 含自然输出的测试可能需要关闭该选项以模拟上波僵尸影响植物索敌的情形
     .dance_cheat(true) // 开启女仆秘籍和Dance秘籍（会自动根据assume_refresh选择类型），默认为true
-    .giga_count(-1) // 锁定每波红眼数，用于变速测试。默认为-1，即不限制
+    .giga_count(-1) // 锁定每波红眼数，用于变速波测试。默认为-1，即不限制
 ;
 ```
 
