@@ -19,6 +19,7 @@ vector<Task> get_tasks();
 bool first_run = true;
 clock_t start_time;
 vector<Task> all_tasks;
+int initial_total_hp[21];
 
 int WaveTotalHp(int wave) {
     int ret;
@@ -100,9 +101,12 @@ void Script() {
     }
 
     int last_time = cur_task->check_time[cur_task->check_time.size() - 1];
-    for(int wave = 1; wave <= 20; ++wave) {
-        if(cur_task->clear_zombies)
-            InsertTimeOperation(1, wave, [](){ GetMainObject()->zombieRefreshHp() = 0; });
+    for(int wave = 1; wave <= 20; wave++) {
+        InsertTimeOperation(1, wave, [=](){
+            initial_total_hp[wave] = GetMainObject()->mRef<int>(0x5598);
+            if(cur_task->clear_zombies)
+                GetMainObject()->zombieRefreshHp() = 0;
+        });
         SetTime(0, wave); cur_task->operation(wave);
         for(int i = 0; i < cur_task->check_time.size(); i++)
             InsertTimeOperation(cur_task->check_time[i], wave, [=](){
@@ -123,8 +127,7 @@ void Script() {
                     ShowErrorNotInQueue("计算总血量 = #\n实际总血量 = #", hp, hp2);
                     throw Exception("");
                 }
-                int total_hp = GetMainObject()->mRef<int>(0x5598);
-                rd.hp_ratio[wave] = 1.0 * hp / total_hp;
+                rd.hp_ratio[wave] = 1.0 * hp / initial_total_hp[wave];
                 double prob = (0.65 - min(max(rd.hp_ratio[wave], 0.5), 0.65)) / 0.15;
                 rd.wave_prob[wave] = cur_task->assume_refresh ? 1 - prob : prob;
             });
