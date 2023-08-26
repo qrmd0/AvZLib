@@ -468,11 +468,11 @@ namespace cresc
     {
         if (f)
         {
-            AvZ::WriteMemory(std::array<uint8_t, 2>{0x90, 0x90}, 0x0052b308);
+            AvZ::WriteMemory(std::array<uint8_t, 2>{0x90, 0x90}, 0x52b308);
         }
         else
         {
-            AvZ::WriteMemory(std::array<uint8_t, 2>{0x74, 0x07}, 0x0052b308);
+            AvZ::WriteMemory(std::array<uint8_t, 2>{0x74, 0x07}, 0x52b308);
         }
     }
 
@@ -494,8 +494,21 @@ namespace cresc
     {
         if (f)
         {
-            // 无视阳光、取消冷却、紫卡直种
-            AvZ::GetPvzBase()->mRef<bool>(0x814) = true;
+            // 无视阳光
+            AvZ::WriteMemory<uint8_t>(0x70, 0x0041ba72);
+            AvZ::WriteMemory<uint8_t>(0x3b, 0x0041ba74);
+            AvZ::WriteMemory<uint8_t>(0x91, 0x0041bac0);
+            AvZ::WriteMemory<uint8_t>(0x80, 0x00427a92);
+            AvZ::WriteMemory<uint8_t>(0x80, 0x00427dfd);
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x0042487f);
+
+            // 取消冷却
+            AvZ::WriteMemory<uint8_t>(0x70, 0x00487296);
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x00488250);
+
+            // 紫卡直种
+            AvZ::WriteMemory(std::array<uint8_t, 3>{0xb0, 0x01, 0xc3}, 0x0041d7d0);
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x0040e477);
 
             // 随意放置
             AvZ::WriteMemory<uint8_t>(0x81, 0x0040fe30);
@@ -503,12 +516,25 @@ namespace cresc
             AvZ::WriteMemory<uint8_t>(0x8d, 0x0042a2d9);
 
             // 蘑菇免唤醒
-            AvZ::WriteMemory<uint8_t>(0xeb, 0x0045de8e);
+            AvZ::WriteMemory<uint8_t>(0xeb, 0x45de8e);
         }
         else
         {
-            // 取消无视阳光、恢复冷却、取消紫卡直种
-            AvZ::GetPvzBase()->mRef<bool>(0x814) = false;
+            // 取消无视阳光
+            AvZ::WriteMemory<uint8_t>(0x7f, 0x0041ba72);
+            AvZ::WriteMemory<uint8_t>(0x2b, 0x0041ba74);
+            AvZ::WriteMemory<uint8_t>(0x9e, 0x0041bac0);
+            AvZ::WriteMemory<uint8_t>(0x8f, 0x00427a92);
+            AvZ::WriteMemory<uint8_t>(0x8f, 0x00427dfd);
+            AvZ::WriteMemory<uint8_t>(0x74, 0x0042487f);
+
+            // 恢复冷却
+            AvZ::WriteMemory<uint8_t>(0x7e, 0x00487296);
+            AvZ::WriteMemory<uint8_t>(0x75, 0x00488250);
+
+            // 取消紫卡直种
+            AvZ::WriteMemory(std::array<uint8_t, 3>{0x51, 0x83, 0xf8}, 0x0041d7d0);
+            AvZ::WriteMemory<uint8_t>(0x74, 0x0040e477);
 
             // 取消随意放置
             AvZ::WriteMemory<uint8_t>(0x84, 0x0040fe30);
@@ -516,7 +542,7 @@ namespace cresc
             AvZ::WriteMemory<uint8_t>(0x84, 0x0042a2d9);
 
             // 取消蘑菇免唤醒
-            AvZ::WriteMemory<uint8_t>(0x74, 0x0045de8e);
+            AvZ::WriteMemory<uint8_t>(0x74, 0x45de8e);
         }
     }
 

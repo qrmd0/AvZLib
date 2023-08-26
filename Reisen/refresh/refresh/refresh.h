@@ -2,6 +2,7 @@
 #include "avz.h"
 #include "avz_testing.h"
 #include "DanceCheat/DanceCheat.h"
+#include "mod/mod.h"
 #include "SelectCardsPlus/SelectCardsPlus.h"
 
 #include "merge_csv.h"
@@ -75,8 +76,8 @@ void Script() {
         initialize_task();
     }
 
-    WriteMemory<uint8_t>(0x2e, 0x482149);
-    WriteMemory<uint8_t>(0x70, 0x54b267);
+    EnableModsScoped(SaveDataReadOnly, FreePlantingCheat, PlantAnywhere, CobInstantRecharge,
+        DisableItemDrop, PlantInvincible, DisableSpecialAttack, CobFixedDelay);
     OpenMultipleEffective('Q', MAIN_UI_OR_FIGHT_UI);
     if(!cur_task->debug)
         SkipTick([](){ return true; });
@@ -84,12 +85,6 @@ void Script() {
 
     type_list = random_type_list(cur_task->required_types, cur_task->banned_types);
     simulate_summon(type_list, 1000, cur_task->huge ? ALL_HUGE : ALL_NORMAL, cur_task->giga_count);
-    cobCannonNoCD();
-    forbidItemDrop();
-    freePlanting();
-    plantInvincible();
-    forbid3zGroup();
-    forbidFireDelay();
     unifyAllWaves(cur_task->huge ? BIG_WAVE : NORMAL_WAVE);
     SetTime(-599, 1); pao_operator.autoGetPaoList();
     if(cur_task->dance_cheat) {

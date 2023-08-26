@@ -9,6 +9,7 @@ qrmd/qmLib
 Reisen/AvZDSL
 Reisen/DanceCheat
 Reisen/fodder
+Reisen/mod
 Reisen/MousePosPatch
 Reisen/refresh
 shallowdream/shallowdream
