@@ -1,4 +1,4 @@
-version 1.1.1+avz1
+version 1.1.2+avz1
 avz 2022_10_01
 DanceCheat 1.0.0+avz1
 SelectCardsPlus 2022_08_05
