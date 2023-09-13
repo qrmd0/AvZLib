@@ -54,6 +54,8 @@ Mod DisableSpecialAttack{
 // 卡片不消耗阳光且无冷却时间，紫卡可直接种植
 Mod FreePlantingCheat{
     {{0x6a9ec0, 0x814}, '\x01', '\x00'},
+    {0x487296, '\x70', '\x7e'}, // 此二行为取消冷却时间，若无AvZ会报“卡片还有Xcs才能使用”错误
+    {0x488250, '\xeb', '\x75'},
 };
 
 // 蘑菇免唤醒

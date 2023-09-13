@@ -77,7 +77,7 @@ void Script() {
     }
 
     EnableModsScoped(SaveDataReadOnly, FreePlantingCheat, PlantAnywhere, CobInstantRecharge,
-        DisableItemDrop, PlantInvincible, DisableSpecialAttack, CobFixedDelay);
+        DisableItemDrop, PlantInvincible, DisableSpecialAttack, CobFixedDelay, MushroomAwake);
     OpenMultipleEffective('Q', MAIN_UI_OR_FIGHT_UI);
     if(!cur_task->debug)
         SkipTick([](){ return true; });
