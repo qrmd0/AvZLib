@@ -1,6 +1,5 @@
 #include <numeric>
 #include "avz.h"
-#include "avz_testing.h"
 #include "DanceCheat/DanceCheat.h"
 #include "mod/mod.h"
 #include "SelectCardsPlus/SelectCardsPlus.h"
@@ -10,10 +9,10 @@
 #include "io.h"
 #include "summon_simulate.h"
 #include "task.h"
+#include "utils.h"
 
 using namespace std;
 using namespace AvZ;
-using namespace cresc;
 
 vector<Task> get_tasks();
 
@@ -21,22 +20,6 @@ bool first_run = true;
 clock_t start_time;
 vector<Task> all_tasks;
 int initial_total_hp[21];
-
-int WaveTotalHp(int wave) {
-    int ret;
-    asm volatile(
-        "pushl %[wave];"
-        "movl 0x6a9ec0, %%ebx;"
-        "movl 0x768(%%ebx), %%ebx;"
-        "movl $0x412e30, %%ecx;"
-        "calll *%%ecx;"
-        "mov %%eax, %[ret];"
-        : [ret] "=rm"(ret)
-        : [wave] "rm"(wave - 1)
-        : "ebx", "ecx", "edx"
-    );
-    return ret;
-}
 
 void initialize_task() {
     progress = 0;
@@ -77,7 +60,7 @@ void Script() {
     }
 
     EnableModsScoped(SaveDataReadOnly, FreePlantingCheat, PlantAnywhere, CobInstantRecharge,
-        DisableItemDrop, PlantInvincible, DisableSpecialAttack, CobFixedDelay);
+        MushroomAwake, DisableItemDrop, PlantInvincible, DisableSpecialAttack, CobFixedDelay);
     OpenMultipleEffective('Q', MAIN_UI_OR_FIGHT_UI);
     if(!cur_task->debug)
         SkipTick([](){ return true; });
@@ -85,7 +68,7 @@ void Script() {
 
     type_list = random_type_list(cur_task->required_types, cur_task->banned_types);
     simulate_summon(type_list, 1000, cur_task->huge ? ALL_HUGE : ALL_NORMAL, cur_task->giga_count);
-    unifyAllWaves(cur_task->huge ? BIG_WAVE : NORMAL_WAVE);
+    UnifyWaves(cur_task->huge);
     SetTime(-599, 1); pao_operator.autoGetPaoList();
     if(cur_task->dance_cheat) {
         DanceCheat(cur_task->assume_refresh ? DanceCheatMode::FAST : DanceCheatMode::SLOW);
@@ -127,7 +110,7 @@ void Script() {
                 rd.wave_prob[wave] = cur_task->assume_refresh ? 1 - prob : prob;
             });
         if(cur_task->clear_zombies || RangeIn(wave, {9, 19, 20}))
-            killAllZombie({wave}, {}, last_time);
+            InsertTimeOperation(last_time, wave, KillAllZombies);
     }
 
     InsertTimeOperation(0, 20, [](){ progress = refresh_data[0].ranking.size() + 1; });
