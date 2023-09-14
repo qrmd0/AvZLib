@@ -55,8 +55,6 @@ vector<Task> get_tasks() {
 脚本需要定义 `vector<Task> get_tasks()` 函数。该函数会在第一次选卡之前运行，并返回需要进行的所有测试。
 `void Script()` 由 `refresh.h` 定义，脚本无需（也不能）定义该函数。
 
-`refresh.h` 中包含了 [AvZ Testing](https://github.com/qrmd0/AvZLib/tree/main/crescendo/avz-testing)，脚本可直接使用其中的函数，无需 `#include "avz_testing.h"`。
-
 刷新测试器会自动开启如下修改：
 
 - 存档只读
