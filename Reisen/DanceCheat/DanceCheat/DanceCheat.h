@@ -34,6 +34,11 @@ SOFTWARE.
 
 // 将当前 dance 状态设为 state（true = dance，false = 正常）
 void SetDance(bool state) {
+    if(SELECT_BY_AVZ_VERSION(AvZ::ReadMemory<int>(0x6a9ec0, 0x82c, 0xf4),
+        AGetPvzBase()->MPtr<APvzStruct>(0x82c)->MRef<int>(0xf4)) < 500) {
+        SELECT_BY_AVZ_VERSION(AvZ::ShowErrorNotInQueue, AGetInternalLogger()->Error)("智慧树高度不足 500 英尺，无法使用 dance 指令");
+        return;
+    }
     asm volatile(
         "movl 0x6a9ec0, %%eax;"
         "movl 0x768(%%eax), %%ecx;"
@@ -42,7 +47,7 @@ void SetDance(bool state) {
         "movl $0x41afd0, %%eax;"
         "calll *%%eax;"
         :
-        : [state] "rm"(state)
+        : [state] "rm"(unsigned(state))
         : "eax", "ebx", "ecx", "edx"
     );
 }
@@ -51,19 +56,19 @@ enum class DanceCheatMode {
     FAST,
     SLOW,
     STOP
-} _reisen_dance_cheat_state = DanceCheatMode::STOP;
+} _dance_cheat_state = DanceCheatMode::STOP;
 
-SELECT_BY_AVZ_VERSION(AvZ::TickRunner, ATickRunner) _reisen_dance_cheat_runner;
+SELECT_BY_AVZ_VERSION(AvZ::TickRunner, ATickRunner) _dance_cheat_runner;
 
 class : SELECT_BY_AVZ_VERSION(AvZ::GlobalVar, AStateHook) {
     void SELECT_BY_AVZ_VERSION(enterFight, _EnterFight)() override {
-        _reisen_dance_cheat_runner.SELECT_BY_AVZ_VERSION(pushFunc, Start)([]{
-            if(_reisen_dance_cheat_state == DanceCheatMode::STOP)
+        _dance_cheat_runner.SELECT_BY_AVZ_VERSION(pushFunc, Start)([]{
+            if(_dance_cheat_state == DanceCheatMode::STOP)
                 return;
-            SetDance(_reisen_dance_cheat_state == DanceCheatMode::SLOW);
+            SetDance(_dance_cheat_state == DanceCheatMode::SLOW);
         });
     }
-} _reisen_dance_cheat_runner_starter;
+} _dance_cheat_runner_starter;
 
 // mode = DanceCheatMode::FAST: 加速模式
 // mode = DanceCheatMode::SLOW: 减速模式
@@ -74,7 +79,7 @@ void SELECT_BY_AVZ_VERSION(DanceCheatNotInQueue, DanceCheat)(DanceCheatMode mode
         SELECT_BY_AVZ_VERSION(AvZ::ShowErrorNotInQueue, AGetInternalLogger()->Error)("智慧树高度不足 500 英尺，无法使用 dance 指令");
         return;
     }
-    _reisen_dance_cheat_state = mode;
+    _dance_cheat_state = mode;
     if(mode == DanceCheatMode::STOP)
         SetDance(false);
 }
