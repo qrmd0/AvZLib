@@ -4,7 +4,6 @@
 #include "libavz.h"
 
 namespace _CrescAverageSpawn {
-
 struct _Zombie : public Zombie {
     int& layer() { return (int&)((uint8_t*)this)[0x20]; }
 };
