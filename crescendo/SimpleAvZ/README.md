@@ -362,8 +362,8 @@ C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8);   // 若本行存在int(x)≤680�
 
 ## 脚本示例
 
-查看本仓库提供的 Simple AvZ 脚本示例.
+查看[本仓库提供的 Simple AvZ 脚本示例](https://github.com/qrmd0/AvZLib/tree/main/crescendo/SimpleAvZ/examples).
 
 ## 了解更多
 
-查看 Simple AvZ 开发者的幕后碎碎念.
+查看 [Simple AvZ 开发者的幕后碎碎念](https://github.com/qrmd0/AvZLib/blob/main/crescendo/SimpleAvZ/docs/About.md).
