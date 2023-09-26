@@ -1,4 +1,5 @@
 crescendo/AverageSpawn
+crescendo/SimpleAvZ
 qrmd/GetZombieAbscissas
 qrmd/KeyAssistant
 qrmd/PlantFixerPlus
