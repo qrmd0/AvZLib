@@ -56,7 +56,7 @@ void Script()
         B(849, 3, 8.3625);
         PP(leng1 - 200, 8.8);
         M_I(after(211), 1, 1);
-        DD(after(9), 7.425);
+        DD(after(220 - 211), 7.425);
 
         C(700, until(800), TALL_NUT, 2, 9);
         C(800, until(1289), POT, 2, 9);
@@ -99,7 +99,7 @@ void Script()
     for (auto w : waves(7, 16)) {
         PP(leng3 - 200, 8.475);
         D(after(231), 5, 3.525);
-        D(after(19), 1, 4);
+        D(after(250 - 231), 1, 4);
         I(leng3, 5, 9);
 
         C(73, keep(1), POT, 2, 9);
@@ -113,7 +113,7 @@ void Script()
         B(1175, 3, 8.1625);
         PP(leng2 - 200, 8.6);
         M_I(after(211), 1, 1);
-        DD(after(9), 7.4125);
+        DD(after(220 - 211), 7.4125);
 
         C(403, until(601), BLOVER, 2, 9);
         C(1014, until(1175), POT, 2, 9);
