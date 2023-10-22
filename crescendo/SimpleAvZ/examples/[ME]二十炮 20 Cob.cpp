@@ -6,6 +6,16 @@
  * 布阵码: LI4/bIyUhNTQTQQswNxUVCU0d0FR
  * 参考视频: https://www.bilibili.com/video/BV1pQ4y1d7rM
  * 说明: C7u-C8u融合解作者Crescendo
+ * 
+ * 
+ * Script author: Crescendo(https://space.bilibili.com/8252252), 2023
+ * You may freely copy, distribute, and modify this script, subject to that
+ * you cite the source and do not remove this notice from the source code.
+ *
+ * Name: [ME] 20 Cob
+ * PvZ Tools code: LI4/bIyUhNTQTQQswNxUVCU0d0FR
+ * Ref video: https://www.bilibili.com/video/BV1pQ4y1d7rM
+ * Note: C7u-C8u solution by Crescendo.
  */
 
 #include "SimpleAvZ/lib.h" // v1.0.0

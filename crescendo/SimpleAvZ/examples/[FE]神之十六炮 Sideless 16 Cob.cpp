@@ -6,6 +6,17 @@
  * 布阵码: LI43NJRUU4Vk15cVU0DYGVAHQ3JUVNBNREVX
  * 参考视频: https://www.bilibili.com/video/BV1EL4y18795
  * 说明: 原阵型作者冰巫师墨舞, 优化C7u解作者Crescendo
+ * 
+ * 
+ * Script author: Crescendo(https://space.bilibili.com/8252252), 2023
+ * You may freely copy, distribute, and modify this script, subject to that
+ * you cite the source and do not remove this notice from the source code.
+ *
+ * Name: [FE] Sideless 16 Cob
+ * PvZ Tools code: LI43NJRUU4Vk15cVU0DYGVAHQ3JUVNBNREVX
+ * Ref video: https://www.bilibili.com/video/BV1EL4y18795
+ * Note: original solution by 冰巫师墨舞,
+ *       improved C7u solution by Crescendo.
  */
 
 #include "SimpleAvZ/lib.h" // v1.0.0

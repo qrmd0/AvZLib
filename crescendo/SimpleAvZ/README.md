@@ -1,5 +1,7 @@
 # Simple AvZ 💫
 
+[English](doc/README(eng).md) | [简体中文](./README.md)
+
 *---------- 一种很新的 AvZ*
 
 Simple AvZ, 即 "AvZ 简化版", 是基于 AvZ 1 设计的一套用于精简脚本的语法框架.
@@ -362,8 +364,8 @@ C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8);   // 若本行存在int(x)≤680�
 
 ## 脚本示例
 
-查看[本仓库提供的 Simple AvZ 脚本示例](https://github.com/qrmd0/AvZLib/tree/main/crescendo/SimpleAvZ/examples).
+查看本仓库提供的 [Simple AvZ 脚本示例](examples).
 
 ## 了解更多
 
-查看 [Simple AvZ 开发者的幕后碎碎念](https://github.com/qrmd0/AvZLib/blob/main/crescendo/SimpleAvZ/docs/About.md).
+查看 [Simple AvZ 开发者的幕后碎碎念](doc/About.md).

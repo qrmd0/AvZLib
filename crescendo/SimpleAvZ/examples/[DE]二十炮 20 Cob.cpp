@@ -6,6 +6,17 @@
  * 布阵码: LI43bJyUlNTYBS1A3FRUkXBbQVQ=
  * 参考视频: https://www.bilibili.com/video/BV1mb4y1t7UD
  * 说明: 无铲种解作者冰巫师墨舞, 优化ch6-I6解作者Crescendo
+ *
+ * 
+ * Script author: Crescendo(https://space.bilibili.com/8252252), 2023
+ * You may freely copy, distribute, and modify this script, subject to that
+ * you cite the source and do not remove this notice from the source code.
+ *
+ * Name: [DE] 20 Cob
+ * PvZ Tools code: LI43bJyUlNTYBS1A3FRUkXBbQVQ=
+ * Ref video: https://www.bilibili.com/video/BV1mb4y1t7UD
+ * Note: non cob replacement solution by 冰巫师墨舞,
+ *       improved ch6-I6 solution by Crescendo.
  */
 
 #include "SimpleAvZ/lib.h" // v1.0.0

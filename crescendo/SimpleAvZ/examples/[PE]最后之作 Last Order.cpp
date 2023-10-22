@@ -6,6 +6,17 @@
  * 布阵码: LI43bJyUlFSWYjTGVZ5Xtc0kRWQkDF3QU0kk3TS+lmRNVPidRIlW
  * 参考视频: https://www.bilibili.com/video/BV1Uo4y1f7Fa
  * 说明: 原阵型作者光锥维, 优化ch4解作者ng收割机
+ * 
+ * 
+ * Script author: Crescendo(https://space.bilibili.com/8252252), 2023
+ * You may freely copy, distribute, and modify this script, subject to that
+ * you cite the source and do not remove this notice from the source code.
+ *
+ * Name: [PE] Last Order
+ * PvZ Tools code: LI43bJyUlFSWYjTGVZ5Xtc0kRWQkDF3QU0kk3TS+lmRNVPidRIlW
+ * Ref video: https://www.bilibili.com/video/BV1Uo4y1f7Fa
+ * Note: original setup by 光锥维,
+ *       improved ch4 solution by ng收割机.
  */
 
 #include "SimpleAvZ/lib.h" // v1.0.0
