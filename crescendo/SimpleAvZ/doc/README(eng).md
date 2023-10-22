@@ -17,9 +17,9 @@ If `Get AvZ Extension` is broken, you may also manually download it from the `/r
 ### Setting Wave
 
 ```cpp
-waves(1, 2, 3);             // w1, w2, w3
-waves({1, 9}, 4);           // w1~w9, every 4 waves
-waves({1, 9}, {11, 19}, 4); // w1~w9, w11~w19, every 4 waves
+waves(1, 2, 3);             // w1, w2, w3 (may specify any number of waves)
+waves({1, 9}, 4);           // from w1 to w9, every 4 waves
+waves({1, 9}, {11, 19}, 4); // from w1 to w9 and from w11 to w19, every 4 waves
 ```
 
 ```cpp
@@ -101,7 +101,7 @@ In roof scenes, you may declare multiple `CobOperator`s before `void Script()`, 
 I(1, 2);             // Place ice at 1-2, taking effect at 601cs (perfect ice)
 I(after(210), 1, 2); // Use ice, taking effect after 210cs (ice3), recommended to be used after activation cobs
 I(359, 1, 2);        // Use ice, taking effect at 359cs
-M_I(...);            // Use imitator ice (same usage)
+M_I(...);            // Use imitater ice (same usage)
 ```
 
 Use ice at nighttime. Effect time is auto-corrected. If effect time is not specified, it defaults to 601cs of the current wave (perfect ice for next wave).
@@ -173,7 +173,7 @@ C_IF(exist(ZOMBONI), 400, SPIKEWEED, 1, 9);     // If there is zomboni in row 1,
 C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8);   // If there is garg or giga with int(x)≤680, place flower pot at 1-8 at 400cs
 ```
 
-Decide whether or not to use cards based on zombies. You may either check if a certain type of zombie exists, or check if certain types of zombie's x is smaller than some threshold. Mostly used in actual gameplay or batch tests.
+Decide whether or not to use cards depending on zombies. You may either check if a certain type of zombie exists, or check if certain types of zombie's x is smaller than some threshold. Mostly used in actual gameplay or batch tests.
 
 For demonstration purposes, using `EnsureExist` is more recommended as it showcases the worst case scenario.
 
@@ -183,4 +183,4 @@ Here are some [Simple AvZ script examples](../examples/).
 
 ## Learn More
 
-[Learn more about Simple AvZ's rationale behind the scenes](./About.md) (Chinese).
+Learn more about [Simple AvZ's rationale behind the scenes](./About.md) (Chinese).
