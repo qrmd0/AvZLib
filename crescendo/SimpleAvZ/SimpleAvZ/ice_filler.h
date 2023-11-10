@@ -15,10 +15,10 @@ void set_ice_internal(const std::vector<AvZ::Grid>& ice_positions)
         auto row = pos.row;
         auto col = pos.col;
         if (row < 1 || row > max_row) {
-            _SimpleAvZInternal::error("SetIce", "Ice row should be within 1~#: #", max_row, row);
+            _SimpleAvZInternal::error("SetIce", "存冰行数应在1~#内\n存冰行数: #", max_row, row);
         }
         if (col < 1 || col > 9) {
-            _SimpleAvZInternal::error("SetIce", "Ice col should be within 1~9: #", col);
+            _SimpleAvZInternal::error("SetIce", "存冰列数应在1~9内\n存冰列数: #", col);
         }
     }
 
@@ -32,11 +32,11 @@ void set_ice_internal(const std::vector<AvZ::Grid>& ice_positions)
 
 } // namespace _SimpleAvZInternal
 
-// Set where to store ices in daytime.
-// If effect time is not specified, it defaults to game start (wave 1, -599cs).
-// *** Usage:
-// SetIce({{1, 1}, {1, 2}})----- Store and use ices at 1-1, 1-2 (use 1-2 first), effective since game start [EXT]
-// SetIce(400, {...})----------- Effective since 400cs
+// 设置存冰位置.
+// 若不指定生效时间, 默认在 wave 1, -599cs 生效.
+// *** 使用示例:
+// SetIce({{1, 1}, {1, 2}})-----在1-1, 1-2存冰(优先使用1-2)[外]
+// SetIce(400, {...})-----------400cs生效
 void SetIce(Time time, const std::vector<AvZ::Grid>& ice_positions)
 {
     _SimpleAvZInternal::get_effect_time_and_set_time(time, "SetIce");
@@ -49,16 +49,16 @@ void SetIce(const std::vector<AvZ::Grid>& ice_positions)
     _SimpleAvZInternal::set_ice_internal(ice_positions);
 }
 
-// Use ice in daytime. Effect time is auto-corrected.
-// If effect time is not specified, it defaults to 601cs of the current wave (perfect ice for next wave).
-// *** Usage:
-// I()--------------- Use ice, taking effect at 601cs (perfect ice)
-// I(after(210))----- Use ice, takeing effect after 210cs (ice3), recommended to be used after activation cobs
-// I(359)------------ Use ice, taking effect at 359cs
+// 白昼点冰. 自带生效时机修正.
+// 若不指定生效时间, 默认在本波 601cs 生效.
+// *** 使用示例:
+// I()---------------点冰, 601cs生效(完美预判冰)
+// I(after(210))-----延迟210cs生效(ice3), 推荐在激活炮后使用
+// I(359)------------359cs生效
 void I(Time time = Time(601))
 {
     if (_SimpleAvZInternal::is_night_time()) {
-        _SimpleAvZInternal::error("I", "Cannot use daytime version of I() at nighttime\nPlease provide ice position");
+        _SimpleAvZInternal::error("I", "不可在夜间使用白昼版本的I()\n请提供用冰位置");
     }
 
     auto effect_time = _SimpleAvZInternal::get_card_effect_time(time, {ICE_SHROOM, COFFEE_BEAN}, "I");
