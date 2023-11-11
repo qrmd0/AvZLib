@@ -43,7 +43,7 @@ public:
             }
         }
 
-        auto detail_str = "僵尸类型: " + std::to_string(zombie_type) + "\n僵尸所在行: " + concat(rows, ",");
+        auto detail_str = "僵尸类型: " + std::to_string(static_cast<int>(zombie_type)) + "\n僵尸所在行: " + concat(rows, ",");
 
         if (is_backyard()) {
             if (AQUATIC_ZOMBIES.count(zombie_type)) {
@@ -102,12 +102,12 @@ public:
 
 void move_zombie_row(Zombie* zombie, int target_row)
 {
-    const int BASE_Y = _SimpleAvZInternal::is_roof() ? 40 : 50;
-    const int GRID_HEIGHT = _SimpleAvZInternal::is_frontyard() ? 100 : 85;
+    const int BASE_Y = is_roof() ? 40 : 50;
+    const int GRID_HEIGHT = is_frontyard() ? 100 : 85;
 
     int diff = (target_row - 1) - zombie->row();
     zombie->row() = target_row - 1;
-    zombie->ordinate() = BASE_Y + (target_row - 1) * GRID_HEIGHT;
+    zombie->ordinate() = static_cast<float>(BASE_Y + (target_row - 1) * GRID_HEIGHT);
     zombie->mRef<int>(0x20) += 10000 * diff; // 僵尸层数
 }
 
@@ -144,7 +144,7 @@ void EnsureExist(const std::vector<_SimpleAvZInternal::EnsureExistInfo>& ensure_
                 continue;
 
             if (_SimpleAvZInternal::is_backyard() && AvZ::RangeIn(zombie->row() + 1, {3, 4})
-                && !_SimpleAvZInternal::AQUATIC_ZOMBIES.count((ZombieType)zombie->type())) // 无视后院水路潜水,海豚以外的僵尸
+                && !_SimpleAvZInternal::AQUATIC_ZOMBIES.count(static_cast<ZombieType>(zombie->type()))) // 无视后院水路潜水,海豚以外的僵尸
                 continue;
 
             zombie_index[zombie->type()][zombie->row() + 1].push_back(i);

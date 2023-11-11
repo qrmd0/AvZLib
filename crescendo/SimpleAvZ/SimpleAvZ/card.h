@@ -10,7 +10,7 @@ namespace _SimpleAvZInternal {
 
 PlantType non_imitater(const PlantType& plant_type)
 {
-    return (plant_type > IMITATOR) ? (PlantType)(plant_type - IMITATOR - 1) : plant_type;
+    return (plant_type > IMITATOR) ? static_cast<PlantType>(plant_type - IMITATOR - 1) : plant_type;
 }
 
 // 是否为一次性植物(白天咖啡豆+冰/核的组合也视为一次性)
@@ -138,7 +138,7 @@ void shovel_with_container(int time, PlantType target, int row, int col, const s
             if (p.row() + 1 == row) {
                 if (p.col() + 1 == col || (p.col() == col && p.type() == COB_CANNON)) {
                     if (p.type() == target)
-                        AvZ::ShovelNotInQueue(row, col, target == PUMPKIN);
+                        AvZ::ShovelNotInQueue(row, static_cast<float>(col), target == PUMPKIN);
                     else if (p.type() == LILY_PAD || p.type() == FLOWER_POT)
                         container_num++;
                     else
@@ -148,7 +148,7 @@ void shovel_with_container(int time, PlantType target, int row, int col, const s
         }
         if (shovel_container)
             for (int i = 0; i < container_num; i++)
-                AvZ::ShovelNotInQueue(row, col);
+                AvZ::ShovelNotInQueue(row, static_cast<float>(col));
     },
         func_name + "-->shovel_with_container");
 }
@@ -224,7 +224,7 @@ void RM(Time time, PlantType target)
     AvZ::InsertOperation([=]() {
         for (auto& p : AvZ::alive_plant_filter) {
             if (p.type() == target) {
-                AvZ::ShovelNotInQueue(p.row() + 1, p.col() + 1, target == PUMPKIN);
+                AvZ::ShovelNotInQueue(p.row() + 1, static_cast<float>(p.col() + 1), target == PUMPKIN);
             }
         }
     },
@@ -254,7 +254,7 @@ void RM(Time time, PlantType target, int row, int col)
         }
 
         if (found) {
-            AvZ::ShovelNotInQueue(row, col, target == PUMPKIN);
+            AvZ::ShovelNotInQueue(row, static_cast<float>(col), target == PUMPKIN);
         }
     },
         "RM");
@@ -268,7 +268,7 @@ void RM(Time time, const std::vector<int>& rows, int col)
 
     _SimpleAvZInternal::get_effect_time_and_set_time(time, "RM");
     for (const auto& row : rows) {
-        AvZ::Shovel(row, col);
+        AvZ::Shovel(row, static_cast<float>(col));
     }
 }
 
@@ -292,7 +292,7 @@ void I(Time time, int row, int col)
 
     auto effect_time = _SimpleAvZInternal::get_card_effect_time(time, {ICE_SHROOM}, "I");
     _SimpleAvZInternal::set_time_inside(effect_time - 100, "I");
-    AvZ::Card(ICE_SHROOM, row, col);
+    AvZ::Card(ICE_SHROOM, row, static_cast<float>(col));
 }
 
 void I(int row, int col)
@@ -315,7 +315,7 @@ void M_I(Time time, int row, int col)
 
     auto effect_time = _SimpleAvZInternal::get_card_effect_time(time, {M_ICE_SHROOM}, "M_I");
     _SimpleAvZInternal::set_time_inside(effect_time - 420, "M_I");
-    AvZ::Card(M_ICE_SHROOM, row, col);
+    AvZ::Card(M_ICE_SHROOM, row, static_cast<float>(col));
     AvZ::SetPlantActiveTime(ICE_SHROOM, 419);
 }
 
@@ -350,7 +350,7 @@ void C(Time time, ShovelTime shovel_time, const std::vector<PlantType>& plant_ty
     if (plant_types.size() != rows.size()) {
         _SimpleAvZInternal::error("C", "卡片数与行数不一致\n卡片数: #\n行数: #", plant_types.size(), rows.size());
     }
-    for (int i = 0; i < plant_types.size(); i++) {
+    for (size_t i = 0; i < plant_types.size(); i++) {
         auto plant_type = plant_types.at(i);
         auto row = rows.at(i);
         _SimpleAvZInternal::validate_card_position(plant_type, row, col, "C");
@@ -358,14 +358,14 @@ void C(Time time, ShovelTime shovel_time, const std::vector<PlantType>& plant_ty
 
     auto effect_time = _SimpleAvZInternal::get_card_effect_time(time, plant_types, "C");
 
-    for (int i = 0; i < plant_types.size(); i++) {
+    for (size_t i = 0; i < plant_types.size(); i++) {
         auto plant_type = plant_types.at(i);
         auto row = rows.at(i);
 
         auto prep_time = _SimpleAvZInternal::get_prep_time(plant_type);
 
         _SimpleAvZInternal::set_time_inside(effect_time - prep_time, "C");
-        AvZ::Card(plant_type, row, col);
+        AvZ::Card(plant_type, row, static_cast<float>(col));
         if (_SimpleAvZInternal::get_set_active_time_flag(plant_type))
             AvZ::SetPlantActiveTime(_SimpleAvZInternal::non_imitater(plant_type), prep_time - 1);
 
@@ -396,13 +396,13 @@ void C(Time time, ShovelTime shovel_time, const std::vector<PlantType>& plant_ty
     auto prep_times = _SimpleAvZInternal::get_prep_times(plant_types);
     auto set_active_time_flags = _SimpleAvZInternal::get_set_active_time_flags(plant_types);
 
-    for (int i = 0; i < plant_types.size(); i++) {
+    for (size_t i = 0; i < plant_types.size(); i++) {
         auto plant_type = plant_types.at(i);
         auto prep_time = prep_times.at(i);
         auto set_active_time_flag = set_active_time_flags.at(i);
 
         _SimpleAvZInternal::set_time_inside(effect_time - prep_time, "C");
-        AvZ::Card(plant_type, row, col);
+        AvZ::Card(plant_type, row, static_cast<float>(col));
         if (set_active_time_flag)
             AvZ::SetPlantActiveTime(_SimpleAvZInternal::non_imitater(plant_type), prep_time - 1);
 
@@ -447,7 +447,7 @@ void C_IF(const std::function<bool(int)>& condition, Time time, ShovelTime shove
     AvZ::InsertOperation([=]() {
         if (condition(row)) {
             AvZ::SetNowTime();
-            AvZ::Card(plant_type, row, col);
+            AvZ::Card(plant_type, row, static_cast<float>(col));
             if (set_active_time_flag)
                 AvZ::SetPlantActiveTime(_SimpleAvZInternal::non_imitater(plant_type), prep_time - 1);
             if (shovel_time.type != ShovelTime::Type::NONE) {
@@ -470,7 +470,7 @@ std::function<bool(int)> exist(const std::vector<ZombieType>& zombie_types)
 {
     return [=](int row) {
         for (auto& z : AvZ::alive_zombie_filter) {
-            if (z.row() + 1 == row && _SimpleAvZInternal::contains(zombie_types, (ZombieType)z.type()))
+            if (z.row() + 1 == row && _SimpleAvZInternal::contains(zombie_types, static_cast<ZombieType>(z.type())))
                 return true;
         }
         return false;
@@ -486,7 +486,7 @@ std::function<bool(int)> pos(const std::vector<ZombieType>& zombie_types, int x)
 {
     return [=](int row) {
         for (auto& z : AvZ::alive_zombie_filter) {
-            if (z.row() + 1 == row && _SimpleAvZInternal::contains(zombie_types, (ZombieType)z.type()) && static_cast<int>(z.abscissa()) <= x)
+            if (z.row() + 1 == row && _SimpleAvZInternal::contains(zombie_types, static_cast<ZombieType>(z.type())) && static_cast<int>(z.abscissa()) <= x)
                 return true;
         }
         return false;
