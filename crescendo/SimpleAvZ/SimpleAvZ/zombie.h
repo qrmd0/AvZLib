@@ -33,42 +33,42 @@ public:
     void validate() const
     {
         if (INVALID_ZOMBIES.count(zombie_type)) {
-            error("EnsureExist", "Unsupported zombie type: #", zombie_type);
+            error("EnsureExist", "不支持的僵尸类型: #", zombie_type);
         }
 
         int max_row = is_backyard() ? 6 : 5;
         for (const auto& row : rows) {
             if (row < 1 || row > max_row) {
-                error("EnsureExist", "Zombie row should be within 1~#: #", max_row, row);
+                error("EnsureExist", "僵尸行数应在1~#内\n无效的行数: #", max_row, row);
             }
         }
 
-        auto detail_str = "Zombie type: " + std::to_string(static_cast<int>(zombie_type)) + "\nZombie rows: " + concat(rows, ",");
+        auto detail_str = "僵尸类型: " + std::to_string(static_cast<int>(zombie_type)) + "\n僵尸所在行: " + concat(rows, ",");
 
         if (is_backyard()) {
             if (AQUATIC_ZOMBIES.count(zombie_type)) {
                 if (rows.count(3) + rows.count(4) != rows.size()) {
-                    error("EnsureExist", "Cannot spawn snorkel or dolphin in non-water rows\n" + detail_str);
+                    error("EnsureExist", "非水路不出潜水与海豚\n" + detail_str);
                 }
             } else {
                 if ((rows.count(3) || rows.count(4))) {
-                    error("EnsureExist", "Setting zombies except snorkel or dolphin in water rows is not supported yet\n" + detail_str);
+                    error("EnsureExist", "暂不支持在水路设定潜水与海豚之外的僵尸\n" + detail_str);
                 }
             }
         } else {
             if (AQUATIC_ZOMBIES.count(zombie_type)) {
-                error("EnsureExist", "Cannot spawn snorkel or dolphin in non-backyard scenes\n" + detail_str);
+                error("EnsureExist", "非后院不出潜水与海豚\n" + detail_str);
             }
             if (is_frontyard()) {
                 if (zombie_type == DANCING_ZOMBIE && (rows.count(1) || rows.count(5))) {
-                    error("EnsureExist", "Cannot spawn dancer in row 1 or 5\n" + detail_str);
+                    error("EnsureExist", "边路不出舞王\n" + detail_str);
                 }
                 if (AvZ::GetMainObject()->scene() == 1 && zombie_type == ZOMBONI) {
-                    error("EnsureExist", "Cannot spawn zomboni at night scene\n" + detail_str);
+                    error("EnsureExist", "黑夜不出冰车\n" + detail_str);
                 }
             } else if (is_roof()) {
                 if (AvZ::RangeIn(zombie_type, {DANCING_ZOMBIE, DIGGER_ZOMBIE})) {
-                    error("EnsureExist", "Cannot spawn dancer or digger in roof scenes\n" + detail_str);
+                    error("EnsureExist", "屋顶不出舞王与矿工\n" + detail_str);
                 }
             } else {
                 assert(false);
@@ -113,12 +113,11 @@ void move_zombie_row(Zombie* zombie, int target_row)
 
 } // namespace _SimpleAvZInternal
 
-// Ensure some zombies appear in certain rows for the current wave.
-// Must be used within waves() loops.
-// *** Usage:
-// EnsureExist(GIGA)----------------------------- Ensure giga appears in all reasonable rows
-// EnsureExist({GIGA, 2, 3})--------------------- Ensure giga appears in row 2 & 3
-// EnsureExist({{GIGA, 2, 3}, {ZOMBONI, 4}})----- Ensure giga appears in row 2 & 3 and zomboni appears in row 4
+// 确保本波某类僵尸出现在某行. 需在waves()循环节内使用. 对本波有效.
+// *** 使用示例:
+// EnsureExist(GIGA)-----------------------------确保红眼出现在所有合理行
+// EnsureExist({GIGA, 2, 3})---------------------确保红眼出现在第2,3行
+// EnsureExist({{GIGA, 2, 3}, {ZOMBONI, 4}})-----确保红眼出现在第2,3行, 冰车出现在第4行
 void EnsureExist(const std::vector<_SimpleAvZInternal::EnsureExistInfo>& ensure_exist_info_list)
 {
     std::set<ZombieType> seen_zombie_types;
@@ -126,7 +125,7 @@ void EnsureExist(const std::vector<_SimpleAvZInternal::EnsureExistInfo>& ensure_
         info.validate();
 
         if (seen_zombie_types.count(info.zombie_type)) {
-            _SimpleAvZInternal::error("EnsureExist", "Duplicate zombie type: #", info.zombie_type);
+            _SimpleAvZInternal::error("EnsureExist", "僵尸类型重复: #", info.zombie_type);
         }
         seen_zombie_types.insert(info.zombie_type);
     }
@@ -173,7 +172,7 @@ void EnsureExist(const std::vector<_SimpleAvZInternal::EnsureExistInfo>& ensure_
                             best_src_row = row;
                     }
                     if (zombie_index[zombie_type][best_src_row].size() <= 1) {
-                        AvZ::ShowErrorNotInQueue("Not enough zombies of type # to ensure it appears in row #", zombie_type, target_row);
+                        AvZ::ShowErrorNotInQueue("僵尸数量不足, 无法确保种类为 # 的僵尸出现在 # 行", zombie_type, target_row);
                         continue;
                     }
                 }

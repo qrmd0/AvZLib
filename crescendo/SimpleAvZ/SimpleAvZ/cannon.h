@@ -8,18 +8,18 @@
 
 class CobOperator : public AvZ::PaoOperator {
 public:
-    // Create CobOperator and specify cobs with tail at which cols to use.
-    // *** Usage:
-    // CobOperator c1(1)--------- Only use cobs with tail at col 1
-    // CobOperator c45(4, 5)----- Only use cobs with tail at col 4 or 5
+    // 创建 CobOperator. 指定要用炮尾在哪些列的炮.
+    // *** 使用示例:
+    // CobOperator c1(1)---------只用炮尾在1列的炮
+    // CobOperator c45(4, 5)-----只用炮尾在4或5列的炮
     template <typename... Args>
     CobOperator(Args... args)
         : AvZ::PaoOperator()
     {
         for (int col : {args...}) {
-            validate_cob_col(col, "CobOperator constructor");
+            validate_cob_col(col, "CobOperator 构造函数");
             if (cob_cols.count(col)) {
-                _SimpleAvZInternal::error("CobOperator constructor", "Duplicate cob tail cols: #", col);
+                _SimpleAvZInternal::error("CobOperator 构造函数", "不可重复指定炮尾列\n重复的炮尾列: #", col);
             }
             cob_cols.insert(col);
         }
@@ -30,15 +30,14 @@ public:
     {
     }
 
-    // Fire two cobs.
-    // If rows are omitted, they default to row 2 & 5 for PE/FE and row 2 & 4 for other scenes.
-    // If col is omitted, it defaults to 9.
-    // *** Usage:
-    // c.PP(318)----------------- Fire (2,9) and (5,9), taking effect at 318cs
-    // c.PP(318, 8)-------------- Fire (2,8) and (5,8)
-    // c.PP(318, {8, 9})--------- Fire (2,8) and (5,9)
-    // c.PP(318, {2, 6}, 9)------ Fire (2,9) and (6,9)
-    // c.PP(after(110), ...)----- Take effect after 110cs
+    // 发射一组并炸炮.
+    // 若省略行数, 默认六行场地炸 2,5 路, 五行场地炸 2,4 路. 若省略列数, 默认炸 9 列.
+    // *** 使用示例:
+    // c.PP(318)-----------------炸(2,9)与(5,9), 318cs生效
+    // c.PP(318, 8)--------------炸(2,8)与(5,8)
+    // c.PP(318, {8, 9})---------炸(2,8)与(5,9)
+    // c.PP(318, {2, 6}, 9)------炸(2,9)与(6,9)
+    // c.PP(after(110), ...)-----用法同上, 延迟110cs生效
     void PP(Time time, const std::array<int, 2>& rows, float col)
     {
         cob_internal(time, {{rows[0], col}, {rows[1], col}}, "PP");
@@ -60,15 +59,14 @@ public:
         PP(time, {9, 9});
     }
 
-    // Fire two interception cobs.
-    // If rows are omitted, they default to row 1 & 5 for PE/FE and row 1 & 4 for other scenes.
-    // If col is omitted, it defaults to 9.
-    // *** Usage:
-    // c.DD(318)----------------- Fire (1,9) and (5,9), taking effect at 318cs
-    // c.DD(318, 8)-------------- Fire (1,8) and (5,8)
-    // c.DD(318, {8, 9})--------- Fire (1,8) and (5,9)
-    // c.DD(318, {2, 5}, 3.5)---- Fire (2,3.5) and (5,3.5)
-    // c.DD(after(110), ...)----- Take effect after 110cs
+    // 发射一组拦截炮.
+    // 若省略行数, 六行场地炸 1,5 路, 五行场地炸 1,4 路. 若省略列数, 默认炸 9 列.
+    // *** 使用示例:
+    // c.DD(318)-----------------炸(1,9)与(5,9), 318cs生效
+    // c.DD(318, 8)--------------炸(1,8)与(5,8)
+    // c.DD(318, {8, 9})---------炸(1,8)与(5,9)
+    // c.DD(318, {2, 5}, 3.5)----炸(2,3.5)与(5,3.5)
+    // c.DD(after(110), ...)-----用法同上, 延迟110cs生效
     void DD(Time time, const std::array<int, 2>& rows, float col)
     {
         std::vector<AvZ::Position> positions;
@@ -93,12 +91,11 @@ public:
         DD(time, {9, 9});
     }
 
-    // Fire one cob.
-    // You may specify which cob to use.
-    // *** Usage:
-    // c.P(318, 2, 9)----------------- Fire (2,9), taking effect at 318cs
-    // c.P(318, 1, 1, 2, 8)----------- Use cob at 1-1 to fire (2,8)
-    // c.P(after(110), ...)----------- Take effect after 110cs
+    // 发射一门炮. 可指明要用哪门炮.
+    // *** 使用示例:
+    // c.P(318, 2, 9)-----------------炸(2,9), 318cs生效
+    // c.P(318, 1, 1, 2, 8)-----------使用1-1炮炸(2,8)
+    // c.P(after(110), ...)-----------用法同上, 延迟110cs生效
     void P(Time time, int row, float col)
     {
         cob_internal(time, {{row, col}}, "P");
@@ -109,26 +106,26 @@ public:
         cob_internal(time, {{row, col}}, "P", {cob_row, cob_col});
     }
 
-    // Fire one separation cob.
-    // *** Usage:
-    // c.B(304, 5, 8.225)----- Fire (5, 8.225), taking effect at 304cs
+    // 发射分离炮.
+    // *** 使用示例:
+    // c.B(304, 5, 8.225)-----炸(5, 8.225), 304cs生效
     void B(Time time, int row, float col)
     {
         cob_internal(time, {{row, col}}, "B");
     }
 
-    // Fire one interception cob.
-    // *** Usage:
-    // c.D(395, 1, 9)----- Fire (1,9), taking effect at 395cs
+    // 发射拦截炮.
+    // *** 使用示例:
+    // c.D(395, 1, 9)-----炸(1,9), 395cs生效
     void D(Time time, int row, float col)
     {
         cob_internal(time, {{row, col}}, "D");
     }
 
-    // Exclude certain cobs from being used.
-    // *** Usage:
-    // c.ExcludeCob(3, 5)--------- Do not use cob at 3-5, effective since game start [EXT]
-    // c.ExcludeCob(400, ...)----- Effective since 400cs
+    // 不使用特定炮.
+    // *** 使用用例:
+    // c.ExcludeCob(3, 5)---------不使用3-5炮, 游戏开始时起效[外]
+    // c.ExcludeCob(400, ...)-----400cs起效
     void ExcludeCob(Time time, int row, int col)
     {
         _SimpleAvZInternal::get_effect_time_and_set_time(time, "ExcludeCob");
@@ -141,9 +138,9 @@ public:
         exclude_cob_internal(row, col);
     }
 
-    // Reset to use all cobs.
-    // *** Usage:
-    // c.ResetCob(400)----- Reset to use all cobs, effective since 400cs
+    // 重置为使用所有炮.
+    // *** 使用用例:
+    // c.ResetCob(400)-----重置为使用所有炮, 400cs起效
     void ResetCob(Time time)
     {
         _SimpleAvZInternal::get_effect_time_and_set_time(time, "ResetCob");
@@ -184,14 +181,14 @@ private:
     {
         int max_row = _SimpleAvZInternal::is_backyard() ? 6 : 5;
         if (row < 1 || row > max_row) {
-            _SimpleAvZInternal::error(func_name, "Cob row should be within 1~#: #", max_row, row);
+            _SimpleAvZInternal::error(func_name, "炮行数应在1~#内\n炮行数: #", max_row, row);
         }
     }
 
     void validate_cob_col(int col, const std::string& func_name)
     {
         if (col < 1 || col > 8) {
-            _SimpleAvZInternal::error(func_name, "Cob col should be within 1~8: #", col);
+            _SimpleAvZInternal::error(func_name, "炮尾列应在1~8内\n炮尾列: #", col);
         }
     }
 
@@ -203,10 +200,10 @@ private:
 
         for (const auto& pos : positions) {
             if (pos.row < 1 || pos.row > max_row) {
-                _SimpleAvZInternal::error(func_name, "Cob hit row should be within 1~#: #", max_row, pos.row);
+                _SimpleAvZInternal::error(func_name, "落点行应在1~#内\n落点行: #", max_row, pos.row);
             }
             if (pos.col < 0 || pos.col > 10) {
-                _SimpleAvZInternal::error(func_name, "Cob hit col should be within 0.0~10.0: #", pos.col);
+                _SimpleAvZInternal::error(func_name, "落点列应在0.0~10.0内\n落点列: #", pos.col);
             }
         }
 
@@ -271,15 +268,14 @@ private:
 
 CobOperator cob_operator;
 
-// Fire two cobs.
-// If rows are omitted, they default to row 2 & 5 for PE/FE and row 2 & 4 for other scenes.
-// If col is omitted, it defaults to 9.
-// *** Usage:
-// PP(318)----------------- Fire (2,9) and (5,9), taking effect at 318cs
-// PP(318, 8)-------------- Fire (2,8) and (5,8)
-// PP(318, {8, 9})--------- Fire (2,8) and (5,9)
-// PP(318, {2, 6}, 9)------ Fire (2,9) and (6,9)
-// PP(after(110), ...)----- Take effect after 110cs
+// 发射一组并炸炮.
+// 若省略行数, 默认六行场地炸 2,5 路, 五行场地炸 2,4 路. 若省略列数, 默认炸 9 列.
+// *** 使用示例:
+// PP(318)-----------------炸(2,9)与(5,9), 318cs生效
+// PP(318, 8)--------------炸(2,8)与(5,8)
+// PP(318, {8, 9})---------炸(2,8)与(5,9)
+// PP(318, {2, 6}, 9)------炸(2,9)与(6,9)
+// PP(after(110), ...)-----用法同上, 延迟110cs生效
 void PP(Time time, const std::array<int, 2>& rows, float col)
 {
     cob_operator.PP(time, rows, col);
@@ -300,15 +296,14 @@ void PP(Time time)
     cob_operator.PP(time);
 }
 
-// Fire two interception cobs.
-// If rows are omitted, they default to row 1 & 5 for PE/FE and row 1 & 4 for other scenes.
-// If col is omitted, it defaults to 9.
-// *** Usage:
-// DD(318)----------------- Fire (1,9) and (5,9), taking effect at 318cs
-// DD(318, 8)-------------- Fire (1,8) and (5,8)
-// DD(318, {8, 9})--------- Fire (1,8) and (5,9)
-// DD(318, {2, 5}, 3.5)---- Fire (2,3.5) and (5,3.5)
-// DD(after(110), ...)----- Take effect after 110cs
+// 发射一组拦截炮.
+// 若省略行数, 六行场地炸 1,5 路, 五行场地炸 1,4 路. 若省略列数, 默认炸 9 列.
+// *** 使用示例:
+// DD(318)-----------------炸(1,9)与(5,9), 318cs生效
+// DD(318, 8)--------------炸(1,8)与(5,8)
+// DD(318, {8, 9})---------炸(1,8)与(5,9)
+// PP(318, {2, 5}, 3.5)----炸(2,3.5)与(5,3.5)
+// DD(after(110), ...)-----用法同上, 延迟110cs生效
 void DD(Time time, const std::array<int, 2>& rows, float col)
 {
     cob_operator.DD(time, rows, col);
@@ -329,37 +324,36 @@ void DD(Time time)
     cob_operator.DD(time);
 }
 
-// Fire one cob.
-// You may specify which cob to use.
-// *** Usage:
-// P(318, 2, 9)----------------- Fire (2,9), taking effect at 318cs
-// P(318, 1, 1, 2, 8)----------- Use cob at 1-1 to fire (2,8)
-// P(after(110), ...)----------- Take effect after 110cs
+// 发射一门炮. 可指明要用哪门炮.
+// *** 使用示例:
+// P(318, 2, 9)-----------------炸(2,9), 318cs生效
+// P(318, 1, 1, 2, 8)-----------使用1-1炮炸(2,8)
+// P(after(110), ...)-----------用法同上, 延迟110cs生效
 void P(Time time, int row, float col)
 {
     cob_operator.P(time, row, col);
 }
 
-// Fire one separation cob.
-// *** Usage:
-// B(304, 5, 8.225)----- Fire (5, 8.225), taking effect at 304cs
+// 发射分离炮.
+// *** 使用示例:
+// B(304, 5, 8.225)-----炸(5, 8.225), 304cs生效
 void B(Time time, int row, float col)
 {
     cob_operator.B(time, row, col);
 }
 
-// Fire one interception cob.
-// *** Usage:
-// D(395, 1, 9)----- Fire (1,9), taking effect at 395cs
+// 发射拦截炮.
+// *** 使用示例:
+// D(395, 1, 9)-----炸(1,9), 395cs生效
 void D(Time time, int row, float col)
 {
     cob_operator.D(time, row, col);
 }
 
-// Exclude certain cobs from being used.
-// *** Usage:
-// ExcludeCob(3, 5)--------- Do not use cob at 3-5, effective since game start [EXT]
-// ExcludeCob(400, ...)----- Effective since 400cs
+// 不使用特定炮.
+// *** 使用用例:
+// ExcludeCob(3, 5)---------不使用3-5炮, 游戏开始时起效[外]
+// ExcludeCob(400, ...)-----400cs起效
 void ExcludeCob(Time time, int row, int col)
 {
     cob_operator.ExcludeCob(time, row, col);
@@ -370,9 +364,9 @@ void ExcludeCob(int row, int col)
     cob_operator.ExcludeCob(row, col);
 }
 
-// Reset to use all cobs.
-// *** Usage:
-// ResetCob(400)----- Reset to use all cobs, effective since 400cs
+// 重置为使用所有炮.
+// *** 使用用例:
+// ResetCob(400)-----重置为使用所有炮, 400cs起效
 void ResetCob(Time time)
 {
     cob_operator.ResetCob(time);
