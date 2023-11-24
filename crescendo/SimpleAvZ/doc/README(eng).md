@@ -25,6 +25,12 @@ waves({1, 9}, {11, 19}, 4); // from w1 to w9 and from w11 to w19, every 4 waves
 ```cpp
 for (auto w : waves(...)) {
     // here goes your operations...
+    // you may use if statements for conditional operations
+    if (w == 1) {
+        C(359, DOOM, 2, 9);
+    } else if (w == 5) {
+        C(359, DOOM, 3, 9);
+    }
 }
 ```
 
