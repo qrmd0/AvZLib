@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-08-14 01:05:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 09:42:18
+ * @LastEditTime: 2023-12-10 21:37:37
  * @Description:
  */
 #ifndef __GETZOMBIEABSCISSAS_2_0__
@@ -105,6 +105,17 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
             break;
         }
         break;
+    case NEWSPAPER_ZOMBIE:
+        switch (begin_frame) {
+        case 29: // 读报行走
+        case 31: // 愤怒行走
+            zombie_walk = newspaper_walk;
+            break;
+        default:
+            return null;
+            break;
+        }
+        break;
     case AFOOTBALL_ZOMBIE:
         switch (begin_frame) {
         case 21: // 行走
@@ -116,16 +127,20 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
         }
         break;
     case ADANCING_ZOMBIE:
+        return null;
         break;
     case ABACKUP_DANCER:
+        return null;
         break;
     case ASNORKEL_ZOMBIE:
+        return null;
         break;
     case AZOMBONI:
         // 行走
         is_uniform = true;
         break;
     case ADOLPHIN_RIDER_ZOMBIE:
+        return null;
         break;
     case AJACK_IN_THE_BOX_ZOMBIE:
         switch (begin_frame) {

@@ -1,11 +1,6 @@
-#ifndef __GETZOMBIEABSCISSAS_1_0__
-#define __GETZOMBIEABSCISSAS_1_0__
-
 #include "avz.h"
 #include <vector>
 using namespace AvZ;
-
-namespace _qrmd {
 struct ZombieAdd : public Zombie {
     // 僵尸动画编号
     uint16_t& animationCode()
@@ -85,15 +80,15 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
     case BUCKETHEAD_ZOMBIE:
     case SCREEN_DOOR_ZOMBIE:
         switch (begin_frame) {
-        case 44: // 行走，两手在前
+        case 44: //行走，两手在前
             zombie_walk = zombie_walk_a;
             break;
-        case 91: // 行走，两手前后摆
+        case 91: //行走，两手前后摆
             zombie_walk = zombie_walk_b;
             break;
-        case 250: // 水中
+        case 250: //水中
             zombie_walk = zombie_swim;
-        case 454: // 智慧树秘笈dance开启
+        case 454: //智慧树秘笈dance开启
             zombie_walk = zombie_dance;
             break;
         default:
@@ -103,22 +98,11 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case POLE_VAULTING_ZOMBIE:
         switch (begin_frame) {
-        case 13: // 跳跃前
+        case 13: //跳跃前
             zombie_walk = polevaulter_before_jump;
             break;
-        case 93: // 跳跃后
+        case 93: //跳跃后
             zombie_walk = polevaulter_after_jump;
-            break;
-        default:
-            return null;
-            break;
-        }
-        break;
-    case NEWSPAPER_ZOMBIE:
-        switch (begin_frame) {
-        case 29: // 读报行走
-        case 31: // 愤怒行走
-            zombie_walk = newspaper_walk;
             break;
         default:
             return null;
@@ -127,7 +111,7 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case FOOTBALL_ZOMBIE:
         switch (begin_frame) {
-        case 21: // 行走
+        case 21: //行走
             zombie_walk = football_walk;
             break;
         default:
@@ -136,24 +120,20 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         }
         break;
     case DANCING_ZOMBIE:
-        return null;
         break;
     case BACKUP_DANCER:
-        return null;
         break;
     case SNORKEL_ZOMBIE:
-        return null;
         break;
     case ZOMBONI:
         // 行走
         is_uniform = true;
         break;
     case DOLPHIN_RIDER_ZOMBIE:
-        return null;
         break;
     case JACK_IN_THE_BOX_ZOMBIE:
         switch (begin_frame) {
-        case 30: // 行走
+        case 30: //行走
             zombie_walk = jackbox_walk;
             break;
         default:
@@ -163,10 +143,10 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case BALLOON_ZOMBIE:
         switch (begin_frame) {
-        case 0: // 飞行
+        case 0: //飞行
             is_uniform = true;
             break;
-        case 84: // 行走
+        case 84: //行走
             zombie_walk = balloon_walk;
             break;
         default:
@@ -176,10 +156,10 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case DIGGER_ZOMBIE:
         switch (begin_frame) {
-        case 128: // 钻地
+        case 128: //钻地
             is_uniform = true;
             break;
-        case 18: // 行走
+        case 18: //行走
             zombie_walk = digger_walk;
             break;
         default:
@@ -189,10 +169,10 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case POGO_ZOMBIE:
         switch (begin_frame) {
-        case 155: // 弹跳
+        case 155: //弹跳
             is_uniform = true;
             break;
-        case 29: // 行走
+        case 29: //行走
             zombie_walk = pogo_walk;
             break;
         default:
@@ -202,7 +182,7 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case ZOMBIE_YETI:
         switch (begin_frame) {
-        case 15: // 行走
+        case 15: //行走
             zombie_walk = yeti_walk;
             break;
         default:
@@ -212,8 +192,8 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case LADDER_ZOMBIE:
         switch (begin_frame) {
-        case 25:  // 有梯行走
-        case 132: // 无梯行走
+        case 25:  //有梯行走
+        case 132: //无梯行走
             zombie_walk = ladder_walk;
             break;
         default:
@@ -223,7 +203,7 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
         break;
     case CATAPULT_ZOMBIE:
         switch (begin_frame) {
-        case 0: // 行走
+        case 0: //行走
             is_uniform = true;
             break;
         default:
@@ -234,7 +214,7 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
     case GARGANTUAR:
     case GIGA_GARGANTUAR:
         switch (begin_frame) {
-        case 22: // 行走
+        case 22: //行走
             zombie_walk = gargantuar_walk;
             break;
         default:
@@ -313,6 +293,3 @@ std::vector<float> GetZombieAbscissas(int index_zombie, int time_length)
     }
     return result;
 }
-}; // namespace _qrmd
-using _qrmd::GetZombieAbscissas;
-#endif
