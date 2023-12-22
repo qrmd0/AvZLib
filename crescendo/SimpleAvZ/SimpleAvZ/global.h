@@ -47,25 +47,48 @@ Global global;
 bool is_night_time()
 {
     auto scene = AvZ::GetMainObject()->scene();
-    return (scene > 4) || (scene % 2 == 1);
+    return scene == 1 || scene == 3 || scene == 5 || scene == 6 || scene == 8 || scene == 11;
 }
 
-bool is_frontyard()
+bool is_visually_six_rows()
 {
     auto scene = AvZ::GetMainObject()->scene();
-    return (scene == 0) || (scene == 1);
+    return scene == 2 || scene == 3 || scene == 10 || scene == 11;
 }
 
-bool is_backyard()
+bool is_actually_six_rows()
 {
     auto scene = AvZ::GetMainObject()->scene();
-    return (scene == 2) || (scene == 3);
+    return scene == 2 || scene == 3 || scene == 8 || scene == 10 || scene == 11;
+}
+
+int get_max_spawn_row()
+{
+    return is_actually_six_rows() ? 6 : 5;
+}
+
+bool has_water_rows()
+{
+    auto scene = AvZ::GetMainObject()->scene();
+    return scene == 2 || scene == 3 || scene == 8;
+}
+
+bool no_dancing_in_side_rows()
+{
+    auto scene = AvZ::GetMainObject()->scene();
+    return scene == 0 || scene == 1 || scene == 6 || scene == 7 || scene == 9 || scene == 10 || scene == 11;
+}
+
+bool no_zomboni()
+{
+    auto scene = AvZ::GetMainObject()->scene();
+    return scene == 1 || scene == 11;
 }
 
 bool is_roof()
 {
     auto scene = AvZ::GetMainObject()->scene();
-    return scene >= 4;
+    return scene == 4 || scene == 5;
 }
 
 } // namespace _SimpleAvZInternal

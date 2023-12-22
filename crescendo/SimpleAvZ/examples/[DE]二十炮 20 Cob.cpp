@@ -3,7 +3,7 @@
  * 可自由复制, 转载, 修改本脚本, 但请注明出处. 不可从源代码中删去本段落.
  *
  * 阵型名: [DE]二十炮
- * 布阵码: LI43bJyUlNTYBS1A3FRUkXBbQVQ=
+ * 布阵码: LI43bJyUlNTYOUyEEUycR1VUghRbBVQ=
  * 参考视频: https://www.bilibili.com/video/BV1mb4y1t7UD
  * 说明: 无铲种解作者冰巫师墨舞, 优化ch6-I6解作者Crescendo
  *
@@ -13,7 +13,7 @@
  * you cite the source and do not remove this notice from the source code.
  *
  * Name: [DE] 20 Cob
- * PvZ Tools code: LI43bJyUlNTYBS1A3FRUkXBbQVQ=
+ * PvZ Tools code: LI43bJyUlNTYOUyEEUycR1VUghRbBVQ=
  * Ref video: https://www.bilibili.com/video/BV1mb4y1t7UD
  * Note: non cob replacement solution by 冰巫师墨舞,
  *       improved ch6-I6 solution by Crescendo.

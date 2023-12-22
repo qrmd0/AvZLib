@@ -30,3 +30,5 @@
 #elif __AVZ_VERSION__ > 221001
 #error "Simple AvZ is designed for AvZ 1, which is incompatible with AvZ 2."
 #endif
+
+using namespace AvZ;

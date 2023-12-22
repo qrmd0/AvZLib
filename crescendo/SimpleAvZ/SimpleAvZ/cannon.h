@@ -45,7 +45,7 @@ public:
 
     void PP(Time time, const std::array<float, 2>& cols)
     {
-        auto row2 = _SimpleAvZInternal::is_backyard() ? 5 : 4;
+        auto row2 = _SimpleAvZInternal::is_actually_six_rows() ? 5 : 4;
         cob_internal(time, {{2, cols[0]}, {row2, cols[1]}}, "PP");
     }
 
@@ -77,7 +77,7 @@ public:
 
     void DD(Time time, const std::array<float, 2>& cols)
     {
-        auto row2 = _SimpleAvZInternal::is_backyard() ? 5 : 4;
+        auto row2 = _SimpleAvZInternal::is_actually_six_rows() ? 5 : 4;
         cob_internal(time, {{1, cols[0]}, {row2, cols[1]}}, "DD");
     }
 
@@ -179,7 +179,7 @@ private:
 
     void validate_cob_row(int row, const std::string& func_name)
     {
-        int max_row = _SimpleAvZInternal::is_backyard() ? 6 : 5;
+        int max_row = _SimpleAvZInternal::is_visually_six_rows() ? 6 : 5;
         if (row < 1 || row > max_row) {
             _SimpleAvZInternal::error(func_name, "炮行数应在1~#内\n炮行数: #", max_row, row);
         }
@@ -196,7 +196,7 @@ private:
     void cob_internal(Time time, const std::vector<AvZ::Position>& positions, const std::string& func_name,
         const AvZ::Grid& specified_cob = {-1, -1})
     {
-        int max_row = _SimpleAvZInternal::is_backyard() ? 6 : 5;
+        int max_row = _SimpleAvZInternal::is_visually_six_rows() ? 6 : 5;
 
         for (const auto& pos : positions) {
             if (pos.row < 1 || pos.row > max_row) {
@@ -225,7 +225,7 @@ private:
                     PaoOperator::rawRoofPao(specified_cob.row, specified_cob.col, row, col);
                 else
                     PaoOperator::roofPao(row, col);
-            } else if (_SimpleAvZInternal::is_backyard() && AvZ::RangeIn(row, {3, 4})) {
+            } else if (_SimpleAvZInternal::has_water_rows() && AvZ::RangeIn(row, {3, 4})) {
                 _SimpleAvZInternal::set_time_inside(effect_time - 378, func_name);
                 if (specify_cob)
                     PaoOperator::rawPao(specified_cob.row, specified_cob.col, row, col);

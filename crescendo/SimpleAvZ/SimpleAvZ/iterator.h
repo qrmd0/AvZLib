@@ -45,34 +45,10 @@ public:
         : value(v)
     {
     }
-    bool operator==(int int_value) const
+    
+    operator int() const
     {
-        return value == int_value;
-    }
-
-    bool operator!=(int int_value) const
-    {
-        return value != int_value;
-    }
-
-    bool operator<(int int_value) const
-    {
-        return value < int_value;
-    }
-
-    bool operator>(int int_value) const
-    {
-        return value > int_value;
-    }
-
-    bool operator<=(int int_value) const
-    {
-        return value <= int_value;
-    }
-
-    bool operator>=(int int_value) const
-    {
-        return value >= int_value;
+        return value;
     }
 };
 

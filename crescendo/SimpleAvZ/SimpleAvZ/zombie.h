@@ -36,63 +36,68 @@ public:
             error("EnsureExist", "不支持的僵尸类型: #", zombie_type);
         }
 
-        int max_row = is_backyard() ? 6 : 5;
         for (const auto& row : rows) {
-            if (row < 1 || row > max_row) {
-                error("EnsureExist", "僵尸行数应在1~#内\n无效的行数: #", max_row, row);
+            if (row < 1 || row > get_max_spawn_row()) {
+                error("EnsureExist", "僵尸行数应在1~#内\n无效的行数: #", get_max_spawn_row(), row);
             }
         }
 
         auto detail_str = "僵尸类型: " + std::to_string(static_cast<int>(zombie_type)) + "\n僵尸所在行: " + concat(rows, ",");
 
-        if (is_backyard()) {
+        if (has_water_rows()) {
             if (AQUATIC_ZOMBIES.count(zombie_type)) {
-                if (rows.count(3) + rows.count(4) != rows.size()) {
+                if (AvZ::GetMainObject()->scene() == 8) {
+                    error("EnsureExist", "水族馆不出潜水与海豚\n" + detail_str);
+                } else if (rows.count(3) + rows.count(4) != rows.size()) {
                     error("EnsureExist", "非水路不出潜水与海豚\n" + detail_str);
                 }
-            } else {
-                if ((rows.count(3) || rows.count(4))) {
-                    error("EnsureExist", "暂不支持在水路设定潜水与海豚之外的僵尸\n" + detail_str);
+            } else if (zombie_type != BALLOON_ZOMBIE) {
+                if (rows.count(3) || rows.count(4)) {
+                    error("EnsureExist", "暂不支持在水路设定潜水、海豚、气球以外的僵尸\n" + detail_str);
                 }
             }
         } else {
             if (AQUATIC_ZOMBIES.count(zombie_type)) {
                 error("EnsureExist", "非后院不出潜水与海豚\n" + detail_str);
             }
-            if (is_frontyard()) {
-                if (zombie_type == DANCING_ZOMBIE && (rows.count(1) || rows.count(5))) {
-                    error("EnsureExist", "边路不出舞王\n" + detail_str);
-                }
-                if (AvZ::GetMainObject()->scene() == 1 && zombie_type == ZOMBONI) {
-                    error("EnsureExist", "黑夜不出冰车\n" + detail_str);
-                }
-            } else if (is_roof()) {
-                if (AvZ::RangeIn(zombie_type, {DANCING_ZOMBIE, DIGGER_ZOMBIE})) {
-                    error("EnsureExist", "屋顶不出舞王与矿工\n" + detail_str);
-                }
-            } else {
-                assert(false);
+            if (no_dancing_in_side_rows()
+                && zombie_type == DANCING_ZOMBIE
+                && (rows.count(1) || rows.count(get_max_spawn_row()))) {
+                error("EnsureExist", "边路不出舞王\n" + detail_str);
+            }
+            if (no_zomboni() && zombie_type == ZOMBONI) {
+                error("EnsureExist", "黑夜不出冰车\n" + detail_str);
+            }
+            if (is_roof()
+                && (zombie_type == DANCING_ZOMBIE || zombie_type == DIGGER_ZOMBIE)) {
+                error("EnsureExist", "屋顶不出舞王与矿工\n" + detail_str);
             }
         }
     }
 
-    std::set<int> get_rows() const
+    std::set<int>
+    get_rows() const
     {
         if (!rows.empty()) {
             return rows;
         } else {
             std::set<int> new_rows;
-            if (is_backyard()) {
+            if (has_water_rows()) {
                 new_rows = {1, 2, 3, 4, 5, 6};
                 if (AQUATIC_ZOMBIES.count(zombie_type)) {
                     new_rows = {3, 4};
+                } else if (zombie_type == BALLOON_ZOMBIE) {
+                    new_rows = {1, 2, 3, 4, 5, 6};
                 } else {
                     new_rows = {1, 2, 5, 6};
                 }
             } else {
-                new_rows = {1, 2, 3, 4, 5};
-                if (is_frontyard() && zombie_type == DANCING_ZOMBIE) {
-                    new_rows = {2, 3, 4};
+                for (int i = 1; i <= get_max_spawn_row(); i++) {
+                    new_rows.insert(i);
+                }
+                if (no_dancing_in_side_rows() && zombie_type == DANCING_ZOMBIE) {
+                    new_rows.erase(1);
+                    new_rows.erase(get_max_spawn_row());
                 }
             }
             return new_rows;
@@ -103,7 +108,7 @@ public:
 void move_zombie_row(Zombie* zombie, int target_row)
 {
     const int BASE_Y = is_roof() ? 40 : 50;
-    const int GRID_HEIGHT = is_frontyard() ? 100 : 85;
+    const int GRID_HEIGHT = is_visually_six_rows() ? 85 : 100;
 
     int diff = (target_row - 1) - zombie->row();
     zombie->row() = target_row - 1;
@@ -143,8 +148,10 @@ void EnsureExist(const std::vector<_SimpleAvZInternal::EnsureExistInfo>& ensure_
             if (zombie->existTime() > 5) // 只考虑本波僵尸
                 continue;
 
-            if (_SimpleAvZInternal::is_backyard() && AvZ::RangeIn(zombie->row() + 1, {3, 4})
-                && !_SimpleAvZInternal::AQUATIC_ZOMBIES.count(static_cast<ZombieType>(zombie->type()))) // 无视后院水路潜水,海豚以外的僵尸
+            if (_SimpleAvZInternal::has_water_rows()
+                && (zombie->row() + 1 == 3 || zombie->row() + 1 == 4)
+                && !_SimpleAvZInternal::AQUATIC_ZOMBIES.count(static_cast<ZombieType>(zombie->type()))
+                && zombie->type() != BALLOON_ZOMBIE) // 无视水路潜水,海豚,气球以外的僵尸
                 continue;
 
             zombie_index[zombie->type()][zombie->row() + 1].push_back(i);

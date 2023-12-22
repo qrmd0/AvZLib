@@ -187,6 +187,10 @@ For demonstration purposes, using `EnsureExist` is more recommended as it showca
 
 Here are some [Simple AvZ script examples](../examples/).
 
+## Change Log
+
+View [Simple AvZ's change log](./CHANGELOG.md).
+
 ## Learn More
 
 Learn more about [Simple AvZ's rationale behind the scenes](./About.md) (Chinese).

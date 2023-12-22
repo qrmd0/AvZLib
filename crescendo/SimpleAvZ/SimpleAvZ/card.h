@@ -153,13 +153,19 @@ void shovel_with_container(int time, PlantType target, int row, int col, const s
         func_name + "-->shovel_with_container");
 }
 
-std::set<PlantType> get_invalid_plants(int row)
+std::set<PlantType> get_invalid_plants(int row, const std::string& func_name)
 {
     switch (AvZ::GetMainObject()->scene()) {
     case 0:
+    case 7:  // 禅境花园
+    case 9:  // 智慧树
+    case 10: // D6E
         return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SEA_SHROOM, CATTAIL};
     case 1:
+    case 11: // N6E
         return {LILY_PAD, TANGLE_KELP, SEA_SHROOM, COFFEE_BEAN, CATTAIL};
+    case 6: // 蘑菇园
+        return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SEA_SHROOM, COFFEE_BEAN, CATTAIL};
     case 2:
         if (row == 3 || row == 4) {
             return {POTATO_MINE, GRAVE_BUSTER, SPIKEWEED, FLOWER_POT, SPIKEROCK};
@@ -167,6 +173,7 @@ std::set<PlantType> get_invalid_plants(int row)
             return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SEA_SHROOM, CATTAIL};
         }
     case 3:
+    case 8: // 水族馆
         if (row == 3 || row == 4) {
             return {POTATO_MINE, GRAVE_BUSTER, SPIKEWEED, FLOWER_POT, COFFEE_BEAN, SPIKEROCK};
         } else {
@@ -174,33 +181,36 @@ std::set<PlantType> get_invalid_plants(int row)
         }
     case 4:
         return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SPIKEWEED, SEA_SHROOM, CATTAIL, SPIKEROCK};
-    default:
+    case 5:
         return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SPIKEWEED, SEA_SHROOM, COFFEE_BEAN, CATTAIL, SPIKEROCK};
+    default:
+        error(func_name, "不支持的场景: #", AvZ::GetMainObject()->scene());
+        return {};
     }
 }
 
 void validate_card_position(const PlantType& plant_type, int row, int col, const std::string& func_name)
 {
-    int max_row = is_backyard() ? 6 : 5;
+    int max_row = is_visually_six_rows() ? 6 : 5;
     if (row < 1 || row > max_row) {
         error(func_name, "用卡行应在1~#内\n用卡行: #", max_row, row);
     }
     if (col < 1 || col > 9) {
         error(func_name, "用卡列应在1~9内\n用卡列: #", col);
     }
-    if (get_invalid_plants(row).count(non_imitater(plant_type))) {
+    if (get_invalid_plants(row, func_name).count(non_imitater(plant_type))) {
         error(func_name, "当前场景不可在此行使用此卡片\n卡片: #\n用卡行: #", non_imitater(plant_type), row);
     }
 }
 
 void validate_shovel_position(int row, int col, const std::string& func_name)
 {
-    int max_row = _SimpleAvZInternal::is_backyard() ? 6 : 5;
+    int max_row = is_visually_six_rows() ? 6 : 5;
     if (row < 1 || row > max_row) {
-        _SimpleAvZInternal::error(func_name, "铲除行应在1~#内\n铲除行: #", max_row, row);
+        error(func_name, "铲除行应在1~#内\n铲除行: #", max_row, row);
     }
     if (col < 1 || col > 9) {
-        _SimpleAvZInternal::error(func_name, "铲除列应在1~9内\n铲除列: #", col);
+        error(func_name, "铲除列应在1~9内\n铲除列: #", col);
     }
 }
 

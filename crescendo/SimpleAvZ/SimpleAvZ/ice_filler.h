@@ -9,7 +9,7 @@ namespace _SimpleAvZInternal {
 
 void set_ice_internal(const std::vector<AvZ::Grid>& ice_positions)
 {
-    int max_row = _SimpleAvZInternal::is_backyard() ? 6 : 5;
+    int max_row = _SimpleAvZInternal::is_visually_six_rows() ? 6 : 5;
 
     for (const auto& pos : ice_positions) {
         auto row = pos.row;
