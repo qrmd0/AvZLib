@@ -31,7 +31,11 @@ public:
 
     void Start()
     {
+#if __AVZ_VERSION__ < 240113
         ATickRunner::Start([this] {
+#else
+        ATickRunnerWithNoStart::_Start([this] {
+#endif
             auto mouseWindow = AGetPvzBase()->MouseWindow();
             int mouseX = mouseWindow->MouseAbscissa();
             int mouseY = mouseWindow->MouseOrdinate();
