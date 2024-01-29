@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2023-08-14 01:05:25
  * @LastEditors: qrmd
- * @LastEditTime: 2023-12-10 21:37:37
+ * @LastEditTime: 2024-01-29 23:13:34
  * @Description:
  */
 #ifndef __GETZOMBIEABSCISSAS_2_0__
@@ -105,11 +105,11 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
             break;
         }
         break;
-    case NEWSPAPER_ZOMBIE:
+    case ANEWSPAPER_ZOMBIE:
         switch (begin_frame) {
-        case 29: // 读报行走
-        case 31: // 愤怒行走
-            zombie_walk = newspaper_walk;
+        case 25: // 读报行走
+        case 145: // 愤怒行走
+            zombie_walk = __newspaper_walk;
             break;
         default:
             return null;

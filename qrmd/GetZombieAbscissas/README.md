@@ -2,7 +2,7 @@
  * @Author: qrmd
  * @Date: 2022-06-09 00:03:58
  * @LastEditors: qrmd
- * @LastEditTime: 2023-08-14 01:42:10
+ * @LastEditTime: 2024-01-29 23:18:57
  * @Description: 
 -->
 # AvZ GetZombieAbscissas 僵尸坐标预测
@@ -71,8 +71,15 @@ std::vector<float> GetZombieAbscissas(int index, int timeLength);
 
 ### 2023年12月11日
 
+**存在AvZ2环境下编译不通过的问题，不提供此版本的下载。**  
+
 1、修复了预测某些不支持的僵尸导致游戏程序崩溃的bug；
 2、新增了对读报僵尸的支持。
+
+### 2024年1月29日
+
+1、修复了AvZ2环境下编译不通过的问题；
+2、修复了读报僵尸预测无效的问题。
 
 ## 更新预告
 
