@@ -80,7 +80,7 @@ namespace _SimpleAvZInternal {
 int get_delayed_time_and_update(int delay_time, const std::string& func_name)
 {
     if (!global.is_last_effect_time_initialized()) {
-        error(func_name + "-->after", "There is no time base for delay. Please use functions with fixed time first.");
+        error(func_name + "-->after", "没有延迟的基准, 请先使用固定时间的用炮/用卡函数");
     }
 
     global.last_effect_time += delay_time;
@@ -92,7 +92,7 @@ int get_delayed_time_and_update(int delay_time, const std::string& func_name)
 int get_effect_time(Time time, const std::string& func_name)
 {
     if (!global.is_last_effect_wave_initialized()) {
-        error(func_name, "You haven't set wave yet. Please use this function as such:\nfor (auto w : waves(...)){\n    // this function\n}");
+        error(func_name, "没有设置波数, 请用以下方式调用本函数:\nfor (auto w : waves(...)){\n    // 调用本函数\n}");
     }
 
     switch (time.type) {
@@ -110,7 +110,7 @@ int get_effect_time(Time time, const std::string& func_name)
 void set_time_inside(int time, const std::string& func_name)
 {
     if (!global.is_last_effect_wave_initialized()) {
-        error(func_name, "You haven't set wave yet. Please use this function as such:\nfor (auto w : waves(...)){\n    // this function\n}");
+        error(func_name, "没有设置波数, 请用以下方式调用本函数:\nfor (auto w : waves(...)){\n    // 调用本函数\n}");
     }
     AvZ::SetTime(time, global.last_effect_wave);
 }
@@ -124,7 +124,7 @@ void get_effect_time_and_set_time(Time time, const std::string& func_name)
 void set_time_outside(int time, int wave, const std::string& func_name)
 {
     if (global.is_last_effect_wave_initialized()) {
-        error(func_name, "If time is omitted, you must use this function outside waves() loops.");
+        error(func_name, "若省略生效时间, 需在waves()循环节外使用");
     }
 
     AvZ::SetTime(time, wave);
