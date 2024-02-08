@@ -6,9 +6,10 @@
 namespace _ModInternal {
 class ModEntry {
 private:
-    std::vector<uint8_t> U32ToBytes(uint32_t x) {
-        std::vector<uint8_t> result(4);
-        memcpy(result.data(), &x, 4);
+    template <typename T>
+    static std::vector<uint8_t> ToBytes(T x) {
+        std::vector<uint8_t> result(sizeof(T));
+        memcpy(result.data(), &x, sizeof(T));
         return result;
     }
 
@@ -16,23 +17,33 @@ public:
     std::vector<uintptr_t> addr;
     std::vector<uint8_t> data, orig;
 
-    ModEntry(std::vector<uintptr_t> addr_, std::vector<uint8_t> data_, std::vector<uint8_t> orig_)
-        : addr(std::move(addr_)), data(std::move(data_)), orig(std::move(orig_)) {}
+    template <typename T>
+    ModEntry(uintptr_t addr, T data, T orig)
+        : addr{addr}, data(ToBytes(data)), orig(ToBytes(orig)) {}
 
-    ModEntry(std::vector<uintptr_t> addr_, char data_, char orig_)
-        : addr(std::move(addr_)), data{(unsigned char)data_}, orig{(unsigned char)orig_} {}
+    template <typename T>
+    ModEntry(uintptr_t addr, T data)
+        : addr{addr}, data(ToBytes(data)) {}
 
-    ModEntry(std::vector<uintptr_t> addr_, uint32_t data_, uint32_t orig_)
-        : addr(std::move(addr_)), data(U32ToBytes(data_)), orig(U32ToBytes(orig_)) {}
+    ModEntry(uintptr_t addr, const std::vector<uint8_t>& data, const std::vector<uint8_t>& orig)
+        : addr{addr}, data(data), orig(orig) {}
 
-    ModEntry(uintptr_t addr_, std::vector<uint8_t> data_, std::vector<uint8_t> orig_)
-        : addr{addr_}, data(std::move(data_)), orig(std::move(orig_)) {}
+    ModEntry(uintptr_t addr, const std::vector<uint8_t>& data)
+        : addr{addr}, data(data) {}
 
-    ModEntry(uintptr_t addr_, char data_, char orig_)
-        : addr{addr_}, data{(unsigned char)data_}, orig{(unsigned char)orig_} {}
+    template <typename T>
+    ModEntry(const std::vector<uintptr_t>& addr, T data, T orig)
+        : addr(addr), data(ToBytes(data)), orig(ToBytes(orig)) {}
 
-    ModEntry(uintptr_t addr_, uint32_t data_, uint32_t orig_)
-        : addr{addr_}, data(U32ToBytes(data_)), orig(U32ToBytes(orig_)) {}
+    template <typename T>
+    ModEntry(const std::vector<uintptr_t>& addr, T data)
+        : addr(addr), data(ToBytes(data)) {}
+
+    ModEntry(const std::vector<uintptr_t>& addr, const std::vector<uint8_t>& data, const std::vector<uint8_t>& orig)
+        : addr(addr), data(data), orig(orig) {}
+
+    ModEntry(const std::vector<uintptr_t>& addr, const std::vector<uint8_t>& data)
+        : addr(addr), data(data) {}
 };
 
 enum class ModState {
@@ -59,8 +70,8 @@ protected:
     }
 
 public:
-    Mod(std::vector<ModEntry> entries_) : entries(std::move(entries_)) {}
-    Mod(std::initializer_list<ModEntry> entries_) : entries(entries_) {}
+    Mod(const std::vector<ModEntry>& entries) : entries(entries) {}
+    Mod(std::initializer_list<ModEntry> entries) : entries(entries) {}
 
     Mod(const Mod&) = delete;
     Mod& operator=(const Mod&) = delete;
@@ -77,7 +88,8 @@ public:
             return;
         auto data = (state == ModState::OFF) ? &ModEntry::orig : &ModEntry::data;
         for(const auto& entry : entries)
-            memcpy(ResolveAddress(entry.addr), (entry.*data).data(), (entry.*data).size());
+            if(!(entry.*data).empty())
+                memcpy(ResolveAddress(entry.addr), (entry.*data).data(), (entry.*data).size());
     }
 
     ModState State() const {

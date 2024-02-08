@@ -106,6 +106,11 @@ Mod SaveDataReadOnly{
     {0x54b267, '\x70', '\x74'},
 };
 
+// 阳光陈化（去除游戏中前 52 个天降阳光掉落更快的设定）
+Mod StabilizeSunDrop{
+    {{0x6a9ec0, 0x768, 0x553c}, 52},
+};
+
 // 暂停刷新
 Mod StopZombieSpawn{
     {0x4265dc, '\xeb', '\x74'},

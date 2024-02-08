@@ -1,5 +1,7 @@
 # AvZ 智能垫材
 
+**本插件已废弃，此后不再更新。请使用 [AvZ DSL](https://gitlab.com/vector-wlc/AsmVsZombies/-/blob/master/tutorial/dsl/0%20%E5%89%8D%E8%A8%80.md)。**
+
 智能垫材插件，支持自动检测卡片CD，多个垫材集合混合使用，智能根据快速僵尸数量调整顺序等功能，且使用方便。
 
 API：
