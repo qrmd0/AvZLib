@@ -172,6 +172,15 @@ Ensure some zombies appear in certain rows for the current wave. Mostly used for
 
 Please DO NOT use this in actual gameplay or batch tests.
 
+```cpp
+EnsureAbsent({GIGA, 2, 3});                   // Ensure giga are absent in row 2 & 3
+EnsureAbsent({{GIGA, 2, 3}, {ZOMBONI, 4}});   // Ensure giga are absent in row 2 & 3 and zomboni are absent in row 4
+```
+
+Ensure some zombies are absent in certain rows for the current wave. Mostly used for demonstration purposes.
+
+Please DO NOT use this in actual gameplay or batch tests.
+
 ### Smart Card
 
 ```cpp
