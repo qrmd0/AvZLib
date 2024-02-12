@@ -154,6 +154,7 @@ Specify the shovel time after using cards.
 RM(400, SUNFLOWER);            // Shovel all sunflowers at 400cs
 RM(400, PUMPKIN, 1, 1);        // Shovel pumpkin at 1-1 (if there is no pumpkin, do nothing)
 RM(400, 1, 1);                 // Shovel 1-1 (non-pumpkin plants first)
+RM(400, {{1, 1}, {1, 2}});     // Shovel 1-1, 1-2 (non-pumpkin plants first)
 RM(400, {1, 2, 5, 6}, 9);      // Shovel 1-9, 2-9, 5-9, 6-9 (non-pumpkin plants first)
 RM(after(751), ...);           // Same usage, taking effect after 751cs
 ```

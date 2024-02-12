@@ -43,7 +43,7 @@ public:
 
 Global global;
 
-// scene related
+// scene 相关
 bool is_night_time()
 {
     auto scene = AvZ::GetMainObject()->scene();
