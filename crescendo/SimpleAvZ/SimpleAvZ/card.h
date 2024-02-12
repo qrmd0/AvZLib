@@ -180,7 +180,7 @@ std::set<PlantType> get_invalid_plants(int row, const std::string& func_name)
     case 5:
         return {GRAVE_BUSTER, LILY_PAD, TANGLE_KELP, SPIKEWEED, SEA_SHROOM, COFFEE_BEAN, CATTAIL, SPIKEROCK};
     default:
-        error(func_name, "不支持的场景: #", AvZ::GetMainObject()->scene());
+        error(func_name, "Unknown scene: #", AvZ::GetMainObject()->scene());
         return {};
     }
 }
@@ -189,13 +189,13 @@ void validate_card_position(const PlantType& plant_type, int row, int col, const
 {
     int max_row = is_visually_six_rows() ? 6 : 5;
     if (row < 1 || row > max_row) {
-        error(func_name, "用卡行应在1~#内\n用卡行: #", max_row, row);
+        error(func_name, "Card row should be within 1~#: #", max_row, row);
     }
     if (col < 1 || col > 9) {
-        error(func_name, "用卡列应在1~9内\n用卡列: #", col);
+        error(func_name, "Card col should be within 1~9: #", col);
     }
     if (get_invalid_plants(row, func_name).count(non_imitater(plant_type))) {
-        error(func_name, "当前场景不可在此行使用此卡片\n卡片: #\n用卡行: #", non_imitater(plant_type), row);
+        error(func_name, "Cannot use this card in the current scene\nCard: #\nCard row: #", non_imitater(plant_type), row);
     }
 }
 
@@ -203,28 +203,29 @@ void validate_shovel_position(int row, int col, const std::string& func_name)
 {
     int max_row = is_visually_six_rows() ? 6 : 5;
     if (row < 1 || row > max_row) {
-        error(func_name, "铲除行应在1~#内\n铲除行: #", max_row, row);
+        error(func_name, "Shovel row should be within 1~#: #", max_row, row);
     }
     if (col < 1 || col > 9) {
-        error(func_name, "铲除列应在1~9内\n铲除列: #", col);
+        error(func_name, "Shovel col should be within 1~9: #", col);
     }
 }
 
 } // namespace _SimpleAvZInternal
 
-// 铲除植物. 可提供单一坐标, 多行同列. 也可指定要铲除的植物种类.
-// *** 使用示例:
-// RM(400, SUNFLOWER)-----------于400cs铲除场地上所有小向
-// RM(400, PUMPKIN, 1, 1)-------铲除1-1南瓜（没有则不铲）
-// RM(400, 1, 1)----------------铲除1-1, 优先铲除非南瓜
-// RM(400, {{1, 1}, {1, 2}})----铲除1-1和1-2, 优先铲除非南瓜
-// RM(400, {1, 2, 5, 6}, 9)-----铲除1,2,5,6路9列, 优先铲除非南瓜
-// RM(after(751), ...)----------用法同上, 延迟751cs生效
+// Shovel plants.
+// You may provide a single position, multiple rows with the same column, or a certain plant type to be shoveled.
+// *** Usage:
+// RM(400, SUNFLOWER)----------- Shovel all sunflowers at 400cs
+// RM(400, PUMPKIN, 1, 1)------- Shovel pumpkin at 1-1 (if there is no pumpkin, do nothing)
+// RM(400, 1, 1)---------------- Shovel 1-1 (non-pumpkin plants first)
+// RM(400, {{1, 1}, {1, 2}})---- Shovel 1-1, 1-2 (non-pumpkin plants first)
+// RM(400, {1, 2, 5, 6}, 9)----- Shovel 1-9, 2-9, 5-9, 6-9 (non-pumpkin plants first)
+// RM(after(751), ...)---------- Same usage, taking effect after 751cs
 void RM(Time time, PlantType target)
 {
     target = _SimpleAvZInternal::non_imitater(target);
     if (target == GRAVE_BUSTER) {
-        _SimpleAvZInternal::error("RM", "墓碑吞噬者无法铲除");
+        _SimpleAvZInternal::error("RM", "Cannot shovel grave buster");
     }
 
     _SimpleAvZInternal::get_effect_time_and_set_time(time, "RM");
@@ -243,7 +244,7 @@ void RM(Time time, PlantType target, int row, int col)
 
     target = _SimpleAvZInternal::non_imitater(target);
     if (target == GRAVE_BUSTER) {
-        _SimpleAvZInternal::error("RM", "墓碑吞噬者无法铲除");
+        _SimpleAvZInternal::error("RM", "Cannot shovel grave buster");
     }
     _SimpleAvZInternal::validate_shovel_position(row, col, "RM");
 
@@ -293,16 +294,16 @@ void RM(Time time, int row, int col)
     RM(time, {{row, col}});
 }
 
-// 夜间用原版冰. 自带生效时机修正.
-// 若不指定生效时间, 默认在本波 601cs 生效.
-// *** 使用示例:
-// I(1, 2)------------------于1-2放置原版冰, 601cs生效(完美预判冰)
-// I(after(210), 1, 2)------延迟210cs生效(ice3), 推荐在激活炮后使用
-// I(359, 1, 2)-------------359cs生效
+// Use ice in nighttime. Effect time is auto-corrected.
+// If effect time is not specified, it defaults to 601cs of the current wave (perfect ice for next wave).
+// *** Usage:
+// I(1, 2)------------------ Place ice at 1-2, taking effect at 601cs (perfect ice)
+// I(after(210), 1, 2)------ Use ice, takeing effect after 210cs (ice3), recommended to be used after activation cobs
+// I(359, 1, 2)------------- Use ice, taking effect at 359cs
 void I(Time time, int row, int col)
 {
     if (!_SimpleAvZInternal::is_night_time()) {
-        _SimpleAvZInternal::error("I", "不可在白昼使用夜间版本的I()\n无需提供用冰位置");
+        _SimpleAvZInternal::error("I", "Cannot use nighttime version of I() at daytime\nThere is no need to provide ice position");
     }
     _SimpleAvZInternal::validate_card_position(ICE_SHROOM, row, col, "I");
 
@@ -316,16 +317,16 @@ void I(int row, int col)
     I(601, row, col);
 }
 
-// 夜间用复制冰. 自带生效时机修正.
-// 若不指定生效时间, 默认在本波 601cs 生效.
-// *** 使用示例:
-// M_I(1, 2)------------------于1-2放置复制冰, 601cs生效(完美预判冰)
-// M_I(after(210), 1, 2)------延迟210cs生效(ice3), 推荐在激活炮后使用
-// M_I(359, 1, 2)-------------359cs生效
+// Use imitater ice in nighttime. Effect time is auto-corrected.
+// If effect time is not specified, it defaults to 601cs of the current wave (perfect ice for next wave).
+// *** Usage:
+// M_I(1, 2)------------------ Place imitater ice at 1-2, taking effect at 601cs (perfect ice)
+// M_I(after(210), 1, 2)------ Use imitater ice, takeing effect after 210cs (ice3), recommended to be used after activation cobs
+// M_I(359, 1, 2)------------- Use imitater ice, taking effect at 359cs
 void M_I(Time time, int row, int col)
 {
     if (!_SimpleAvZInternal::is_night_time()) {
-        _SimpleAvZInternal::error("M_I", "M_I为夜间复制冰函数, 不可在白昼使用");
+        _SimpleAvZInternal::error("M_I", "M_I is for nighttime only");
     }
     _SimpleAvZInternal::validate_card_position(M_ICE_SHROOM, row, col, "M_I");
 
@@ -340,31 +341,31 @@ void M_I(int row, int col)
     M_I(601, row, col);
 }
 
-// 用卡. 可提供单一坐标, 多行同列, 或多卡同坐标.
-// *** 使用示例:
-// C(359, CHERRY, 2, 9)-------------------于2-9放置樱桃, 359cs生效
-// C(400, {PUFF, SUN}, {1, 2}, 9)---------于1-9放置小喷, 2-9放置阳光菇
-// C(359, {LILY, DOOM, COFFEE}, 3, 9)-----于3-9放置荷叶, 核武, 咖啡豆
+// Use cards. You may provide a single position, multiple rows with the same column, or multiple cards at the same position.
+// *** Usage:
+// C(359, CHERRY, 2, 9)------------------- Place cherry at 2-9, taking effect at 359cs
+// C(400, {PUFF, SUN}, {1, 2}, 9)--------- Place puff-shroom at 1-9 and sun-shroom at 2-9
+// C(359, {LILY, DOOM, COFFEE}, 3, 9)----- Place lily pad, doom, and coffee bean at 3-9
 //
-// *** 生效时间的变种:
-// C(after(110), ...)-----------用法同上, 延迟110cs生效
-// C(exact(800), ...)-----------不使用炮等效时间, 800cs生效
-// C(after(exact(..)), ...)-----以上两者的结合
+// *** Alternative forms of card time:
+// C(after(110), ...)----------- Same usage, taking effect after 110cs
+// C(exact(800), ...)----------- Use card-based time instead of cob-based time, taking effect at 800cs
+// C(after(exact(..)), ...)----- Combination of the above two
 //
-// *** 指定铲除时机:
-// C(400, keep(266), ...)-------放置后266cs铲
-// C(400, until(1036), ...)-----1036cs铲
-// 注意: 容器会被一并铲除.
+// *** Specify shovel time:
+// C(400, keep(266), ...)------- Shovel 266cs after effect time
+// C(400, until(1036), ...)----- Shovel at 1036cs
+// Note: containers (lily pad, flower pot) will be shoveled as well.
 void C(Time time, ShovelTime shovel_time, const std::vector<PlantType>& plant_types, const std::vector<int>& rows, int col)
 {
     if (plant_types.empty()) {
-        _SimpleAvZInternal::error("C", "要用的卡片不可为空");
+        _SimpleAvZInternal::error("C", "Must provide the card to use");
     }
     if (rows.empty()) {
-        _SimpleAvZInternal::error("C", "用卡行数不可为空");
+        _SimpleAvZInternal::error("C", "Must provide which row to use the card");
     }
     if (plant_types.size() != rows.size()) {
-        _SimpleAvZInternal::error("C", "卡片数与行数不一致\n卡片数: #\n行数: #", plant_types.size(), rows.size());
+        _SimpleAvZInternal::error("C", "Number of cards and number of rows must be the same\nNumber of cards: #\nNumber of rows: #", plant_types.size(), rows.size());
     }
     for (size_t i = 0; i < plant_types.size(); i++) {
         auto plant_type = plant_types.at(i);
@@ -402,7 +403,7 @@ void C(Time time, const std::vector<PlantType>& plant_types, const std::vector<i
 void C(Time time, ShovelTime shovel_time, const std::vector<PlantType>& plant_types, int row, int col)
 {
     if (plant_types.empty()) {
-        _SimpleAvZInternal::error("C", "要用的卡片不可为空");
+        _SimpleAvZInternal::error("C", "Must provide the card to use");
     }
     for (const auto& plant_type : plant_types) {
         _SimpleAvZInternal::validate_card_position(plant_type, row, col, "C");
@@ -447,11 +448,11 @@ void C(Time time, PlantType plant_type, int row, int col)
     C(time, ShovelTime(), {{plant_type}}, {{row}}, col);
 }
 
-// 智能用卡. 根据本行僵尸情况决定是否用卡.
-// 提供"僵尸是否存在", 以及"僵尸x是否小于某值"两种判断方式.
-// *** 使用示例:
-// C_IF(exist(ZOMBONI), 400, SPIKEWEED, 1, 9)-------若本行存在冰车, 于400cs在1-9放置地刺
-// C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8)-----若本行存在int(x)≤680的白眼或红眼, 于400cs在1-8放置花盆
+// Decide whether or not to use cards depending on zombies.
+// You may either check if a certain type of zombie exists, or check if certain types of zombie's x is smaller than some threshold.
+// *** Usage:
+// C_IF(exist(ZOMBONI), 400, SPIKEWEED, 1, 9)------- If there is zomboni in row 1, place spikeweed at 1-9 at 400cs
+// C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8)----- If there is garg or giga with int(x)≤680, place flower pot at 1-8 at 400cs
 void C_IF(const std::function<bool(int)>& condition, Time time, ShovelTime shovel_time, const PlantType& plant_type, int row, int col)
 {
     _SimpleAvZInternal::validate_card_position(plant_type, row, col, "C");
