@@ -15,3 +15,5 @@
 * [单页布局](./example/single_page.cpp)
 
 * [多页布局](./example/multi_page.cpp)
+
+* [AvZ Win32 Gui TAS](./example/tas.cpp)
