@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2022-2023 Reisen
+Copyright (c) 2022-2024 Reisen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -87,11 +87,6 @@ void SELECT_BY_AVZ_VERSION(DanceCheatNotInQueue, DanceCheat)(DanceCheatMode mode
 #if __AVZ_VERSION__ <= 221001
 void DanceCheat(DanceCheatMode mode) {
     AvZ::InsertOperation([=]{ DanceCheatNotInQueue(mode); });
-}
-#else
-[[nodiscard("ARelOp 需要绑定到时间才会执行")]]
-ARelOp DanceCheatR(DanceCheatMode mode) {
-    return ARelOp([=]{ DanceCheat(mode); });
 }
 #endif
 
