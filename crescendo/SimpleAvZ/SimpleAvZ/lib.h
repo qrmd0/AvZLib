@@ -1,5 +1,7 @@
+// Simple AvZ Version: 1.1.0 (2024/06/28)
+
 // Simple AvZ is an AvZ 1 extension to simplify scripting syntax.
-// Copyright (C) 2023 Crescendo
+// Copyright (C) 2023-2024 Crescendo
 
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -21,6 +23,7 @@
 #include "ice_filler.h"
 #include "iterator.h"
 #include "macro.h"
+#include "maid.h"
 #include "zombie.h"
 
 #ifndef __AVZ_VERSION__

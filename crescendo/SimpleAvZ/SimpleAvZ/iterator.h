@@ -31,7 +31,7 @@ public:
             }
         }
         if (!duplicate_waves.empty()) {
-            error("waves", "duplicate wave in waves(): " + concat(duplicate_waves, ","));
+            error("waves", "waves调用的波次不可重复.\n重复的波次: " + concat(duplicate_waves, ","));
         }
     }
 };
@@ -56,7 +56,7 @@ void init(Wave& wave)
 {
     _SimpleAvZInternal::global.reset_last_effect_time();
     _SimpleAvZInternal::global.last_effect_wave = wave.value;
-    AvZ::SetTime(3000, wave.value); // 如果使用AvZ原生IQ函数且不SetTime, 就会有报错提醒, 而非静默出错
+    AvZ::SetTime(-65535, wave.value); // 如果使用AvZ原生IQ函数且不SetTime, 就会有报错提醒, 而非静默出错
 }
 
 class WaveIterator : public std::iterator<std::input_iterator_tag, Wave> {
@@ -108,12 +108,12 @@ public:
 std::vector<Wave> wave_range_to_waves_vec(const std::array<int, 2>& wave_range, int step, const std::string& func_name)
 {
     if (wave_range[0] > wave_range[1]) {
-        _SimpleAvZInternal::error(func_name, "Start wave should ≤ end wave\nStart wave: #\nEnd wave: #", wave_range[0], wave_range[1]);
+        _SimpleAvZInternal::error(func_name, "起始波数应≤终止波数\n起始波数: #\n终止波数: #", wave_range[0], wave_range[1]);
     }
     std::vector<_SimpleAvZInternal::Wave> waves_vec;
     for (int w = wave_range[0]; w <= wave_range[1]; w += step) {
         if (w < 1 || w > 20) {
-            _SimpleAvZInternal::error(func_name, "Wave should be within 1~20: #", w);
+            _SimpleAvZInternal::error(func_name, "波数应在1~20内\n当前为: #", w);
         }
         _SimpleAvZInternal::waves_validator.waves.push_back(w);
         waves_vec.push_back(
@@ -124,21 +124,21 @@ std::vector<Wave> wave_range_to_waves_vec(const std::array<int, 2>& wave_range, 
 
 }
 
-// Set wave.
-// Basic usage: for (auto w : waves(...)) {
-//                  // here goes your operations...
-//              }
-// *** Usage:
-// waves(1, 2, 3)----------------- w1, w2, w3 (may specify any number of waves)
-// waves({1, 9}, 4)--------------- from w1 to w9, every 4 waves
-// waves({1, 9}, {11, 19}, 4)----- from w1 to w9 and from w11 to w19, every 4 waves
+// 设定波次.
+// 基础用法: for (auto w : waves(...)) {
+//              // 具体操作
+//          }
+// *** 使用例:
+// waves(1, 2, 3)-----------------w1, w2, w3(可指定任意多个)
+// waves({1, 9}, 4)---------------w1-w9 每4波一循环
+// waves({1, 9}, {11, 19}, 4)-----w1-w9, w11-w19 每4波一循环
 template <typename... Args>
 _SimpleAvZInternal::Waves waves(Args... args)
 {
     std::vector<_SimpleAvZInternal::Wave> waves_vec = {_SimpleAvZInternal::Wave(args)...};
     for (const auto& w : waves_vec) {
         if (w.value < 1 || w.value > 20) {
-            _SimpleAvZInternal::error("waves", "Wave should be within 1~20: #", w.value);
+            _SimpleAvZInternal::error("waves", "波数应在1~20内\n波数: #", w.value);
         }
         _SimpleAvZInternal::waves_validator.waves.push_back(w.value);
     }
@@ -148,7 +148,7 @@ _SimpleAvZInternal::Waves waves(Args... args)
 _SimpleAvZInternal::Waves waves(const std::array<int, 2>& wave_range_1, const std::array<int, 2>& wave_range_2, int step)
 {
     if (step <= 0) {
-        _SimpleAvZInternal::error("waves", "Step should >0: #", step);
+        _SimpleAvZInternal::error("waves", "循环长度应>0\n循环长度: #", step);
     }
 
     auto waves_vec_1 = _SimpleAvZInternal::wave_range_to_waves_vec(wave_range_1, step, "waves");
@@ -160,7 +160,7 @@ _SimpleAvZInternal::Waves waves(const std::array<int, 2>& wave_range_1, const st
 _SimpleAvZInternal::Waves waves(const std::array<int, 2>& wave_range, int step)
 {
     if (step <= 0) {
-        _SimpleAvZInternal::error("waves", "Step should >0: #", step);
+        _SimpleAvZInternal::error("waves", "循环长度应>0\n循环长度: #", step);
     }
 
     return _SimpleAvZInternal::Waves(_SimpleAvZInternal::wave_range_to_waves_vec(wave_range, step, "waves"));
