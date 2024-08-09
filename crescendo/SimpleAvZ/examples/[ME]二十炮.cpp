@@ -11,8 +11,6 @@
 #include "SimpleAvZ/lib.h" // v1.1.0
 #include "avz.h"           // 22_10_01
 
-using namespace AvZ;
-
 CobOperator c1(1);
 CobOperator c3(3);
 CobOperator c5(5);

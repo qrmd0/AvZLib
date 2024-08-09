@@ -11,8 +11,6 @@
 #include "SimpleAvZ/lib.h" // v1.1.0
 #include "avz.h"           // 22_10_01
 
-using namespace AvZ;
-
 int leng1 = 1526;
 int leng2 = 1642;
 int leng3 = 631;
