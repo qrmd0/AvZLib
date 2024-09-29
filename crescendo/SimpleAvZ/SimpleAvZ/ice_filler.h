@@ -39,12 +39,20 @@ void set_ice_internal(const std::vector<AvZ::Grid>& ice_positions)
 // SetIce(400, {...})-----------400cs生效
 void SetIce(Time time, const std::vector<AvZ::Grid>& ice_positions)
 {
+    if (_SimpleAvZInternal::is_night_time()) {
+        _SimpleAvZInternal::error("SetIce", "SetIce()为设置存冰位置, 不可在夜间使用\n请使用I()或M_I()");
+    }
+
     _SimpleAvZInternal::set_effect_time_and_update(time, "SetIce");
     _SimpleAvZInternal::set_ice_internal(ice_positions);
 }
 
 void SetIce(const std::vector<AvZ::Grid>& ice_positions)
 {
+    if (_SimpleAvZInternal::is_night_time()) {
+        _SimpleAvZInternal::error("SetIce", "SetIce()为设置存冰位置, 不可在夜间使用\n请使用I()或M_I()");
+    }
+    
     _SimpleAvZInternal::set_time_outside(-599, 1, "SetIce");
     _SimpleAvZInternal::set_ice_internal(ice_positions);
 }

@@ -380,8 +380,6 @@ C_IF(pos({GARG, GIGA}, 680), 400, POT, 1, 8);   // 若本行存在int(x)≤680�
 
 录制演示视频时, 更推荐用 `EnsureExist` 与 `EnsureAbsent`, 因为这样可以展现最复杂的情况.
 
-## v1.1.0 新功能
-
 ### 更多用卡
 
 ```cpp
