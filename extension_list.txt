@@ -20,3 +20,4 @@ sin20/sin20_tools
 vector/win32gui
 vector/showme
 vector/avz1
+xiao_He/MakeSkip
