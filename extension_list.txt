@@ -21,3 +21,4 @@ vector/win32gui
 vector/showme
 vector/avz1
 xiao_He/MakeSkip
+xiao_He/TestCobCd
