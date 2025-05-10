@@ -10,7 +10,7 @@
 
 ## 使用方法
 
-在 Vscode 内 Ctrl + Shift + P -> AvZ: Get AvZ Extention 选择本插件安装后，在 AScript() 外添加此头文件并运行即可:
+在 Vscode 内 Ctrl + Shift + P -> AvZ: Get AvZ Extention 选择本插件安装后，在 AScript() 外添加此头文件并运行即可
 
 ```c++
 #include "ShowWavelength.h"
