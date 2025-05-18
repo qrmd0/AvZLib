@@ -1,6 +1,7 @@
 crescendo/AverageSpawn
 crescendo/Overwatch
 crescendo/SimpleAvZ
+mint/ShowWavelength
 qrmd/GetZombieAbscissas
 qrmd/KeyAssistant
 qrmd/PlantFixerPlus
