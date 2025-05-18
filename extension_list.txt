@@ -17,6 +17,7 @@ Reisen/MousePosPatch
 Reisen/refresh
 shallowdream/shallowdream
 sin20/sin20_tools
+vector/AsmInsertCode
 vector/win32gui
 vector/showme
 vector/avz1
