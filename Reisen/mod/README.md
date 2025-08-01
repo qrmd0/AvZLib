@@ -4,6 +4,7 @@
 
 目前包含以下修改：
 
+- `AccelerateGame`：简化部分非战斗逻辑，加速游戏运行（实验性，建议配合跳帧使用）
 - `AlwaysButter`：玉米投手只投黄油
 - `AlwaysKernel`：玉米投手只投玉米粒
 - `AshInstantExplode`：寒冰菇和灰烬放置后立即生效
@@ -12,8 +13,10 @@
 - `DisableJackExplode`：小丑僵尸与辣椒僵尸不会爆炸
 - `DisableItemDrop`：不掉战利品
 - `DisableSpecialAttack`：不生成墓碑、墓碑僵尸、珊瑚僵尸、空降僵尸
+- `FixCobDrift`：修复“上界之风”
 - `FreePlantingCheat`：卡片不消耗阳光且无冷却时间，紫卡可直接种植（在AvZ1中实际仍有1cs冷却时间，AvZ2不存在此问题）
 - `MushroomAwake`：蘑菇免唤醒
+- `NeverFail`：僵尸进家即死
 - `PlantAnywhere`：无视所有种植限制条件（此修改允许重叠种植，慎用）
 - `PlantInvincible`：植物无敌
 - `PlantWeak`：植物虚弱（受到伤害直接死亡）

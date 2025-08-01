@@ -9,8 +9,7 @@
 #include "mod_avz1.h"
 #endif
 
-// 简化部分非战斗逻辑，加速游戏运行（实验性）
-// 简化部分非战斗逻辑，加速游戏运行（实验性）
+// 简化部分非战斗逻辑，加速游戏运行（实验性，建议配合跳帧使用）
 Mod AccelerateGame{
     {0x40ef00, {0xc2, 0x04, 0x00}, {0x6a, 0xff, 0x64}},
     {0x455930, '\xc3', '\x80'},
@@ -69,6 +68,11 @@ Mod DisableSpecialAttack{
     {0x42694a, '\xeb', '\x75'},
 };
 
+// 修复“上界之风”
+Mod FixCobDrift{
+    {0x46dce3, {0x83, 0x7e, 0x5c, 0x0b, 0x75, 0x04, 0xdd, 0xd8, 0xeb, 0x1b}, {0x75, 0x08, 0xd9, 0x46, 0x34, 0xd8, 0xc1, 0xd9, 0x5e, 0x34}},
+};
+
 // 卡片不消耗阳光且无冷却时间，紫卡可直接种植
 Mod FreePlantingCheat{
     {{0x6a9ec0, 0x814}, '\x01', '\x00'},
@@ -81,6 +85,11 @@ Mod FreePlantingCheat{
 // 蘑菇免唤醒
 Mod MushroomAwake{
     {0x45de8e, '\xeb', '\x74'},
+};
+
+// 僵尸进家即死
+Mod NeverFail{
+    {0x52b308, {0x90, 0x90}, {0x74, 0x07}},
 };
 
 // 无视所有种植限制条件（此修改允许重叠种植，慎用）
