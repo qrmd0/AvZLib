@@ -10,6 +10,7 @@ namespace _SimpleAvZInternal {
 class WavesValidator : AvZ::GlobalVar {
 public:
     std::vector<int> waves = {};
+    bool allow_duplicate_waves = false;
 
     void virtual beforeScript() override
     {
@@ -18,20 +19,20 @@ public:
 
     void virtual afterScript() override
     {
-        int count[21] = {};
-
-        for (int w : waves) {
-            count[w]++;
-        }
-
-        std::vector<int> duplicate_waves;
-        for (int i = 1; i <= 20; i++) {
-            if (count[i] > 1) {
-                duplicate_waves.push_back(i);
+        if (!allow_duplicate_waves) {
+            int count[21] = {};
+            for (int w : waves) {
+                count[w]++;
             }
-        }
-        if (!duplicate_waves.empty()) {
-            error("waves", "waves调用的波次不可重复.\n重复的波次: " + concat(duplicate_waves, ","));
+            std::vector<int> duplicate_waves;
+            for (int i = 1; i <= 20; i++) {
+                if (count[i] > 1) {
+                    duplicate_waves.push_back(i);
+                }
+            }
+            if (!duplicate_waves.empty()) {
+                error("waves", "waves调用的波次不可重复.\n重复的波次: " + concat(duplicate_waves, ","));
+            }
         }
     }
 };
@@ -164,4 +165,9 @@ _SimpleAvZInternal::Waves waves(const std::array<int, 2>& wave_range, int step)
     }
 
     return _SimpleAvZInternal::Waves(_SimpleAvZInternal::wave_range_to_waves_vec(wave_range, step, "waves"));
+}
+
+void allow_duplicate_waves()
+{
+    _SimpleAvZInternal::waves_validator.allow_duplicate_waves = true;
 }

@@ -1,3 +1,7 @@
+## v1.1.2 - 2024/12/21
+
+- Make duplicate waves check togglable
+
 ## v1.1.1 - 2024/09/29
 
 - Fix `SetIce()` doesn't error in night time bug
