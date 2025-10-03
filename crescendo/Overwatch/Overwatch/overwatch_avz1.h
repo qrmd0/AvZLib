@@ -283,7 +283,7 @@ private:
                 if (garg.row() == p.row() && zombie_attack_rect.get_rect_overlap(get_plant_rect(p)) >= 20
                     && !grids_about_to_be_smashed.count({p.row(), p.col()})) {
                     if (watched_plants.count(grid_with_type(p))) {
-                        smash_stats[grid_with_type(p)].add(garg.standState(), 1);
+                        smash_stats[grid_with_type(p)].add(AvZ::GetMainObject()->wave() - 1, 1);
                         garg.state() = 3;
                     } else
                         grids_about_to_be_smashed.insert({p.row(), p.col()});
@@ -296,7 +296,7 @@ private:
     void restore_health() {
         for (auto& p : AvZ::alive_plant_filter) {
             if (watched_plants.count(grid_with_type(p)) && p.hp() && p.hp() < INIT_HP) {
-                hp_stats[grid_with_type(p)].add(AvZ::GetMainObject()->wave(), INIT_HP - p.hp());
+                hp_stats[grid_with_type(p)].add(AvZ::GetMainObject()->wave() - 2, INIT_HP - p.hp());
                 p.hp() = INIT_HP;
             }
         }
@@ -421,6 +421,7 @@ public:
             for (auto zombie_info : enter_home_records)
                 oss << zombie_info.str() << "\n";
         }
+        oss << "注：巨人砸炮按砸炮波数显示\n";
         AvZ::ShowErrorNotInQueue(oss.str());
     }
 };

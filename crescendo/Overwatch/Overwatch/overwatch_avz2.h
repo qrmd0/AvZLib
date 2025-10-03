@@ -284,7 +284,7 @@ private:
                 if (garg.Row() == p.Row() && zombie_attack_rect.get_rect_overlap(get_plant_rect(p)) >= 20
                     && !grids_about_to_be_smashed.count({p.Row(), p.Col()})) {
                     if (watched_plants.count(grid_with_type(p))) {
-                        smash_stats[grid_with_type(p)].add(garg.StandState(), 1);
+                        smash_stats[grid_with_type(p)].add(AGetMainObject()->Wave() - 1, 1);
                         garg.State() = 3;
                     } else
                         grids_about_to_be_smashed.insert({p.Row(), p.Col()});
@@ -297,7 +297,7 @@ private:
     void restore_health() {
         for (auto& p : alivePlantFilter) {
             if (watched_plants.count(grid_with_type(p)) && p.Hp() && p.Hp() < INIT_HP) {
-                hp_stats[grid_with_type(p)].add(AGetMainObject()->Wave(), INIT_HP - p.Hp());
+                hp_stats[grid_with_type(p)].add(AGetMainObject()->Wave() - 2, INIT_HP - p.Hp());
                 p.Hp() = INIT_HP;
             }
         }
@@ -423,6 +423,7 @@ public:
             for (auto zombie_info : enter_home_records)
                 oss << zombie_info.str() << "\n";
         }
+        oss << "注：巨人砸炮按砸炮波数显示\n";
         GetInternalLogger()->Debug(oss.str());
     }
 };
