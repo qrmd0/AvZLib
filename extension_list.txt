@@ -11,6 +11,7 @@ qrmd/TickPlanter
 qrmd/AutoFodder
 qrmd/qmLib
 Reisen/AvZDSL
+Reisen/cob_marker
 Reisen/DanceCheat
 Reisen/fodder
 Reisen/mod
