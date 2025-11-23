@@ -73,7 +73,7 @@ inline void Shovel(const std::vector<AShovelPosition>& lst)
 {
     InsertOperation([=]() {
         for (auto&& each : lst) {
-            AShovel(each.row, each.col, each.pumpkin);
+            AShovel(each.row, each.col, each.targetType);
         }
     });
 }

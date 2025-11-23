@@ -81,7 +81,7 @@ public:
     // setSequentialMode(AvZ::PaoOperator::SPACE) ---- 设置空间使用模式
     void setSequentialMode(int _sequential_mode)
     {
-        InsertOperation([=] { this->SetSequentialMode(_sequential_mode); });
+        InsertOperation([=] { this->SetSequentialMode(ACobManager::SequentialMode(_sequential_mode)); });
     }
 
     // *** In Queue
