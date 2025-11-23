@@ -13,6 +13,7 @@
 - `DisableJackExplode`：小丑僵尸与辣椒僵尸不会爆炸
 - `DisableItemDrop`：不掉战利品
 - `DisableSpecialAttack`：不生成墓碑、墓碑僵尸、珊瑚僵尸、空降僵尸
+- `DisableSunDrop`：取消天降阳光
 - `FixCobDrift`：修复“上界之风”
 - `FreePlantingCheat`：卡片不消耗阳光且无冷却时间，紫卡可直接种植（在AvZ1中实际仍有1cs冷却时间，AvZ2不存在此问题）
 - `MushroomAwake`：蘑菇免唤醒
@@ -22,6 +23,7 @@
 - `PlantWeak`：植物虚弱（受到伤害直接死亡）
 - `RemoveFog`：清除浓雾
 - `SaveDataReadOnly`：存档只读
+- `StabilizeSunDrop`：阳光陈化（去除游戏中前 52 个天降阳光掉落更快的设定）
 - `StopZombieSpawn`：暂停刷新
 - `UnlimitedSun`：不消耗阳光
 
