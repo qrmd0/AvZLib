@@ -240,6 +240,12 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
     }
     if (is_uniform) {
         for (int time = 0; time < timeLength; ++time) {
+            if (zombie_freeze_countdown > 0) {
+                zombie_freeze_countdown--;
+            }
+            if (zombie_slow_countdown > 0) {
+                zombie_slow_countdown--;
+            }
             if (zombie_type == AZOMBONI) {
                 if ((int)zombie_abscissa >= 700) {
                     present_frame_movement = 0.25;
@@ -260,12 +266,6 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
             }
             zombie_abscissa -= present_frame_movement;
             result.emplace_back(zombie_abscissa);
-            if (zombie_freeze_countdown > 0) {
-                zombie_freeze_countdown--;
-            }
-            if (zombie_slow_countdown > 0) {
-                zombie_slow_countdown--;
-            }
         }
     } else {
         float total_movement = zombie_walk.back() - zombie_walk.front();
@@ -275,6 +275,12 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
         float circulation_rate_change = zombie_speed * 47 * 0.01 / total_movement;
         int index_present_frame = 0;
         for (int time = 0; time < timeLength; ++time) {
+            if (zombie_freeze_countdown > 0) {
+                zombie_freeze_countdown--;
+            }
+            if (zombie_slow_countdown > 0) {
+                zombie_slow_countdown--;
+            }            
             index_present_frame = (int)(circulation_rate * (frame_number - 1) + 1);
             if (zombie_freeze_countdown > 0) {
                 present_frame_movement = 0;
@@ -294,12 +300,6 @@ std::vector<float> AGetZombieAbscissas(int index, int timeLength)
                 circulation_rate += circulation_rate_change;
             }
             circulation_rate = circulation_rate > 1 ? circulation_rate - 1 : circulation_rate;
-            if (zombie_freeze_countdown > 0) {
-                zombie_freeze_countdown--;
-            }
-            if (zombie_slow_countdown > 0) {
-                zombie_slow_countdown--;
-            }
         }
     }
     return result;
